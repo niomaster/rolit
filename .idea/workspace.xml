@@ -6,8 +6,8 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/Board.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1384997054973" ignored="false" />
     <file path="/Protocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389284048012" ignored="false" />
-    <file path="/ServerProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389293927745" ignored="false" />
-    <file path="/ClientProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389294061351" ignored="false" />
+    <file path="/ServerProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389294513892" ignored="false" />
+    <file path="/ClientProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389294905780" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +71,7 @@
       <file leaf-file-name="ServerProtocol.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/ServerProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="51" selection-start="213" selection-end="321" vertical-scroll-proportion="0.0">
+            <state line="79" column="55" selection-start="2134" selection-end="2134" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -80,7 +80,7 @@
       <file leaf-file-name="ClientProtocol.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="24" selection-start="407" selection-end="728" vertical-scroll-proportion="0.26578072">
+            <state line="30" column="34" selection-start="722" selection-end="3142" vertical-scroll-proportion="0.39816934">
               <folding />
             </state>
           </provider>
@@ -104,10 +104,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="64" />
-    <option name="y" value="-4" />
-    <option name="width" value="1857" />
-    <option name="height" value="1085" />
+    <option name="x" value="333" />
+    <option name="y" value="203" />
+    <option name="width" value="1855" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -326,8 +326,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-4" width="1857" height="1085" extended-state="6" />
-    <editor active="true" />
+    <frame x="333" y="203" width="1855" height="1056" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -341,7 +341,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24764542" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24792013" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -417,14 +417,14 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/ServerProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="51" selection-start="213" selection-end="321" vertical-scroll-proportion="0.0">
+        <state line="79" column="55" selection-start="2134" selection-end="2134" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="24" selection-start="407" selection-end="728" vertical-scroll-proportion="0.26578072">
+        <state line="30" column="34" selection-start="722" selection-end="3142" vertical-scroll-proportion="0.39816934">
           <folding />
         </state>
       </provider>

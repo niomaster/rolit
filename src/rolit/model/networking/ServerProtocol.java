@@ -77,6 +77,8 @@ public abstract class ServerProtocol {
     public static final int ERROR_HANDSHAKE_MISSING = 7;
     public static final int ERROR_USER_ALREADY_HAS_GAME = 8;
 
+    public static final int HIGHSCORE_UNAVAILABLE = -1;
+
     /**
      * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
      * errors.
