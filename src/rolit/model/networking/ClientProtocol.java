@@ -54,35 +54,52 @@ public abstract class ClientProtocol {
 
     /**
      * Handshake voor de server. Moet altijd het eerste verzonden pakket zijn, met uitzondering van de errors.
+     * @requires Dat de handshake nog niet is ontvangen
+     * @requires Dat dit het eerste pakket op de communicatelijn is.
      * @param clientName Naam van de client.
-     * @param version Versie van het clientprotocol
+     * @param supports Wat de client ondersteunt.
+     * @param version Een beschrijving van wat de client kan.
      */
-    public abstract void hello(String clientName, int version);
+    public abstract void hello(String clientName, int supports, String version);
 
     /**
      * Maak een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client nog geen spel is begonnen
      */
     public abstract void createGame();
 
     /**
      * Join een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler nog niet in een spel zit.
+     * @requires Dat het spel nog niet vol zit.
      * @param creator De maker van het spel
      */
     public abstract void joinGame(String creator);
 
     /**
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat de speler de creator van het spel is.
+     * @requires Dat het spel nog niet is gestart.
      * Start het spel waarvan de gebruiker de creator is.
      */
     public abstract void startGame();
 
     /**
      * Doe een zet
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit
+     * @requires Dat de speler een move-commando heeft ontvangen.
      * @param x X-coördinaat
      * @param y Y-coördinaat
      */
     public abstract void move(int x, int y);
 
     /**
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de server chat-berichten ondersteunt.
      * Stuur een bericht naar iedereen in de lobby of iedereen in het spel
      * @param body Het bericht
      */
@@ -90,12 +107,18 @@ public abstract class ClientProtocol {
 
     /**
      * Daag één ander uit voor een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler niet in een spel zit.
+     * @requires Dat de speler niet een uitdager is.
+     * @requires Dat de speler niet al is uitgedaagd.
+     * @requires Dat de uitgedaagde(n) kunnen worden uitgedaagd.
      * @param other De ander
      */
     public abstract void challenge(String other);
 
     /**
      * Daag twee anderen uit voor een spel
+     * @requires Dat de requirements bij de andere overload worden voldaan.
      * @param other1 De een
      * @param other2 De ander
      */
@@ -103,6 +126,7 @@ public abstract class ClientProtocol {
 
     /**
      * Daag drie anderen uit voor een spel
+     * @requires Dat de requirements bij de andere overload worden voldaan.
      * @param other1 De eerste andere
      * @param other2 De tweede andere
      * @param other3 De derder andere
@@ -111,12 +135,18 @@ public abstract class ClientProtocol {
 
     /**
      * Reageer op een uitdaging
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler is uitgedaagd.
      * @param accept Of de client accepteert
      */
     public abstract void challengeResponse(boolean accept);
 
     /**
      * Vraag highscores op bij de server
+     * @requires Dat de handshake is gedaan
+     * @requires Dat wanneer het type één van "date" of "player" is, arg respectievelijk van het volgende formaat is:
+     *           * yyyy-[m]m-[d]d
+     *           * SpelerNaamZonderSpaties
      * @param type Type highscore (bijv. date, player)
      * @param arg Een argument (bijv. 2014-01-01)
      */

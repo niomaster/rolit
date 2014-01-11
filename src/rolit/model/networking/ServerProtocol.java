@@ -63,6 +63,11 @@ public abstract class ServerProtocol {
     public static final String CAN_BE_CHALLENGED = "canBeChallenged";
 
     /**
+     *
+     */
+    public static final String ONLINE = "online";
+
+    /**
      * Constante voor highscore
      */
     public static final String HIGHSCORE = "highscore";
@@ -82,13 +87,18 @@ public abstract class ServerProtocol {
     /**
      * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
      * errors.
-     * @param version De protocolversie van de server of wat de server ondersteunt.
+     * @requires Dat de handshake van de client is verzonden.
+     * @requires Dat de handshake van de client niet een al ingelodge naam kiest.
+     * @param supports Wat de server ondersteunt.
+     * @param version Een beschrijving van wat de server kan
      */
-    public abstract void handshake(int version);
+    public abstract void handshake(int supports, String version);
 
     /**
      * Commando om de client te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden
      * verbroken.
+     * @requires Dat de client iets fout heeft gedaan...
+     * @requires Dat dit het enige en eerste pakket na de fout is.
      * @param errorCode De error-code, op te zoeken in de errorCode-tabel.
      */
     public abstract void error(int errorCode);
@@ -98,6 +108,9 @@ public abstract class ServerProtocol {
      * Clients krijgen een serie van deze commando's na de handshake om zo een lijst van alle spellen op te bouwen. Als
      * er daarna iets verandert aan het aantal spelers of dat het spel is begonnen moet de server weer een update
      * sturen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client
+     * nog niet de volledige lijst met spellen heeft ontvangen direct na de handshake.
      * @param creator De maker van het spel.
      * @param hasStarted Of het spel al begonnen is.
      * @param noPlayers Het aantal spelers in het spel.
@@ -106,6 +119,10 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om een spel te starten met twee spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat de creator van het spel het spel heeft gestart.
+     * @requires Dat dit bericht nog niet is gestuurd voor dit spel.
      * @param playerOne De eerste speler
      * @param playerTwo De tweede speler
      */
@@ -113,6 +130,7 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om een spel te starten met drie spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
      * @param playerOne De eerste speler
      * @param playerTwo De tweede speler
      * @param playerThree De derde speler
@@ -121,6 +139,7 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om een spel te starten met vier spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
      * @param playerOne De eerste speler
      * @param playerTwo De tweede speler
      * @param playerThree De derde speler
@@ -130,11 +149,19 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om de client te vertellen dat hij een zet moet gaan doen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
+     * @requires Dat de speler ook echt aan de beurt is.
      */
     public abstract void move();
 
     /**
      * Commando om de client te laten weten dat iemand een zet heeft gedaan in het huidige spel.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
+     * @requires Dat de speler die zet heeft gedaan
      * @param name Naam van de speler die de zet heeft gedan.
      * @param x X-coördinaat, waarbij de linkerkant 0 is en de rechterkant 7.
      * @param y Y-coördinaat, waarbij de bovenkant 0 is en de onderkant 7.
@@ -145,6 +172,12 @@ public abstract class ServerProtocol {
      * Commando om de client te laten weten dat het spel is afgelopen, om welke reden dan ook. Eventueel zijn er
      * winnaars als het spel helemaal is voltooid. De server mag bepalen wat er gebeurt als er meerdere mensen dezelfde
      * score hebben.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat:
+     *           * Als het spel is gestart: ofwel het spel is afgelopen volgens de regels van de server ofwel één van de
+     *                 mensen is weggegaan
+     *           * Als het spel niet is gestart: de creator is weggegaan.
      * @param score De hoogste score
      * @param winners De mensen met die score
      */
@@ -152,34 +185,44 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om de client op te hoogte te stellen van een chatbericht
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler dit bericht heeft verzonden.
      * @param name Afzender van het chatbericht
      * @param body Tekst van het chatbericht
      */
     public abstract void message(String name, String body);
 
     /**
-     * Commando om de client op te hoogte te stellen van een uitdaging met twee mensen
+     * Commando om de client op te hoogte te stellen van een uitdaging met twee mensen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler niet is uitgedaagd.
+     * @requires Dat de speler niet in een spel zit.
+     * @requires Dat de speler uitdaagbaar is.
      * @param challenger De uitdager
-     */
-    public abstract void challenge(String challenger);
-
-    /**
-     * Commando om de client op de hoogte te stellen van een uitdaging met drie mensen
-     * @param challenger De uitdager
-     * @param other1 Andere gebruiker
      */
     public abstract void challenge(String challenger, String other1);
 
     /**
-     * Commando om de client op de hoogte te stellen van een uitdaging met vier mensen
+     * Commando om de client op de hoogte te stellen van een uitdaging met drie mensen
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
      * @param challenger De uitdager
-     * @param other1 Andere gebruiker 1
-     * @param other2 Andere gebruiker 2
+     * @param other1 Andere gebruiker
      */
     public abstract void challenge(String challenger, String other1, String other2);
 
     /**
-     * Commando om mensen van een uitdaging op de hoogte te stellen van de status van de andere uitgedaagden.
+     * Commando om de client op de hoogte te stellen van een uitdaging met vier mensen
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
+     * @param challenger De uitdager
+     * @param other1 Andere gebruiker 1
+     * @param other2 Andere gebruiker 2
+     */
+    public abstract void challenge(String challenger, String other1, String other2, String other3);
+
+    /**
+     * Commando om mensen die in een uitdaging zitten op de hoogte te stellen van de status van de uitgedaagden.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client is uitgedaagd.
      * @param name Naam van de uitgedaagde.
      * @param accept Of deze persoon accepteert.
      */
@@ -187,6 +230,8 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om de client op de hoogte te stellen van het veranderen van de status van iemand.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de flag true is als de speler is uitgedaagd of een uitdager is.
      * @param name Naam van de uitgedaagde
      * @param flag Of hij kan worden uitgedaagd.
      */
@@ -194,7 +239,18 @@ public abstract class ServerProtocol {
 
     /**
      * Commando om de client op de hoogte te stellen van de gevraagde highscores.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client heeft gevraagd om highscores.
      * @param args Argumenten
      */
     public abstract void highscore(String[] args);
+
+    /**
+     * Commando om de client op de hoogte te stellen van een gebruiker die inlogt of weggaat
+     * @requires Dat de handshake is gedaan
+     * @requires Dat ófwel er een client bijkomt, ófwel er een client weggaat, ófwel dat de client de lijst met mensen
+     * nog niet in zijn geheel heeft ontvangen na de lijst van spellen. Dit laatste is geen requirement voor servers
+     * zonder chat.
+     */
+    public abstract void online(String name, boolean isOnline);
 }

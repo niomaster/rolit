@@ -1,4 +1,4 @@
 ===
-Rolit Networking Model
+Rolit
 ===
-A model for the rolit networking protocol determined in group INF D.
+Het spel van Pieter en Martijn. Het protocol voor INF D vind men in rolit.model.networking.
