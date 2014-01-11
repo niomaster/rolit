@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="157bc44f-705c-46ce-9714-3d803413bb9d" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rolit/model/networking/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java" afterPath="$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/ServerProtocol.java" afterPath="$PROJECT_DIR$/src/rolit/model/networking/ServerProtocol.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketClientProtocol.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketServerProtocol.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java" afterPath="$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/README" afterPath="$PROJECT_DIR$/src/rolit/model/networking/README" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Rolit.iws" />
@@ -16,11 +14,13 @@
     <file path="/Protocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389284048012" ignored="false" />
     <file path="/ServerProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389397718203" ignored="false" />
     <file path="/ClientProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389398148973" ignored="false" />
-    <file path="/Dummy.txt" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389399407223" ignored="false" />
+    <file path="/Dummy.txt" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389399423468" ignored="false" />
     <file path="/README.md" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389396762795" ignored="false" />
     <file path="/CommonProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389394481342" ignored="false" />
-    <file path="/CommonProtocolConstants.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389399392649" ignored="false" />
-    <file path="/README" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389398616541" ignored="false" />
+    <file path="/CommonProtocolConstants.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389400477962" ignored="false" />
+    <file path="/README" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389400434284" ignored="false" />
+    <file path="/WebSocketServerProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389400670771" ignored="false" />
+    <file path="/WebSocketClientProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389399832927" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,19 +90,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="README" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="1100" selection-end="1100" vertical-scroll-proportion="0.0">
+            <state line="13" column="119" selection-start="1040" selection-end="1040" vertical-scroll-proportion="0.22941177">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CommonProtocol.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="CommonProtocol.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="104" column="5" selection-start="2890" selection-end="2890" vertical-scroll-proportion="2.7036395">
+            <state line="102" column="29" selection-start="2868" selection-end="2868" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WebSocketServerProtocol.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketServerProtocol.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="0" selection-start="1524" selection-end="1524" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WebSocketClientProtocol.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketClientProtocol.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="48" selection-start="286" selection-end="286" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -111,7 +129,7 @@
       <file leaf-file-name="README.md" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="91" selection-start="105" selection-end="105" vertical-scroll-proportion="0.0">
+            <state line="3" column="68" selection-start="82" selection-end="82" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -150,8 +168,10 @@
         <option value="$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/ServerProtocol.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/CommonProtocolConstants.java" />
+        <option value="$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketClientProtocol.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/README" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java" />
+        <option value="$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketServerProtocol.java" />
       </list>
     </option>
   </component>
@@ -242,6 +262,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Rolit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Rolit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="networking" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="extensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="PackagesPane" />
@@ -259,6 +301,118 @@
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RestoreUpdateTree">
+    <UpdateInfo date="Moments ago" ActionInfo="_Update">
+      <UpdatedFiles>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated from server" />
+          <option name="myStatusName" value="Changed on server" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CHANGED_ON_SERVER" />
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Updated" />
+            <option name="myStatusName" value="Changed" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="UPDATED" />
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/README.md</PATH>
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Created" />
+            <option name="myStatusName" value="Created" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="CREATED" />
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Deleted" />
+            <option name="myStatusName" value="Deleted" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="true" />
+            <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Restored" />
+            <option name="myStatusName" value="Will be restored" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="RESTORED" />
+          </FILE-GROUP>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Modified" />
+          <option name="myStatusName" value="Modified" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MODIFIED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Skipped" />
+          <option name="myStatusName" value="Skipped" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SKIPPED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with conflicts" />
+          <option name="myStatusName" value="Will be merged with conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_CONFLICTS" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with tree conflicts" />
+          <option name="myStatusName" value="Merged with tree conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with property conflicts" />
+          <option name="myStatusName" value="Will be merged with property conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged" />
+          <option name="myStatusName" value="Will be merged" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Not in repository" />
+          <option name="myStatusName" value="Not in repository" />
+          <option name="mySupportsDeletion" value="true" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UNKNOWN" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally added" />
+          <option name="myStatusName" value="Locally added" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_ADDED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally removed" />
+          <option name="myStatusName" value="Locally removed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_REMOVED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Switched" />
+          <option name="myStatusName" value="Switched" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SWITCHED" />
+        </FILE-GROUP>
+      </UpdatedFiles>
+    </UpdateInfo>
   </component>
   <component name="RunManager">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
@@ -379,11 +533,16 @@
       <created>1384993717988</created>
       <updated>1384993717988</updated>
     </task>
+    <task id="LOCAL-00001" summary="Compleet protocol">
+      <created>1389399439672</created>
+      <updated>1389399439672</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1855" height="1056" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -392,8 +551,8 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32890365" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32890365" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32890365" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -515,13 +674,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="91" selection-start="105" selection-end="105" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/ClientProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="148" column="42" selection-start="4639" selection-end="4639" vertical-scroll-proportion="0.0">
@@ -529,9 +681,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="1100" selection-end="1100" vertical-scroll-proportion="0.0">
+        <state line="102" column="29" selection-start="2868" selection-end="2868" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketClientProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="48" selection-start="286" selection-end="286" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -543,9 +702,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/CommonProtocol.java">
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/extensions/WebSocketServerProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="5" selection-start="2890" selection-end="2890" vertical-scroll-proportion="2.7036395">
+        <state line="27" column="0" selection-start="1524" selection-end="1524" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="68" selection-start="82" selection-end="82" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="119" selection-start="1040" selection-end="1040" vertical-scroll-proportion="0.22941177">
           <folding />
         </state>
       </provider>

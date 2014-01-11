@@ -11,6 +11,8 @@ Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgend
   zodat jouw server en client extra pakketten kunnen versturen tussen elkaar. Het formaat hiervoor is:
   UniekeNaamVanGroepje_InternVersienummer.
 
+* De line endings zijn nu \r\n, omdat veel lijn-gebaseerde protocollen dit ook gebruiken, waaronder telnet en het http.
+
 Suggesties zijn welkom en kunnen worden geplaatst als issue in de github repository:
 https://github.com/niomaster/rolit/issues/new, of natuurlijk als pull request.
 

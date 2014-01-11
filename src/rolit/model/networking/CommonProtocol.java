@@ -89,7 +89,8 @@ public final class CommonProtocol {
             command += argument;
         }
 
-        output.println(command);
+        output.print(command);
+        output.print("\r\n");
     }
 
     /**
