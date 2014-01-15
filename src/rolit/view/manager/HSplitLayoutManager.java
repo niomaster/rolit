@@ -2,37 +2,32 @@ package rolit.view.manager;
 
 import java.awt.*;
 
-/**
- * @author Pieter Bos
- *
- * Lays out exactly two components stacked vertically, splitting at a given distance from the top or bottom.
- */
-public class VSplitLayoutManager implements LayoutManager {
-    public enum VSplitType {
-        Top,
-        Bottom
+public class HSplitLayoutManager implements LayoutManager {
+    public enum HSplitType {
+        Left,
+        Right
     }
 
     private static final int DEFAULT_SPLIT = 24;
-    private static final VSplitType DEFAULT_TYPE = VSplitType.Top;
+    private static final HSplitType DEFAULT_TYPE = HSplitType.Left;
 
-    private VSplitType splitType;
+    private HSplitType splitType;
     private int split;
 
-    public VSplitLayoutManager(int split, VSplitType type) {
+    public HSplitLayoutManager(int split, HSplitType type) {
         this.splitType = type;
         this.split = split;
     }
 
-    public VSplitLayoutManager(int split) {
+    public HSplitLayoutManager(int split) {
         this(split, DEFAULT_TYPE);
     }
 
-    public VSplitLayoutManager(VSplitType type) {
+    public HSplitLayoutManager(HSplitType type) {
         this(DEFAULT_SPLIT, type);
     }
 
-    public VSplitLayoutManager() {
+    public HSplitLayoutManager() {
         this(DEFAULT_TYPE);
     }
 
@@ -53,7 +48,7 @@ public class VSplitLayoutManager implements LayoutManager {
     public Dimension minimumLayoutSize(Container parent) {
         Dimension size1 = parent.getComponent(0).getMinimumSize();
         Dimension size2 = parent.getComponent(1).getMinimumSize();
-        return new Dimension(Math.max(size1.width, size2.width), size1.height + size2.height);
+        return new Dimension(size1.width + size2.width, Math.max(size1.height, size2.height));
     }
 
     @Override
@@ -62,12 +57,12 @@ public class VSplitLayoutManager implements LayoutManager {
         Dimension size1 = parent.getComponent(0).getPreferredSize();
         Dimension size2 = parent.getComponent(1).getPreferredSize();
 
-        if(splitType == VSplitType.Top) {
-            parent.getComponent(0).setBounds(0, 0, parentSize.width, split);
-            parent.getComponent(1).setBounds(0, split, parentSize.width, parentSize.height - split);
+        if(splitType == HSplitType.Left) {
+            parent.getComponent(0).setBounds(0, 0, split, parentSize.height);
+            parent.getComponent(1).setBounds(split, 0, parentSize.width - split, parentSize.height);
         } else {
-            parent.getComponent(0).setBounds(0, 0, parentSize.width, parentSize.height - split);
-            parent.getComponent(1).setBounds(0, parentSize.height - split, parentSize.width, split);
+            parent.getComponent(0).setBounds(0, 0, parentSize.width - split, parentSize.height);
+            parent.getComponent(1).setBounds(parentSize.width - split, 0, split, parentSize.height);
         }
     }
 }

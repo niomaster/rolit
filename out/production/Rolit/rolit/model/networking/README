@@ -1,0 +1,19 @@
+Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgende dingen toegevoegd:
+
+* het server-side commando "online name isOnline". Als de applicatie geen chat ondersteund kunnen berichten met
+  isOnline=true worden genegeerd en bij isOnline=false moet als diegene een spel heeft dat spel uit de lijst
+  worden gehaald. Als chat wel wordt ondersteund kun je leuke dingen doen als laten zien wie er online zijn.
+
+* De parameter version van de handshake is hernoemd naar supports, om beter aan te geven wat er wordt bedoeld.
+
+* De handshake heeft nu een extra parameter version. **In de standaardversie kan deze parameter worden genegeerd
+  en kan hij de waarde "Standaard" hebben als je hem moet sturen.** Als je wilt kun je hem een andere waarde geven,
+  zodat jouw server en client extra pakketten kunnen versturen tussen elkaar. Het formaat hiervoor is:
+  UniekeNaamVanGroepje_InternVersienummer.
+
+* De line endings zijn nu \r\n, omdat veel lijn-gebaseerde protocollen dit ook gebruiken, waaronder telnet en het http.
+
+Suggesties zijn welkom en kunnen worden geplaatst als issue in de github repository:
+https://github.com/niomaster/rolit/issues/new, of natuurlijk als pull request.
+
+Happy coding!
