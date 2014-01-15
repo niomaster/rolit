@@ -1,4 +1,6 @@
-package rolit.model.networking;
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.CommonProtocol;
 
 /**
  * @author Pieter Bos
@@ -6,7 +8,7 @@ package rolit.model.networking;
  *
  * Abstract class met alle constanten en methodes die gebruikt kunnen worden
  */
-public abstract class ClientProtocol {
+public abstract class ClientProtocol extends CommonProtocol {
     /**
      * Constante voor het handshake-commando
      */

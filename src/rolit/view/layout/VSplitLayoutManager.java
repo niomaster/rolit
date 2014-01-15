@@ -1,4 +1,4 @@
-package rolit.view.manager;
+package rolit.view.layout;
 
 import java.awt.*;
 

@@ -1,6 +1,6 @@
 package rolit.view.client;
 
-import rolit.view.manager.VSplitLayoutManager;
+import rolit.view.layout.VSplitLayoutManager;
 
 import javax.swing.*;
 

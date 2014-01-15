@@ -1,6 +1,8 @@
 package rolit.model.networking.extensions;
 
-public abstract class WebSocketClientProtocol {
+import rolit.model.networking.client.ClientProtocol;
+
+public abstract class WebSocketClientProtocol extends ClientProtocol {
     public static final String GET = "GET";
 
     /**

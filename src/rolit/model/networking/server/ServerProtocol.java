@@ -1,4 +1,8 @@
-package rolit.model.networking;
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.CommonProtocol;
+
+import java.io.IOException;
 
 /**
  * @author Pieter Bos
@@ -6,7 +10,7 @@ package rolit.model.networking;
  *
  * Abstract class met alle constanten en methodes die gebruikt kunnen worden
  */
-public abstract class ServerProtocol {
+public abstract class ServerProtocol extends CommonProtocol {
     /**
      * Constante voor het handshake-commando
      */
@@ -92,7 +96,7 @@ public abstract class ServerProtocol {
      * @param supports Wat de server ondersteunt.
      * @param version Een beschrijving van wat de server kan
      */
-    public abstract void handshake(int supports, String version);
+    public abstract void handshake(int supports, String version) throws IOException;
 
     /**
      * Commando om de client te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden
@@ -101,7 +105,7 @@ public abstract class ServerProtocol {
      * @requires Dat dit het enige en eerste pakket na de fout is.
      * @param errorCode De error-code, op te zoeken in de errorCode-tabel.
      */
-    public abstract void error(int errorCode);
+    public abstract void error(int errorCode) throws IOException;
 
     /**
      * Commando om de client te laten weten dat er óf een nieuw spel is, óf dat er een spel is veranderd in status.
@@ -115,7 +119,7 @@ public abstract class ServerProtocol {
      * @param hasStarted Of het spel al begonnen is.
      * @param noPlayers Het aantal spelers in het spel.
      */
-    public abstract void game(String creator, boolean hasStarted, int noPlayers);
+    public abstract void game(String creator, boolean hasStarted, int noPlayers) throws IOException;
 
     /**
      * Commando om een spel te starten met twee spelers, die in die volgorde een zet moeten doen.
@@ -126,7 +130,7 @@ public abstract class ServerProtocol {
      * @param playerOne De eerste speler
      * @param playerTwo De tweede speler
      */
-    public abstract void start(String playerOne, String playerTwo);
+    public abstract void start(String playerOne, String playerTwo) throws IOException;
 
     /**
      * Commando om een spel te starten met drie spelers, die in die volgorde een zet moeten doen.
@@ -135,7 +139,7 @@ public abstract class ServerProtocol {
      * @param playerTwo De tweede speler
      * @param playerThree De derde speler
      */
-    public abstract void start(String playerOne, String playerTwo, String playerThree);
+    public abstract void start(String playerOne, String playerTwo, String playerThree) throws IOException;
 
     /**
      * Commando om een spel te starten met vier spelers, die in die volgorde een zet moeten doen.
@@ -145,7 +149,7 @@ public abstract class ServerProtocol {
      * @param playerThree De derde speler
      * @param playerFour De vierde speler
      */
-    public abstract void start(String playerOne, String playerTwo, String playerThree, String playerFour);
+    public abstract void start(String playerOne, String playerTwo, String playerThree, String playerFour) throws IOException;
 
     /**
      * Commando om de client te vertellen dat hij een zet moet gaan doen.
@@ -154,7 +158,7 @@ public abstract class ServerProtocol {
      * @requires Dat het spel is gestart.
      * @requires Dat de speler ook echt aan de beurt is.
      */
-    public abstract void move();
+    public abstract void move() throws IOException;
 
     /**
      * Commando om de client te laten weten dat iemand een zet heeft gedaan in het huidige spel.
@@ -166,7 +170,7 @@ public abstract class ServerProtocol {
      * @param x X-coördinaat, waarbij de linkerkant 0 is en de rechterkant 7.
      * @param y Y-coördinaat, waarbij de bovenkant 0 is en de onderkant 7.
      */
-    public abstract void moveDone(String name, int x, int y);
+    public abstract void moveDone(String name, int x, int y) throws IOException;
 
     /**
      * Commando om de client te laten weten dat het spel is afgelopen, om welke reden dan ook. Eventueel zijn er
@@ -181,7 +185,7 @@ public abstract class ServerProtocol {
      * @param score De hoogste score
      * @param winners De mensen met die score
      */
-    public abstract void gameOver(int score, String[] winners);
+    public abstract void gameOver(int score, String[] winners) throws IOException;
 
     /**
      * Commando om de client op te hoogte te stellen van een chatbericht
@@ -190,7 +194,7 @@ public abstract class ServerProtocol {
      * @param name Afzender van het chatbericht
      * @param body Tekst van het chatbericht
      */
-    public abstract void message(String name, String body);
+    public abstract void message(String name, String body) throws IOException;
 
     /**
      * Commando om de client op te hoogte te stellen van een uitdaging met twee mensen.
@@ -200,7 +204,7 @@ public abstract class ServerProtocol {
      * @requires Dat de speler uitdaagbaar is.
      * @param challenger De uitdager
      */
-    public abstract void challenge(String challenger, String other1);
+    public abstract void challenge(String challenger, String other1) throws IOException;
 
     /**
      * Commando om de client op de hoogte te stellen van een uitdaging met drie mensen
@@ -208,7 +212,7 @@ public abstract class ServerProtocol {
      * @param challenger De uitdager
      * @param other1 Andere gebruiker
      */
-    public abstract void challenge(String challenger, String other1, String other2);
+    public abstract void challenge(String challenger, String other1, String other2) throws IOException;
 
     /**
      * Commando om de client op de hoogte te stellen van een uitdaging met vier mensen
@@ -217,7 +221,7 @@ public abstract class ServerProtocol {
      * @param other1 Andere gebruiker 1
      * @param other2 Andere gebruiker 2
      */
-    public abstract void challenge(String challenger, String other1, String other2, String other3);
+    public abstract void challenge(String challenger, String other1, String other2, String other3) throws IOException;
 
     /**
      * Commando om mensen die in een uitdaging zitten op de hoogte te stellen van de status van de uitgedaagden.
@@ -226,7 +230,7 @@ public abstract class ServerProtocol {
      * @param name Naam van de uitgedaagde.
      * @param accept Of deze persoon accepteert.
      */
-    public abstract void challengeResponse(String name, boolean accept);
+    public abstract void challengeResponse(String name, boolean accept) throws IOException;
 
     /**
      * Commando om de client op de hoogte te stellen van het veranderen van de status van iemand.
@@ -235,7 +239,7 @@ public abstract class ServerProtocol {
      * @param name Naam van de uitgedaagde
      * @param flag Of hij kan worden uitgedaagd.
      */
-    public abstract void canBeChallenged(String name, boolean flag);
+    public abstract void canBeChallenged(String name, boolean flag) throws IOException;
 
     /**
      * Commando om de client op de hoogte te stellen van de gevraagde highscores.
@@ -243,7 +247,7 @@ public abstract class ServerProtocol {
      * @requires Dat de client heeft gevraagd om highscores.
      * @param args Argumenten
      */
-    public abstract void highscore(String[] args);
+    public abstract void highscore(String[] args) throws IOException;
 
     /**
      * Commando om de client op de hoogte te stellen van een gebruiker die inlogt of weggaat
@@ -252,5 +256,5 @@ public abstract class ServerProtocol {
      * nog niet in zijn geheel heeft ontvangen na de lijst van spellen. Dit laatste is geen requirement voor servers
      * zonder chat.
      */
-    public abstract void online(String name, boolean isOnline);
+    public abstract void online(String name, boolean isOnline) throws IOException;
 }

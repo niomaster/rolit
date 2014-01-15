@@ -1,7 +1,6 @@
-package rolit.view.manager;
+package rolit.view.layout;
 
 import java.awt.*;
-import java.util.LinkedList;
 
 /**
  * @author Pieter Bos

@@ -1,10 +1,6 @@
-package rolit.view.manager;
-
-import com.sun.javaws.exceptions.InvalidArgumentException;
+package rolit.view.layout;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * @author Pieter Bos

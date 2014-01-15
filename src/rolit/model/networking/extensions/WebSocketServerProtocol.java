@@ -1,6 +1,6 @@
 package rolit.model.networking.extensions;
 
-import rolit.model.networking.ServerProtocol;
+import rolit.model.networking.server.ServerProtocol;
 
 /**
  * @author Pieter Bos

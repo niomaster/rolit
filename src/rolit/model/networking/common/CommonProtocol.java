@@ -1,4 +1,4 @@
-package rolit.model.networking;
+package rolit.model.networking.common;
 
 import java.io.*;
 
@@ -8,7 +8,7 @@ import java.io.*;
  *
  *
  */
-public final class CommonProtocol {
+public class CommonProtocol {
     /**
      * Constante om aan te geven dat de client of server alleen de basisdingen kan doen.
      */
@@ -45,6 +45,16 @@ public final class CommonProtocol {
     public static final String VERSION_NONE = "Standaard";
 
     /**
+     * Einde van regels
+     */
+    public static final String LINE_ENDING = "\r\n";
+
+    /**
+     * Delimiter van commando's
+     */
+    public static final String COMMAND_DELIMITER = " ";
+
+    /**
      * Methode om van een {@code OutputStream} een correcte {@code PrintStream} te maken.
      * @param output De {@code OutputStream}
      * @return de {@code PrintStream}
@@ -62,7 +72,7 @@ public final class CommonProtocol {
      * @param input De {@code InputStream}
      * @return De {@code BufferedReader}
      */
-    public BufferedReader getInputStreamReader(InputStream input) {
+    public BufferedReader getBufferedReader(InputStream input) {
         try {
             return new BufferedReader(new InputStreamReader(input, "UTF-8"));
         } catch (UnsupportedEncodingException e) {

@@ -1,8 +1,8 @@
 package rolit.view.client;
 
-import rolit.view.manager.GridLayoutManager;
-import rolit.view.manager.HSplitLayoutManager;
-import rolit.view.manager.VSplitLayoutManager;
+import rolit.view.layout.GridLayoutManager;
+import rolit.view.layout.HSplitLayoutManager;
+import rolit.view.layout.VSplitLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;

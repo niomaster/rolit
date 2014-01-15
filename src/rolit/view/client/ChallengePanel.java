@@ -1,9 +1,9 @@
 package rolit.view.client;
 
-import rolit.view.manager.CenterLayoutManager;
-import rolit.view.manager.GridLayoutManager;
-import rolit.view.manager.HBoxLayoutManager;
-import rolit.view.manager.VBoxLayoutManager;
+import rolit.view.layout.CenterLayoutManager;
+import rolit.view.layout.GridLayoutManager;
+import rolit.view.layout.HBoxLayoutManager;
+import rolit.view.layout.VBoxLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;

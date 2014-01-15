@@ -1,7 +1,7 @@
 package rolit.view.client;
 
-import rolit.view.manager.HBoxLayoutManager;
-import rolit.view.manager.LeftRightLayoutManager;
+import rolit.view.layout.HBoxLayoutManager;
+import rolit.view.layout.LeftRightLayoutManager;
 
 import javax.swing.*;
 

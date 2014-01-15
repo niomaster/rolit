@@ -1,9 +1,8 @@
 package rolit.view.client;
 
-import rolit.view.manager.*;
+import rolit.view.layout.*;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 
 public class GameListPanel extends JPanel {
