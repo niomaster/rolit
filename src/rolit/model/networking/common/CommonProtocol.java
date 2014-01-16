@@ -86,7 +86,7 @@ public class CommonProtocol {
      * @param output De {@code PrintStream}
      */
     public void writeCommandTo(String[] commandParts, PrintStream output) {
-        boolean first = false;
+        boolean first = true;
         String command = "";
 
         for(String argument : commandParts) {
