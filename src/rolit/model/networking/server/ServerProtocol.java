@@ -94,6 +94,21 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final int HIGHSCORE_UNAVAILABLE = -1;
 
     /**
+     * Status om aan te geven dat de creator voortijdig is weggegaan
+     */
+    public static final int STATUS_PREMATURE_LEAVE = -1;
+
+    /**
+     * Status om aan te geven dat het spel nog niet is gestart.
+     */
+    public static final int STATUS_NOT_STARTED = 0;
+
+    /**
+     * Status om aan te geven dat het spel is gestart.
+     */
+    public static final int STATUS_STARTED = 1;
+
+    /**
      * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
      * errors.
      * @requires Dat de handshake van de client is verzonden.
@@ -143,10 +158,10 @@ public abstract class ServerProtocol extends CommonProtocol {
      * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client
      * nog niet de volledige lijst met spellen heeft ontvangen direct na de handshake.
      * @param creator De maker van het spel.
-     * @param hasStarted Of het spel al begonnen is.
+     * @param hasStarted De status van het spel.
      * @param noPlayers Het aantal spelers in het spel.
      */
-    public abstract void game(String creator, boolean hasStarted, int noPlayers) throws IOException;
+    public abstract void game(String creator, int status, int noPlayers) throws IOException;
 
     /**
      * Commando om een spel te starten met twee spelers, die in die volgorde een zet moeten doen.
@@ -205,10 +220,10 @@ public abstract class ServerProtocol extends CommonProtocol {
      * score hebben.
      * @requires Dat de handshake is gedaan.
      * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
      * @requires Dat:
      *           * Als het spel is gestart: ofwel het spel is afgelopen volgens de regels van de server ofwel één van de
      *                 mensen is weggegaan
-     *           * Als het spel niet is gestart: de creator is weggegaan.
      * @param score De hoogste score
      * @param winners De mensen met die score
      */

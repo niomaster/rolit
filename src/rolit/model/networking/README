@@ -26,6 +26,14 @@ Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgend
 * Argumenten en commando's worden gesplitst door exact één spatie, dat was in de implementatie van CommonProtocol niet
   zo.
 
+* De hasStarted-parameter heet nu status en het type is veranderd naar een integer. Hij neemt de waarde -1 aan als het
+  spel voortijdig is beëindigd, 0 als het spel nog niet is gestart en 1 als het spel is gestart. Bij de documentatie 
+  van gameOver stond eerst dat hij moest worden verstuurd als de creator weg ging, maar het is ook nodig voor andere
+  gebruikers om die informatie te krijgen voordat het spel begint. Daarom hoeft dat nu niet meer. Als de creator weg
+  gaat tijdens het spel stuurt de server zowel een game-commando als een gameOver-commando naar de spelers die er nog
+  zijn, aangezien de highscores nogsteeds wel relevant kunnen zijn. Als iemand anders dan de creator weg gaat wordt er
+  alleen een gameOver-commando gestuurd naar alle spelers die nog in het spel zitten.
+
 Suggesties zijn welkom en kunnen worden geplaatst als issue in de github repository:
 https://github.com/niomaster/rolit/issues/new, of natuurlijk als pull request.
 
