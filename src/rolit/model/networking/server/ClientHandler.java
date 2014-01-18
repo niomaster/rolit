@@ -1,9 +1,7 @@
 package rolit.model.networking.server;
 
-import rolit.model.game.Game;
 import rolit.model.networking.client.ClientProtocol;
 import rolit.model.networking.common.Command;
-import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.ProtocolException;
 import rolit.util.Strings;
 
@@ -53,6 +51,16 @@ public class ClientHandler extends ServerProtocol implements Runnable {
     @Override
     public synchronized void handshake(int supports, String version) throws IOException {
         new Command(ServerProtocol.HANDSHAKE, supports, version).writeTo(output);
+    }
+
+    @Override
+    public void handshake(int supports, String version, String nonce) throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void authOk() throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -225,7 +233,7 @@ public class ClientHandler extends ServerProtocol implements Runnable {
                 clientVersion = (String) handshake.getArgument(2);
 
                 if(user == null) {
-                    throw new ProtocolException("Invalid authentication for user " + ((String) handshake.getArgument(0)), ServerProtocol.ERROR_INVALID_NAME);
+                    throw new ProtocolException("Invalid authentication for user " + ((String) handshake.getArgument(0)), ServerProtocol.ERROR_INVALID_LOGIN);
                 }
 
                 handshake(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION);

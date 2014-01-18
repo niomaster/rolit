@@ -1,0 +1,2092 @@
+package rolit.view.layout;
+
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Lays out exactly two components stacked vertically, splitting at a given distance from the top or bottom.
+ */
+public class VSplitLayoutManager implements LayoutManager {
+    public enum VSplitType {
+        Top,
+        Bottom
+    }
+
+    private static final int DEFAULT_SPLIT = 24;
+    private static final VSplitType DEFAULT_TYPE = VSplitType.Top;
+
+    private VSplitType splitType;
+    private int split;
+
+    public VSplitLayoutManager(int split, VSplitType type) {
+        this.splitType = type;
+        this.split = split;
+    }
+
+    public VSplitLayoutManager(int split) {
+        this(split, DEFAULT_TYPE);
+    }
+
+    public VSplitLayoutManager(VSplitType type) {
+        this(DEFAULT_SPLIT, type);
+    }
+
+    public VSplitLayoutManager() {
+        this(DEFAULT_TYPE);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        return parent.getParent().getMinimumSize();
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        Dimension size1 = parent.getComponent(0).getMinimumSize();
+        Dimension size2 = parent.getComponent(1).getMinimumSize();
+        return new Dimension(Math.max(size1.width, size2.width), size1.height + size2.height);
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        Dimension parentSize = parent.getSize();
+        Dimension size1 = parent.getComponent(0).getPreferredSize();
+        Dimension size2 = parent.getComponent(1).getPreferredSize();
+
+        if(splitType == VSplitType.Top) {
+            parent.getComponent(0).setBounds(0, 0, parentSize.width, split);
+            parent.getComponent(1).setBounds(0, split, parentSize.width, parentSize.height - split);
+        } else {
+            parent.getComponent(0).setBounds(0, 0, parentSize.width, parentSize.height - split);
+            parent.getComponent(1).setBounds(0, parentSize.height - split, parentSize.width, split);
+        }
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Lays out all components horizontally with a given gap, aligned to the top.
+ */
+public class HBoxLayoutManager implements LayoutManager {
+    private static final int DEFAULT_GAP = 8;
+
+    private int gap;
+
+    public HBoxLayoutManager(int gap) {
+        this.gap = gap;
+    }
+
+    public HBoxLayoutManager() {
+        this(DEFAULT_GAP);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        int max = 0;
+        int totalWidth = 0;
+
+        for(int i = parent.getComponentCount() - 1; i >= 0; i--) {
+            if(parent.getComponent(i).getMinimumSize().height > max) {
+                max = parent.getComponent(i).getMinimumSize().height;
+            }
+
+            totalWidth += parent.getComponent(i).getMinimumSize().width;
+        }
+
+        return new Dimension(totalWidth + (parent.getComponentCount() - 1) * gap, max);
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        return preferredLayoutSize(parent);
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        int currentX = 0;
+
+        int components = parent.getComponentCount();
+
+        for(int i = 0; i < components; i++) {
+            Component component = parent.getComponent(i);
+            component.setBounds(currentX, 0, component.getPreferredSize().width, component.getPreferredSize().height);
+
+            currentX += component.getPreferredSize().width + gap;
+        }
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Always centers a single component.
+ */
+public class CenterLayoutManager implements LayoutManager {
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        Component component = parent.getComponent(0);
+        return component.getMinimumSize();
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        return preferredLayoutSize(parent);
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        Dimension parentSize = parent.getSize();
+        Component component = parent.getComponent(0);
+        Dimension componentSize = component.getPreferredSize();
+        component.setBounds((parentSize.width - componentSize.width) / 2, (parentSize.height - componentSize.height) / 2, componentSize.width, componentSize.height);
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Stacks all components vertically with a given gap. The components are left-aligned.
+ */
+public class VBoxLayoutManager implements LayoutManager {
+    private static final int DEFAULT_GAP = 8;
+
+    private int gap;
+
+    public VBoxLayoutManager(int gap) {
+        this.gap = gap;
+    }
+
+    public VBoxLayoutManager() {
+        this(DEFAULT_GAP);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        int max = 0;
+        int totalHeight = 0;
+
+        for(int i = parent.getComponentCount() - 1; i >= 0; i--) {
+            if(parent.getComponent(i).getMinimumSize().width > max) {
+                max = parent.getComponent(i).getMinimumSize().width;
+            }
+
+            totalHeight += parent.getComponent(i).getMinimumSize().height;
+        }
+
+        return new Dimension(max, totalHeight + (parent.getComponentCount() - 1) * gap);
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        return preferredLayoutSize(parent);
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        int currentY = 0;
+
+        int components = parent.getComponentCount();
+
+        for(int i = 0; i < components; i++) {
+            Component component = parent.getComponent(i);
+            component.setBounds(0, currentY, component.getPreferredSize().width, component.getPreferredSize().height);
+
+            currentY += component.getPreferredSize().height + gap;
+        }
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+public class HSplitLayoutManager implements LayoutManager {
+    public enum HSplitType {
+        Left,
+        Right
+    }
+
+    private static final int DEFAULT_SPLIT = 24;
+    private static final HSplitType DEFAULT_TYPE = HSplitType.Left;
+
+    private HSplitType splitType;
+    private int split;
+
+    public HSplitLayoutManager(int split, HSplitType type) {
+        this.splitType = type;
+        this.split = split;
+    }
+
+    public HSplitLayoutManager(int split) {
+        this(split, DEFAULT_TYPE);
+    }
+
+    public HSplitLayoutManager(HSplitType type) {
+        this(DEFAULT_SPLIT, type);
+    }
+
+    public HSplitLayoutManager() {
+        this(DEFAULT_TYPE);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        return parent.getParent().getMinimumSize();
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        Dimension size1 = parent.getComponent(0).getMinimumSize();
+        Dimension size2 = parent.getComponent(1).getMinimumSize();
+        return new Dimension(size1.width + size2.width, Math.max(size1.height, size2.height));
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        Dimension parentSize = parent.getSize();
+        Dimension size1 = parent.getComponent(0).getPreferredSize();
+        Dimension size2 = parent.getComponent(1).getPreferredSize();
+
+        if(splitType == HSplitType.Left) {
+            parent.getComponent(0).setBounds(0, 0, split, parentSize.height);
+            parent.getComponent(1).setBounds(split, 0, parentSize.width - split, parentSize.height);
+        } else {
+            parent.getComponent(0).setBounds(0, 0, parentSize.width - split, parentSize.height);
+            parent.getComponent(1).setBounds(parentSize.width - split, 0, split, parentSize.height);
+        }
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Lays out exactly two components left and right, with a given minimum gap.
+ */
+public class LeftRightLayoutManager implements LayoutManager {
+    private static final int DEFAULT_MINIMUM_GAP = 8;
+
+    private int minimumGap;
+
+    public LeftRightLayoutManager(int minimumGap) {
+        this.minimumGap = minimumGap;
+    }
+
+    public LeftRightLayoutManager() {
+        this(DEFAULT_MINIMUM_GAP);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        int width = Math.max(minimumLayoutSize(parent).width, parent.getParent().getPreferredSize().width);
+        int height = minimumLayoutSize(parent).height;
+        return new Dimension(width, height);
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        Dimension size1 = parent.getComponent(0).getPreferredSize();
+        Dimension size2 = parent.getComponent(1).getPreferredSize();
+        return new Dimension(size1.width + size2.width + minimumGap, Math.max(size1.height, size2.height));
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        int height = minimumLayoutSize(parent).height;
+        Dimension size1 = parent.getComponent(0).getPreferredSize();
+        Dimension size2 = parent.getComponent(1).getPreferredSize();
+        parent.getComponent(0).setBounds(0, (height - size1.height) / 2, size1.width, size1.height);
+        parent.getComponent(1).setBounds(parent.getSize().width - size2.width, (height - size2.height) / 2, size2.width, size2.height);
+    }
+}
+package rolit.view.layout;
+
+import java.awt.*;
+
+public class GridLayoutManager implements LayoutManager {
+    private static final int DEFAULT_GAP = 8;
+
+    private int width;
+    private int height;
+    private int gap;
+
+    public GridLayoutManager(int width, int height, int gap) {
+        this.width = width;
+        this.height = height;
+        this.gap = gap;
+    }
+
+    public GridLayoutManager(int width, int height) {
+        this(width, height, DEFAULT_GAP);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {
+    }
+
+    @Override
+    public void removeLayoutComponent(Component comp) {
+    }
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+        int[] x = new int[width + 1];
+        int[] y = new int[height + 1];
+
+        for(int i = 0; i < height; i++) {
+            int maxHeight = 0;
+
+            for(int j = 0; j < width; j++) {
+                Dimension size = parent.getComponent(j + i * width).getPreferredSize();
+                if(size.height > maxHeight) {
+                    maxHeight = size.height;
+                }
+            }
+
+            y[i + 1] = y[i] + maxHeight;
+        }
+
+        for(int i = 0; i < width; i++) {
+            int maxWidth = 0;
+
+            for(int j = 0; j < height; j++) {
+                Dimension size = parent.getComponent(i + j * width).getPreferredSize();
+                if(size.width > maxWidth) {
+                    maxWidth = size.width;
+                }
+            }
+
+            x[i + 1] = x[i] + maxWidth;
+        }
+
+        return new Dimension(x[width] + (width - 1) * gap, y[height] + (height - 1) * gap);
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+        return preferredLayoutSize(parent);
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+        int[] x = new int[width + 1];
+        int[] y = new int[height + 1];
+
+        for(int i = 0; i < height; i++) {
+            int maxHeight = 0;
+
+            for(int j = 0; j < width; j++) {
+                Dimension size = parent.getComponent(j + i * width).getPreferredSize();
+                if(size.height > maxHeight) {
+                    maxHeight = size.height;
+                }
+            }
+
+            y[i + 1] = y[i] + maxHeight + gap;
+        }
+
+        for(int i = 0; i < width; i++) {
+            int maxWidth = 0;
+
+            for(int j = 0; j < height; j++) {
+                Dimension size = parent.getComponent(i + j * width).getPreferredSize();
+                if(size.width > maxWidth) {
+                    maxWidth = size.width;
+                }
+            }
+
+            x[i + 1] = x[i] + maxWidth + gap;
+        }
+
+        for(int i = 0; i < width; i++) {
+            for(int j = 0; j < height; j++) {
+                parent.getComponent(i + j * width).setBounds(x[i], y[j], x[i + 1] - x[i] - gap, y[j + 1] - y[j] - gap);
+            }
+        }
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.VSplitLayoutManager;
+
+import javax.swing.*;
+
+public class ChatPanel extends JPanel {
+    private JTextArea textArea;
+    private JTextField textField;
+
+    public ChatPanel() {
+        setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Bottom));
+
+        textArea = new JTextArea();
+        textField = new JTextField();
+
+        add(textArea);
+        add(textField);
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.*;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class GameListPanel extends JPanel {
+    public GameListPanel() {
+        setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Top));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new HSplitLayoutManager(200, HSplitLayoutManager.HSplitType.Right));
+
+        JPanel gamesPanel = new JPanel();
+        gamesPanel.setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Bottom));
+
+        JPanel listPanel = new JPanel();
+        listPanel.setLayout(new GridLayoutManager(3, 3));
+
+        listPanel.add(new JLabel("Spelmaker"));
+        listPanel.add(new JLabel("Aantal spelers"));
+        listPanel.add(Box.createGlue());
+        listPanel.add(new JLabel("Pieter"));
+        listPanel.add(new JLabel("2"));
+        listPanel.add(new JButton("Meedoen"));
+        listPanel.add(new JLabel("Martijn"));
+        listPanel.add(new JLabel("4"));
+        JButton joinGameButton = new JButton("Meedoen");
+        joinGameButton.setEnabled(false);
+        listPanel.add(joinGameButton);
+
+
+        JPanel buttonsArrayPanel = new JPanel();
+        buttonsArrayPanel.setLayout(new HBoxLayoutManager());
+
+        JButton createGameButton = new JButton("Maak spel");
+        JButton challengeButton = new JButton("Daag een speler uit");
+
+        buttonsArrayPanel.add(createGameButton);
+        buttonsArrayPanel.add(challengeButton);
+
+        gamesPanel.add(listPanel);
+        gamesPanel.add(buttonsArrayPanel);
+
+        mainPanel.add(gamesPanel);
+        mainPanel.add(new ChatPanel());
+
+        add(new ServerPanel());
+        add(mainPanel);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(new GameListPanel());
+        frame.setSize(640, 480);
+        frame.setMinimumSize(new Dimension(640, 480));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.CenterLayoutManager;
+import rolit.view.layout.LeftRightLayoutManager;
+import rolit.view.layout.VBoxLayoutManager;
+
+import javax.swing.*;
+import java.awt.*;
+
+/**
+ * @author Pieter Bos
+ *
+ * Panel to connect to a server.
+ */
+public class ConnectPanel extends JPanel {
+    private static final int DEFAULT_TEXT_FIELD_WIDTH = 200;
+    private static final int DEFAULT_TEXT_FIELD_HEIGHT = 24;
+
+    private JTextField hostname;
+    private JTextField userName;
+    private JButton loginButton;
+
+    public ConnectPanel() {
+        setLayout(new CenterLayoutManager());
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new VBoxLayoutManager());
+
+        JLabel logInLabel = new JLabel("Verbinden met server");
+        panel.add(logInLabel);
+
+        JPanel panel1 = new JPanel();
+        panel1.setLayout(new LeftRightLayoutManager());
+
+        JLabel hostnameLabel = new JLabel("Hostname");
+        hostname = new JTextField();
+        hostname.setPreferredSize(new Dimension(DEFAULT_TEXT_FIELD_WIDTH, DEFAULT_TEXT_FIELD_HEIGHT));
+        panel1.add(hostnameLabel);
+        panel1.add(hostname);
+        panel.add(panel1);
+
+        JPanel panel2 = new JPanel();
+        panel2.setLayout(new LeftRightLayoutManager());
+
+        JLabel userNameLabel = new JLabel("Gebruikersnaam");
+        userName = new JTextField();
+        userName.setPreferredSize(new Dimension(DEFAULT_TEXT_FIELD_WIDTH, DEFAULT_TEXT_FIELD_HEIGHT));
+        panel2.add(userNameLabel);
+        panel2.add(userName);
+        panel.add(panel2);
+
+        JPanel panel3 = new JPanel();
+        panel3.setLayout(new LeftRightLayoutManager());
+
+
+        loginButton = new JButton("Inloggen");
+        panel3.add(Box.createGlue());
+        panel3.add(loginButton);
+        panel.add(panel3);
+
+        add(panel);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame window = new JFrame();
+        window.getContentPane().add(new ConnectPanel());
+        window.setSize(640, 480);
+        window.setMinimumSize(new Dimension(640, 480));
+        window.setVisible(true);
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.HBoxLayoutManager;
+import rolit.view.layout.LeftRightLayoutManager;
+
+import javax.swing.*;
+
+public class ServerPanel extends JPanel {
+    JLabel serverConnectionLabel;
+    JLabel userNameLabel;
+    JButton logoutButton;
+
+    public ServerPanel() {
+        setLayout(new LeftRightLayoutManager());
+
+        serverConnectionLabel = new JLabel("Verbonden met pieterbos.me:667");
+        add(serverConnectionLabel);
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new HBoxLayoutManager());
+
+        userNameLabel = new JLabel("Ingelogd als Pieter");
+        logoutButton = new JButton("Uitloggen");
+
+        rightPanel.add(userNameLabel);
+        rightPanel.add(logoutButton);
+
+        add(rightPanel);
+    }
+}
+package rolit.view.client;
+
+import javax.swing.*;
+
+public class MainView extends JFrame {
+    
+}
+package rolit.view.client;
+
+import rolit.view.layout.CenterLayoutManager;
+import rolit.view.layout.GridLayoutManager;
+import rolit.view.layout.HBoxLayoutManager;
+import rolit.view.layout.VBoxLayoutManager;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class ChallengePanel extends JPanel {
+    public ChallengePanel() {
+        setLayout(new CenterLayoutManager());
+        setSize(new Dimension(300, 1));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new VBoxLayoutManager());
+
+        JLabel challengeLabel = new JLabel("Daag mensen uit:");
+
+        JPanel challengePanel = new JPanel();
+        challengePanel.setLayout(new HBoxLayoutManager());
+
+        JComboBox players = new JComboBox<String>();
+        players.addItem("Pieter");
+        players.addItem("Martijn");
+
+        JButton challengeButton = new JButton("Uitdagen");
+
+        challengePanel.add(players);
+        challengePanel.add(challengeButton);
+
+        JLabel challengedPeople = new JLabel("Uitgedaagde mensen:");
+
+        JPanel challengedPanel = new JPanel();
+        challengedPanel.setLayout(new GridLayoutManager(2, 2));
+        challengedPanel.add(new JLabel("Laurens"));
+        challengedPanel.add(new JButton("Verwijder"));
+        challengedPanel.add(new JLabel("Sophie"));
+        challengedPanel.add(new JButton("Verwijder"));
+
+        mainPanel.add(challengeLabel);
+        mainPanel.add(challengePanel);
+        mainPanel.add(Box.createGlue());
+        mainPanel.add(challengedPeople);
+        mainPanel.add(challengedPanel);
+
+        add(mainPanel);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(new ChallengePanel());
+        frame.setSize(640, 480);
+        frame.setMinimumSize(new Dimension(640, 480));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.VBoxLayoutManager;
+import rolit.view.layout.VSplitLayoutManager;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class WaitPanel extends JPanel {
+    public WaitPanel() {
+        setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Top));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new VBoxLayoutManager());
+
+        JLabel status = new JLabel("Het spel van Pieter is nog niet begonnen. Er zitten nu 3 mensen in het spel.");
+        JButton actionButton = new JButton("Beginnen");
+        actionButton.setEnabled(false);
+
+        mainPanel.add(status);
+        mainPanel.add(actionButton);
+
+        add(new ServerPanel());
+        add(mainPanel);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(new WaitPanel());
+        frame.setSize(640, 480);
+        frame.setMinimumSize(new Dimension(640, 480));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+package rolit.view.client;
+
+import rolit.view.layout.GridLayoutManager;
+import rolit.view.layout.HSplitLayoutManager;
+import rolit.view.layout.VSplitLayoutManager;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class GamePanel extends JPanel {
+    public GamePanel() {
+        setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Top));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new HSplitLayoutManager(200, HSplitLayoutManager.HSplitType.Right));
+
+        JPanel gamePanel = new JPanel();
+        gamePanel.setLayout(new GridLayout(8, 8));
+
+        JButton[][] buttons = new JButton[8][8];
+
+        for(int y = 0; y < 8; y++) {
+            for(int x = 0; x < 8; x++) {
+                buttons[x][y] = new JButton("(" + x + "; " + y + ")");
+                gamePanel.add(buttons[x][y]);
+            }
+        }
+
+        JPanel sideBarPanel = new JPanel();
+        sideBarPanel.setLayout(new VSplitLayoutManager(100, VSplitLayoutManager.VSplitType.Top));
+
+        JPanel scorePanel = new JPanel();
+        scorePanel.setLayout(new GridLayoutManager(2, 4));
+
+        scorePanel.add(new JLabel("Pieter"));
+        scorePanel.add(new JLabel("0"));
+        scorePanel.add(new JLabel("Martijn"));
+        scorePanel.add(new JLabel("0"));
+        scorePanel.add(new JLabel("Laurens"));
+        scorePanel.add(new JLabel("0"));
+        scorePanel.add(new JLabel("Sophie"));
+        scorePanel.add(new JLabel("0"));
+
+        sideBarPanel.add(scorePanel);
+        sideBarPanel.add(new ChatPanel());
+
+        mainPanel.add(gamePanel);
+        mainPanel.add(sideBarPanel);
+
+        add(new ServerPanel());
+        add(mainPanel);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(new GamePanel());
+        frame.setSize(640, 480);
+        frame.setMinimumSize(new Dimension(640, 480));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+package rolit.model.networking.common;
+
+import java.io.*;
+
+/**
+ * @author Pieter Bos
+ * @author Martijn de Bijl
+ *
+ *
+ */
+public class CommonProtocol {
+    /**
+     * Constante om aan te geven dat de client of server alleen de basisdingen kan doen.
+     */
+    public static final int SUPPORTS_BAREBONE = 0;
+
+    /**
+     * Constante om aan te geven dat de client of server ook kan chatten.
+     */
+    public static final int SUPPORTS_CHAT = 1;
+
+    /**
+     * Constante om aan te geven dat de client of server ook kan uitdagen / uitgedaagd worden.
+     */
+    public static final int SUPPORTS_CHALLENGE = 2;
+
+    /**
+     * SUPPORTS_CHAT | SUPPORTS_CHALLENGE
+     */
+    public static final int SUPPORTS_CHAT_CHALLENGE = 3;
+
+    /**
+     * String-waarde voor true in het protocol
+     */
+    public static final String T_BOOLEAN_TRUE = "true";
+
+    /**
+     * String-waarde voor false in het protocol
+     */
+    public static final String T_BOOLEAN_FALSE = "false";
+
+    /**
+     * Versie in de handshake voor een standaardimplementatie
+     */
+    public static final String VERSION_NONE = "Standaard";
+
+    /**
+     * Einde van regels
+     */
+    public static final String LINE_ENDING = "\r\n";
+
+    /**
+     * Delimiter van commando's
+     */
+    public static final String COMMAND_DELIMITER = " ";
+
+    /**
+     * Methode om van een {@code OutputStream} een correcte {@code PrintStream} te maken.
+     * @param output De {@code OutputStream}
+     * @return de {@code PrintStream}
+     */
+    public PrintStream getPrintStream(OutputStream output) {
+        try {
+            return new PrintStream(output, true, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Methode om van een {@code InputStream} een correcte {@code BufferedReader} te maken.
+     * @param input De {@code InputStream}
+     * @return De {@code BufferedReader}
+     */
+    public BufferedReader getBufferedReader(InputStream input) {
+        try {
+            return new BufferedReader(new InputStreamReader(input, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Methode om een commando naar een {@code PrintStream} te schrijven.
+     * @param commandParts De gedeeltes van het commando.
+     * @param output De {@code PrintStream}
+     */
+    public void writeCommandTo(String[] commandParts, PrintStream output) {
+        boolean first = true;
+        String command = "";
+
+        for(String argument : commandParts) {
+            if(!first) {
+                command += " ";
+            }
+
+            first = false;
+
+            command += argument;
+        }
+
+        output.print(command);
+        output.print("\r\n");
+    }
+
+    /**
+     * Methode om een commando van een {@code BufferedReader} te lezen.
+     * @param input De {@code BufferedReader}
+     * @return De array van {@code String}s
+     * @throws IOException
+     */
+    public String[] readCommandFrom(BufferedReader input) throws IOException {
+        String line = input.readLine();
+
+        return line.split(" +");
+    }
+}
+package rolit.model.networking.common;
+
+public class ProtocolException extends Exception {
+    private final int code;
+
+    public ProtocolException(String message, int code) {
+        super(message);
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+}
+package rolit.model.networking.common;
+
+import rolit.model.networking.client.ClientProtocol;
+import rolit.model.networking.server.ServerProtocol;
+import rolit.util.Strings;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+public class Command {
+    private final static HashMap<String, ArgumentType[]> serverArgumentTypes = new LinkedHashMap<String, ArgumentType[]>();
+    private final static HashMap<String, ArgumentType[]> clientArgumentTypes = new LinkedHashMap<String, ArgumentType[]>();
+
+    static {
+        serverArgumentTypes.put(ServerProtocol.HANDSHAKE, new ArgumentType[] { ArgumentType.Integer, ArgumentType.String });
+        serverArgumentTypes.put(ServerProtocol.ERROR, new ArgumentType[] { ArgumentType.Integer });
+        serverArgumentTypes.put(ServerProtocol.GAME, new ArgumentType[] { ArgumentType.String, ArgumentType.Boolean, ArgumentType.Integer });
+        serverArgumentTypes.put(ServerProtocol.START, new ArgumentType[] { ArgumentType.MultiString });
+        serverArgumentTypes.put(ServerProtocol.MOVE, new ArgumentType[] {  });
+        serverArgumentTypes.put(ServerProtocol.MOVE_DONE, new ArgumentType[] { ArgumentType.String, ArgumentType.Integer, ArgumentType.Integer });
+        serverArgumentTypes.put(ServerProtocol.GAME_OVER, new ArgumentType[] { ArgumentType.Integer, ArgumentType.MultiString });
+        serverArgumentTypes.put(ServerProtocol.MESSAGE, new ArgumentType[] { ArgumentType.String, ArgumentType.String });
+        serverArgumentTypes.put(ServerProtocol.CHALLENGE, new ArgumentType[] { ArgumentType.MultiString } );
+        serverArgumentTypes.put(ServerProtocol.CHALLENGE_RESPONSE, new ArgumentType[] { ArgumentType.String, ArgumentType.Boolean });
+        serverArgumentTypes.put(ServerProtocol.CAN_BE_CHALLENGED, new ArgumentType[] { ArgumentType.String, ArgumentType.Boolean });
+        serverArgumentTypes.put(ServerProtocol.HIGHSCORE, new ArgumentType[] { ArgumentType.MultiString });
+        serverArgumentTypes.put(ServerProtocol.ONLINE, new ArgumentType[] { ArgumentType.String, ArgumentType.Boolean });
+
+        clientArgumentTypes.put(ClientProtocol.HANDSHAKE, new ArgumentType[] { ArgumentType.String, ArgumentType.Integer, ArgumentType.String });
+        clientArgumentTypes.put(ClientProtocol.CREATE_GAME, new ArgumentType[] {  });
+        clientArgumentTypes.put(ClientProtocol.JOIN_GAME, new ArgumentType[] { ArgumentType.String });
+        clientArgumentTypes.put(ClientProtocol.START_GAME, new ArgumentType[] {  });
+        clientArgumentTypes.put(ClientProtocol.MOVE, new ArgumentType[] { ArgumentType.Integer, ArgumentType.Integer });
+        clientArgumentTypes.put(ClientProtocol.MESSAGE, new ArgumentType[] { ArgumentType.String });
+        clientArgumentTypes.put(ClientProtocol.CHALLENGE, new ArgumentType[] { ArgumentType.MultiString });
+        clientArgumentTypes.put(ClientProtocol.CHALLENGE_RESPONSE, new ArgumentType[] { ArgumentType.Boolean });
+        clientArgumentTypes.put(ClientProtocol.HIGHSCORE, new ArgumentType[] { ArgumentType.String, ArgumentType.String });
+    }
+
+    private final Object[] arguments;
+    private final String command;
+
+    public enum ArgumentType {
+        Integer,
+        Boolean,
+        String,
+        MultiString
+    }
+
+    public Command(String command, Object... arguments) {
+        this.command = command;
+        this.arguments = arguments;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public Object getArgument(int i) {
+        return arguments[i];
+    }
+
+    public int getArgumentCount() {
+        return arguments.length;
+    }
+
+    public void writeTo(PrintStream output) throws IOException {
+        output.print(this.command);
+
+        for(Object argument : arguments) {
+            output.print(CommonProtocol.COMMAND_DELIMITER);
+
+            if(argument instanceof String[]) {
+                output.print(Strings.join(CommonProtocol.COMMAND_DELIMITER, (String[]) argument));
+            } else {
+                output.print(argument);
+            }
+        }
+
+        output.print(CommonProtocol.LINE_ENDING);
+        output.flush();
+
+        if(output.checkError()) {
+            throw new IOException("Write failed");
+        }
+    }
+
+    private static Object parse(String data, ArgumentType arg) throws ProtocolException {
+        switch(arg) {
+            case Integer:
+                return Integer.parseInt(data);
+            case Boolean:
+                if(!data.equals(CommonProtocol.T_BOOLEAN_TRUE) && !data.equals(CommonProtocol.T_BOOLEAN_FALSE)) {
+                    throw new ProtocolException("Boolean must be true or false.", ServerProtocol.ERROR_GENERIC);
+                }
+
+                return data.equals(CommonProtocol.T_BOOLEAN_TRUE);
+            case String:
+                return data;
+            case MultiString:
+                throw new ProtocolException("Cannot parse a MultiString as a singular argument.", ServerProtocol.ERROR_GENERIC);
+        }
+
+        // Impossible
+        return null;
+    }
+
+    public static Command readFromClient(BufferedReader input) throws IOException, ProtocolException {
+        return readFrom(input, clientArgumentTypes);
+    }
+
+    public static Command readFromServer(BufferedReader input) throws IOException, ProtocolException {
+        return readFrom(input, serverArgumentTypes);
+    }
+
+    private static Command readFrom(BufferedReader input, HashMap<String, ArgumentType[]> argumentTypes) throws IOException, ProtocolException {
+        String[] parts = input.readLine().split(CommonProtocol.COMMAND_DELIMITER);
+        String command = parts[0];
+        parts = Arrays.copyOfRange(parts, 1, parts.length);
+
+        ArgumentType[] args = argumentTypes.get(command);
+
+        if(args == null) {
+            throw new ProtocolException("Can't parse unregistered command " + command, ServerProtocol.ERROR_GENERIC);
+        }
+
+        boolean multiString = false;
+        int multiStringLocation = -1;
+
+        for(int i = 0; i < args.length; i++) {
+            if(args[i] == ArgumentType.MultiString) {
+                multiString = true;
+                multiStringLocation = i;
+                break;
+            }
+        }
+
+        Object[] result = new Object[args.length];
+
+        if(multiString) {
+            for(int i = 0; i < multiStringLocation; i++) {
+                result[i] = parse(parts[i], args[i]);
+            }
+
+            int left = args.length - multiStringLocation - 1;
+
+            for(int i = parts.length - left, resultI = multiStringLocation + 1; i < parts.length; i++, resultI++) {
+                result[resultI] = parse(parts[i], args[resultI]);
+            }
+
+            result[multiStringLocation] = Arrays.copyOfRange(parts, multiStringLocation, multiStringLocation + parts.length - args.length + 1);
+        } else {
+            if(parts.length > args.length) {
+                throw new ProtocolException("Length of parts exceeds argument count.", ServerProtocol.ERROR_GENERIC);
+            }
+
+            for(int i = 0; i < parts.length; i++) {
+                result[i] = parse(parts[i], args[i]);
+            }
+        }
+
+        return new Command(command, result);
+    }
+}
+package rolit.model.networking.extensions;
+
+import rolit.model.networking.client.ClientProtocol;
+
+public abstract class WebSocketClientProtocol extends ClientProtocol {
+    public static final String GET = "GET";
+
+    /**
+     * Bij wijze van spreke een methode van de client.
+     * @param path Moet altijd / zijn
+     * @param version Moet altijd HTTP/1.1 zijn;
+     */
+    public abstract void get(String path, String version);
+}
+package rolit.model.networking.extensions;
+
+import rolit.model.networking.server.ServerProtocol;
+
+/**
+ * @author Pieter Bos
+ *
+ * Abstract class voor het protocol van een rolit WebSocket server.
+ *
+ * Dit type server kan een extra commando ontvangen, GET. Deze moet als eerste worden verstuurd in plaats van de
+ * handshake, of helemaal niet. Als dit commando wordt verstuurd wordt de connectie omgezet naar een HTTP-verbinding.
+ * De server verwacht dan een "Upgrade: websocket" header en verder alle andere headers zoals gespecificeerd in
+ * rfc #6455. Daarna reageert de server of met een 501 Not Implemented of een 101 Switching Protocols, afhankelijk van
+ * of de request correct is. In het tweede geval wordt de connectie verheven naar een JSON-RPC 2.0 WebSocket server,
+ * zoals hier gespecificeerd: http://www.jsonrpc.org/specification.
+ * Elk commando is dan een JSON-RPC methode, met als argumenten gewoon de argumenten. Uitzondering is het chat-bericht,
+ * die als één argument wordt verzonden. Daarnaast zijn de typen gewoon native JSON typen, namelijk strings, numbers en
+ * booleans.
+ *
+ * Redenen voor dit protocol:
+ * - Webstandaard die geïmplementeerd is in alle moderne browsers: IE10+, FF4+, Chrome14+, Safari5+, Opera11+ en deze
+ *   browsers voor mobiele platforms.
+ * - Heeft libraries voor bijna alle talen
+ * - Is tekst-gebaseerd in het begin, zodat het redelijk vloeiend gaat tussen een WebSocket client en een gewone
+ *   server.
+ */
+public abstract class WebSocketServerProtocol extends ServerProtocol {
+
+}
+package rolit.model.networking.server;
+
+import rolit.model.event.ServerListener;
+import rolit.model.game.Game;
+import rolit.model.networking.common.CommonProtocol;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.LinkedList;
+
+public class Server extends ServerSocket implements Runnable {
+    private static final int DEFAULT_BACKLOG = 5;
+    public static final int GLOBAL_SUPPORTS = CommonProtocol.SUPPORTS_CHAT_CHALLENGE;
+    public static final String GLOBAL_VERSION = "PieterMartijn_Alpha1";
+
+    private Thread serverThread;
+    private LinkedList<ServerListener> listeners = new LinkedList<ServerListener>();
+    private LinkedList<ClientHandler> clients = new LinkedList<ClientHandler>();
+    private LinkedList<User> users = new LinkedList<User>();
+    private LinkedList<ServerGame> games = new LinkedList<ServerGame>();
+
+    public Server(String bindAddress, int port) throws IOException {
+        super(port, DEFAULT_BACKLOG, InetAddress.getByName(bindAddress));
+        serverThread = new Thread(this);
+    }
+
+    public Thread getServerThread() {
+        return serverThread;
+    }
+
+    public void addListener(ServerListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(ServerListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void serveForever() {
+        serverThread.start();
+    }
+
+    public void fireServerError(String reason) {
+        for(ServerListener listener : listeners) {
+            listener.serverError(reason);
+        }
+    }
+
+    private void fireNewClient(ClientHandler handler) {
+        for(ServerListener listener : listeners) {
+            listener.newClient(handler);
+        }
+    }
+
+    public void fireClientError(String reason) {
+        for(ServerListener listener : listeners) {
+            listener.clientError(reason);
+        }
+    }
+
+    public synchronized User authenticateUser(String username) {
+        boolean exists = false;
+        User theUser = null;
+
+        for(User user : users) {
+            if(user.getUsername().equals(username)) {
+                exists = true;
+                theUser = user;
+                break;
+            }
+        }
+
+        if(!exists) {
+            User user = new User(username);
+            users.add(user);
+            return user;
+        } else {
+            for(ClientHandler client : clients) {
+                if(client.getUser() == theUser) {
+                    return null;
+                }
+            }
+
+            return theUser;
+        }
+    }
+
+    public synchronized void addGame(ServerGame game) {
+        games.add(game);
+    }
+
+    public synchronized ServerGame getGame(String creator) {
+        for(ServerGame game : games) {
+            if(game.getCreator().getUsername().equals(creator)) {
+                return game;
+            }
+        }
+
+        return null;
+    }
+
+    public synchronized void broadcastMessage(User user, String message) {
+        for(ClientHandler client : clients) {
+            try {
+                client.message(user.getUsername(), message);
+            } catch(IOException e) {
+                // Wait for client to be removed by ClientHandler
+            }
+        }
+    }
+
+    public synchronized void gameMessage(User user, String join, ServerGame game) {
+        for(User gameUser : game.getPlayers()) {
+            for(ClientHandler client : clients) {
+                if(client.getUser() == gameUser) {
+                    try {
+                        client.message(user.getUsername(), join);
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        }
+    }
+
+    public void challenge(User user, String[] others) {
+        for(String userName : others) {
+            for(ClientHandler client : clients) {
+                if(client.getUser().getUsername().equals(userName)) {
+                    try {
+                        switch(others.length) {
+                            case 1:
+                                client.challenge(user.getUsername(), others[0]);
+                                break;
+                            case 2:
+                                client.challenge(user.getUsername(), others[0], others[1]);
+                                break;
+                            case 3:
+                                client.challenge(user.getUsername(), others[0], others[1], others[2]);
+                        }
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void run() {
+        try {
+            while(true) {
+                Socket client = accept();
+                ClientHandler handler = new ClientHandler(this, client);
+                fireNewClient(handler);
+            }
+        } catch(IOException e) {
+            fireServerError("IOException: " + e.getMessage());
+        }
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.game.Game;
+
+import java.util.LinkedList;
+
+public class ServerGame extends Game {
+    private final LinkedList<User> players = new LinkedList<User>();
+    private final User creator;
+    private boolean started;
+
+    public ServerGame(User creator) {
+        this.creator = creator;
+        players.add(creator);
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void addPlayer(User player) {
+        players.add(player);
+    }
+
+    public void removePlayer(User player) {
+        players.remove(player);
+    }
+
+    public User[] getPlayers() {
+        User[] result = new User[players.size()];
+        players.toArray(result);
+        return result;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void start() {
+        started = true;
+    }
+
+    public boolean isNext(User user) {
+        return true;
+    }
+
+    public boolean canDoMove(int x, int y) {
+        return true;
+    }
+
+    public void doMove(int x, int y) {
+
+    }
+}
+package rolit.model.networking.server;
+
+public class User {
+    private final String username;
+
+    public User(String username) {
+        this.username = username;
+    }
+
+    public boolean isValidAuthentication() {
+        return true;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.game.Game;
+import rolit.model.networking.client.ClientProtocol;
+import rolit.model.networking.common.Command;
+import rolit.model.networking.common.CommonProtocol;
+import rolit.model.networking.common.ProtocolException;
+import rolit.util.Strings;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.Socket;
+
+public class ClientHandler extends ServerProtocol implements Runnable {
+    private final Server server;
+    private final Socket client;
+    private BufferedReader input;
+    private PrintStream output;
+    private final Thread thread;
+
+    private int clientSupports;
+    private String clientVersion;
+    private User user;
+    private ServerGame currentGame;
+
+    public ClientHandler(Server server, Socket client) throws IOException {
+        this.server = server;
+        this.client = client;
+        thread = new Thread(this);
+    }
+
+    public int getClientSupports() {
+        return clientSupports;
+    }
+
+    public String getClientVersion() {
+        return clientVersion;
+    }
+
+    public boolean isInGame() {
+        return currentGame != null;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void start() {
+        thread.start();
+    }
+
+    @Override
+    public synchronized void handshake(int supports, String version) throws IOException {
+        new Command(ServerProtocol.HANDSHAKE, supports, version).writeTo(output);
+    }
+
+    @Override
+    public synchronized void error(int errorCode) throws IOException {
+        new Command(ServerProtocol.ERROR, errorCode).writeTo(output);
+    }
+
+    @Override
+    public synchronized void game(String creator, boolean hasStarted, int noPlayers) throws IOException {
+        new Command(ServerProtocol.GAME, creator, hasStarted, noPlayers).writeTo(output);
+    }
+
+    @Override
+    public synchronized void start(String playerOne, String playerTwo) throws IOException {
+        new Command(ServerProtocol.START, playerOne, playerTwo).writeTo(output);
+    }
+
+    @Override
+    public synchronized void start(String playerOne, String playerTwo, String playerThree) throws IOException {
+        new Command(ServerProtocol.START, playerOne, playerTwo, playerThree).writeTo(output);
+    }
+
+    @Override
+    public synchronized void start(String playerOne, String playerTwo, String playerThree, String playerFour) throws IOException {
+        new Command(ServerProtocol.START, playerOne, playerTwo, playerThree, playerFour).writeTo(output);
+    }
+
+    @Override
+    public synchronized void move() throws IOException {
+        new Command(ServerProtocol.MOVE).writeTo(output);
+    }
+
+    @Override
+    public synchronized void moveDone(String name, int x, int y) throws IOException {
+        new Command(ServerProtocol.MOVE_DONE, x, y).writeTo(output);
+    }
+
+    @Override
+    public synchronized void gameOver(int score, String[] winners) throws IOException {
+        new Command(ServerProtocol.GAME_OVER, score, winners).writeTo(output);
+    }
+
+    @Override
+    public synchronized void message(String name, String body) throws IOException {
+        new Command(ServerProtocol.MESSAGE, name, body).writeTo(output);
+    }
+
+    @Override
+    public synchronized void challenge(String challenger, String other1) throws IOException {
+        new Command(ServerProtocol.CHALLENGE, challenger, other1).writeTo(output);
+    }
+
+    @Override
+    public synchronized void challenge(String challenger, String other1, String other2) throws IOException {
+        new Command(ServerProtocol.CHALLENGE, challenger, other1, other2).writeTo(output);
+    }
+
+    @Override
+    public synchronized void challenge(String challenger, String other1, String other2, String other3) throws IOException {
+        new Command(ServerProtocol.CHALLENGE, challenger, other1, other2, other3).writeTo(output);
+    }
+
+    @Override
+    public synchronized void challengeResponse(String name, boolean accept) throws IOException {
+        new Command(ServerProtocol.CHALLENGE_RESPONSE, name, accept).writeTo(output);
+    }
+
+    @Override
+    public synchronized void canBeChallenged(String name, boolean flag) throws IOException {
+        new Command(ServerProtocol.CAN_BE_CHALLENGED, name, flag).writeTo(output);
+    }
+
+    @Override
+    public synchronized void highscore(String[] args) throws IOException {
+        new Command(ServerProtocol.HIGHSCORE, args).writeTo(output);
+    }
+
+    @Override
+    public synchronized void online(String name, boolean isOnline) throws IOException {
+       new Command(ServerProtocol.ONLINE, name, isOnline).writeTo(output);
+    }
+
+    private void handlePacket(Command command) throws ProtocolException {
+        if(command.getCommand().equals(ClientProtocol.HANDSHAKE)) {
+            throw new ProtocolException("Client must not send a handshake after the initial handshake.", ServerProtocol.ERROR_GENERIC);
+        } else if(command.getCommand().equals(ClientProtocol.CREATE_GAME)) {
+            if(isInGame()) {
+                throw new ProtocolException("Client must not start a game while in a game.", ServerProtocol.ERROR_USER_ALREADY_HAS_GAME);
+            }
+
+            ServerGame game = new ServerGame(user);
+
+            server.addGame(game);
+            currentGame = game;
+        } else if(command.getCommand().equals(ClientProtocol.JOIN_GAME)) {
+            if(isInGame()) {
+                throw new ProtocolException("Client must not start a game while in a game.", ServerProtocol.ERROR_USER_ALREADY_HAS_GAME);
+            }
+
+            ServerGame game = server.getGame((String) command.getArgument(0));
+
+            if(game == null) {
+                throw new ProtocolException("Client tried to join a game that doesn't exist.", ServerProtocol.ERROR_NO_SUCH_GAME);
+            }
+
+            game.addPlayer(user);
+
+            currentGame = game;
+        } else if(command.getCommand().equals(ClientProtocol.START_GAME)) {
+            if(currentGame == null) {
+                throw new ProtocolException("Client must not try to start while not in a game.", ServerProtocol.ERROR_USER_HAS_NO_GAME);
+            }
+
+            if(currentGame.getCreator() != user) {
+                throw new ProtocolException("Client must be the creator of the game to start.", ServerProtocol.ERROR_GENERIC);
+            }
+
+            if(currentGame.isStarted()) {
+                throw new ProtocolException("Client must be in a game that is not started to start", ServerProtocol.ERROR_GENERIC);
+            }
+
+            currentGame.start();
+        } else if(command.getCommand().equals(ClientProtocol.MOVE)) {
+            int x = (Integer) command.getArgument(0), y = (Integer) command.getArgument(1);
+
+            if(currentGame == null) {
+                throw new ProtocolException("Client must be in a game to do a move.", ServerProtocol.ERROR_USER_HAS_NO_GAME);
+            }
+
+            if(!currentGame.isNext(user)) {
+                throw new ProtocolException("Client must be next to do a move.", ServerProtocol.ERROR_GENERIC);
+            }
+
+            if(!currentGame.canDoMove(x, y)) {
+                throw new ProtocolException("Client must do a move within the board.", ServerProtocol.ERROR_INVALID_MOVE);
+            }
+
+            currentGame.doMove(x, y);
+        } else if(command.getCommand().equals(ClientProtocol.MESSAGE)) {
+            String message = Strings.join(" ", (String[]) command.getArgument(0));
+
+            if(currentGame == null) {
+                server.broadcastMessage(user, message);
+            } else {
+                server.gameMessage(user, message, currentGame);
+            }
+        } else if(command.getCommand().equals(ClientProtocol.CHALLENGE)) {
+            server.challenge(user, (String[]) command.getArgument(0));
+
+        } else if(command.getCommand().equals(ClientProtocol.CHALLENGE_RESPONSE)) {
+
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            try {
+                this.input = getBufferedReader(client.getInputStream());
+                this.output = getPrintStream(client.getOutputStream());
+
+                Command handshake = Command.readFromClient(input);
+
+                if(!handshake.getCommand().equals(ServerProtocol.HANDSHAKE)) {
+                    throw new ProtocolException("Client did not send a handshake as first packet", ServerProtocol.ERROR_HANDSHAKE_MISSING);
+                }
+
+                user = server.authenticateUser((String) handshake.getArgument(0));
+                clientSupports = (Integer) handshake.getArgument(1);
+                clientVersion = (String) handshake.getArgument(2);
+
+                if(user == null) {
+                    throw new ProtocolException("Invalid authentication for user " + ((String) handshake.getArgument(0)), ServerProtocol.ERROR_INVALID_NAME);
+                }
+
+                handshake(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION);
+
+                while(true) {
+                    handlePacket(Command.readFromClient(input));
+                }
+            } catch (ProtocolException e) {
+                server.fireClientError("ProtocolException: " + e.getMessage());
+                error(e.getCode());
+                client.close();
+            }
+        } catch (IOException e) {
+            server.fireClientError("IOException: " + e.getMessage());
+        }
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.CommonProtocol;
+
+import java.io.IOException;
+
+/**
+ * @author Pieter Bos
+ * @author Martijn de Bijl
+ *
+ * Abstract class met alle constanten en methodes die gebruikt kunnen worden
+ */
+public abstract class ServerProtocol extends CommonProtocol {
+    /**
+     * Constante voor het handshake-commando
+     */
+    public static final String HANDSHAKE = "hello";
+
+    /**
+     * Constante voor het error-commando
+     */
+    public static final String ERROR = "error";
+
+    /**
+     * Constante voor het game-commando
+     */
+    public static final String GAME = "game";
+
+    /**
+     * Constante voor het start-commando
+     */
+    public static final String START = "start";
+
+    /**
+     * Constante voor het move-commando
+     */
+    public static final String MOVE = "move";
+
+    /**
+     * Constante voor het move-done-commando
+     */
+    public static final String MOVE_DONE = "moveDone";
+
+    /**
+     * Constante voor het game-over-command
+     */
+    public static final String GAME_OVER = "gameOver";
+
+    /**
+     * Constante voor het message-commando
+     */
+    public static final String MESSAGE = "message";
+
+    /**
+     * Constante voor het challenge-commando
+     */
+    public static final String CHALLENGE = "challenge";
+
+    /**
+     * Constante voor het challenge-response-commando
+     */
+    public static final String CHALLENGE_RESPONSE = "challengeResponse";
+
+    /**
+     * Constante voor het can-be-challenged-commando
+     */
+    public static final String CAN_BE_CHALLENGED = "canBeChallenged";
+
+    /**
+     *
+     */
+    public static final String ONLINE = "online";
+
+    /**
+     * Constante voor highscore
+     */
+    public static final String HIGHSCORE = "highscore";
+
+    public static final int ERROR_GENERIC = -1;
+    public static final int ERROR_INVALID_NAME = 1;
+    public static final int ERROR_GAME_FULL = 2;
+    public static final int ERROR_TOO_LITTLE_PLAYERS = 3;
+    public static final int ERROR_INVALID_MOVE = 4;
+    public static final int ERROR_NO_SUCH_GAME = 5;
+    public static final int ERROR_USER_HAS_NO_GAME = 6;
+    public static final int ERROR_HANDSHAKE_MISSING = 7;
+    public static final int ERROR_USER_ALREADY_HAS_GAME = 8;
+
+    public static final int HIGHSCORE_UNAVAILABLE = -1;
+
+    /**
+     * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
+     * errors.
+     * @requires Dat de handshake van de client is verzonden.
+     * @requires Dat de handshake van de client niet een al ingelodge naam kiest.
+     * @param supports Wat de server ondersteunt.
+     * @param version Een beschrijving van wat de server kan
+     */
+    public abstract void handshake(int supports, String version) throws IOException;
+
+    /**
+     * Commando om de client te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden
+     * verbroken.
+     * @requires Dat de client iets fout heeft gedaan...
+     * @requires Dat dit het enige en eerste pakket na de fout is.
+     * @param errorCode De error-code, op te zoeken in de errorCode-tabel.
+     */
+    public abstract void error(int errorCode) throws IOException;
+
+    /**
+     * Commando om de client te laten weten dat er óf een nieuw spel is, óf dat er een spel is veranderd in status.
+     * Clients krijgen een serie van deze commando's na de handshake om zo een lijst van alle spellen op te bouwen. Als
+     * er daarna iets verandert aan het aantal spelers of dat het spel is begonnen moet de server weer een update
+     * sturen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client
+     * nog niet de volledige lijst met spellen heeft ontvangen direct na de handshake.
+     * @param creator De maker van het spel.
+     * @param hasStarted Of het spel al begonnen is.
+     * @param noPlayers Het aantal spelers in het spel.
+     */
+    public abstract void game(String creator, boolean hasStarted, int noPlayers) throws IOException;
+
+    /**
+     * Commando om een spel te starten met twee spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat de creator van het spel het spel heeft gestart.
+     * @requires Dat dit bericht nog niet is gestuurd voor dit spel.
+     * @param playerOne De eerste speler
+     * @param playerTwo De tweede speler
+     */
+    public abstract void start(String playerOne, String playerTwo) throws IOException;
+
+    /**
+     * Commando om een spel te starten met drie spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
+     * @param playerOne De eerste speler
+     * @param playerTwo De tweede speler
+     * @param playerThree De derde speler
+     */
+    public abstract void start(String playerOne, String playerTwo, String playerThree) throws IOException;
+
+    /**
+     * Commando om een spel te starten met vier spelers, die in die volgorde een zet moeten doen.
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
+     * @param playerOne De eerste speler
+     * @param playerTwo De tweede speler
+     * @param playerThree De derde speler
+     * @param playerFour De vierde speler
+     */
+    public abstract void start(String playerOne, String playerTwo, String playerThree, String playerFour) throws IOException;
+
+    /**
+     * Commando om de client te vertellen dat hij een zet moet gaan doen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
+     * @requires Dat de speler ook echt aan de beurt is.
+     */
+    public abstract void move() throws IOException;
+
+    /**
+     * Commando om de client te laten weten dat iemand een zet heeft gedaan in het huidige spel.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
+     * @requires Dat de speler die zet heeft gedaan
+     * @param name Naam van de speler die de zet heeft gedan.
+     * @param x X-coördinaat, waarbij de linkerkant 0 is en de rechterkant 7.
+     * @param y Y-coördinaat, waarbij de bovenkant 0 is en de onderkant 7.
+     */
+    public abstract void moveDone(String name, int x, int y) throws IOException;
+
+    /**
+     * Commando om de client te laten weten dat het spel is afgelopen, om welke reden dan ook. Eventueel zijn er
+     * winnaars als het spel helemaal is voltooid. De server mag bepalen wat er gebeurt als er meerdere mensen dezelfde
+     * score hebben.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat:
+     *           * Als het spel is gestart: ofwel het spel is afgelopen volgens de regels van de server ofwel één van de
+     *                 mensen is weggegaan
+     *           * Als het spel niet is gestart: de creator is weggegaan.
+     * @param score De hoogste score
+     * @param winners De mensen met die score
+     */
+    public abstract void gameOver(int score, String[] winners) throws IOException;
+
+    /**
+     * Commando om de client op te hoogte te stellen van een chatbericht
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler dit bericht heeft verzonden.
+     * @param name Afzender van het chatbericht
+     * @param body Tekst van het chatbericht
+     */
+    public abstract void message(String name, String body) throws IOException;
+
+    /**
+     * Commando om de client op te hoogte te stellen van een uitdaging met twee mensen.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler niet is uitgedaagd.
+     * @requires Dat de speler niet in een spel zit.
+     * @requires Dat de speler uitdaagbaar is.
+     * @param challenger De uitdager
+     */
+    public abstract void challenge(String challenger, String other1) throws IOException;
+
+    /**
+     * Commando om de client op de hoogte te stellen van een uitdaging met drie mensen
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
+     * @param challenger De uitdager
+     * @param other1 Andere gebruiker
+     */
+    public abstract void challenge(String challenger, String other1, String other2) throws IOException;
+
+    /**
+     * Commando om de client op de hoogte te stellen van een uitdaging met vier mensen
+     * @requires Dat de requirements bij de eerste overload zijn voldaan.
+     * @param challenger De uitdager
+     * @param other1 Andere gebruiker 1
+     * @param other2 Andere gebruiker 2
+     */
+    public abstract void challenge(String challenger, String other1, String other2, String other3) throws IOException;
+
+    /**
+     * Commando om mensen die in een uitdaging zitten op de hoogte te stellen van de status van de uitgedaagden.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client is uitgedaagd.
+     * @param name Naam van de uitgedaagde.
+     * @param accept Of deze persoon accepteert.
+     */
+    public abstract void challengeResponse(String name, boolean accept) throws IOException;
+
+    /**
+     * Commando om de client op de hoogte te stellen van het veranderen van de status van iemand.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de flag true is als de speler is uitgedaagd of een uitdager is.
+     * @param name Naam van de uitgedaagde
+     * @param flag Of hij kan worden uitgedaagd.
+     */
+    public abstract void canBeChallenged(String name, boolean flag) throws IOException;
+
+    /**
+     * Commando om de client op de hoogte te stellen van de gevraagde highscores.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client heeft gevraagd om highscores.
+     * @param args Argumenten
+     */
+    public abstract void highscore(String[] args) throws IOException;
+
+    /**
+     * Commando om de client op de hoogte te stellen van een gebruiker die inlogt of weggaat
+     * @requires Dat de handshake is gedaan
+     * @requires Dat ófwel er een client bijkomt, ófwel er een client weggaat, ófwel dat de client de lijst met mensen
+     * nog niet in zijn geheel heeft ontvangen na de lijst van spellen. Dit laatste is geen requirement voor servers
+     * zonder chat.
+     */
+    public abstract void online(String name, boolean isOnline) throws IOException;
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.CommonProtocol;
+
+/**
+ * @author Pieter Bos
+ * @author Martijn de Bijl
+ *
+ * Abstract class met alle constanten en methodes die gebruikt kunnen worden
+ */
+public abstract class ClientProtocol extends CommonProtocol {
+    /**
+     * Constante voor het handshake-commando
+     */
+    public static final String HANDSHAKE = "hello";
+
+    /**
+     * Constante voor het create-gamecommando
+     */
+    public static final String CREATE_GAME = "createGame";
+
+    /**
+     * Constante voor het join-gamecommando
+     */
+    public static final String JOIN_GAME = "joinGame";
+
+    /**
+     * Constante voor het start-gamecommando
+     */
+    public static final String START_GAME = "startGame";
+
+    /**
+     * Constante voor het movecommando
+     */
+    public static final String MOVE = "move";
+
+    /**
+     * Constante voor het messagecommando
+     */
+    public static final String MESSAGE = "message";
+
+    /**
+     * Constante voor het challengecommando
+     */
+    public static final String CHALLENGE = "challenge";
+
+    /**
+     * Constante voor het challenge-responsecommando
+     */
+    public static final String CHALLENGE_RESPONSE = "challengeResponse";
+
+    /**
+     * Constante voor het highscorecommando
+     */
+    public static final String HIGHSCORE = "highscore";
+
+    /**
+     * Handshake voor de server. Moet altijd het eerste verzonden pakket zijn, met uitzondering van de errors.
+     * @requires Dat de handshake nog niet is ontvangen
+     * @requires Dat dit het eerste pakket op de communicatelijn is.
+     * @param clientName Naam van de client.
+     * @param supports Wat de client ondersteunt.
+     * @param version Een beschrijving van wat de client kan.
+     */
+    public abstract void hello(String clientName, int supports, String version);
+
+    /**
+     * Maak een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client nog geen spel is begonnen
+     */
+    public abstract void createGame();
+
+    /**
+     * Join een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler nog niet in een spel zit.
+     * @requires Dat het spel nog niet vol zit.
+     * @param creator De maker van het spel
+     */
+    public abstract void joinGame(String creator);
+
+    /**
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit.
+     * @requires Dat de speler de creator van het spel is.
+     * @requires Dat het spel nog niet is gestart.
+     * Start het spel waarvan de gebruiker de creator is.
+     */
+    public abstract void startGame();
+
+    /**
+     * Doe een zet
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler in een spel zit
+     * @requires Dat de speler een move-commando heeft ontvangen.
+     * @param x X-coördinaat
+     * @param y Y-coördinaat
+     */
+    public abstract void move(int x, int y);
+
+    /**
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de server chat-berichten ondersteunt.
+     * Stuur een bericht naar iedereen in de lobby of iedereen in het spel
+     * @param body Het bericht
+     */
+    public abstract void message(String body);
+
+    /**
+     * Daag één ander uit voor een spel
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler niet in een spel zit.
+     * @requires Dat de speler niet een uitdager is.
+     * @requires Dat de speler niet al is uitgedaagd.
+     * @requires Dat de uitgedaagde(n) kunnen worden uitgedaagd.
+     * @param other De ander
+     */
+    public abstract void challenge(String other);
+
+    /**
+     * Daag twee anderen uit voor een spel
+     * @requires Dat de requirements bij de andere overload worden voldaan.
+     * @param other1 De een
+     * @param other2 De ander
+     */
+    public abstract void challenge(String other1, String other2);
+
+    /**
+     * Daag drie anderen uit voor een spel
+     * @requires Dat de requirements bij de andere overload worden voldaan.
+     * @param other1 De eerste andere
+     * @param other2 De tweede andere
+     * @param other3 De derder andere
+     */
+    public abstract void challenge(String other1, String other2, String other3);
+
+    /**
+     * Reageer op een uitdaging
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de speler is uitgedaagd.
+     * @param accept Of de client accepteert
+     */
+    public abstract void challengeResponse(boolean accept);
+
+    /**
+     * Vraag highscores op bij de server
+     * @requires Dat de handshake is gedaan
+     * @requires Dat wanneer het type één van "date" of "player" is, arg respectievelijk van het volgende formaat is:
+     *           * yyyy-[m]m-[d]d
+     *           * SpelerNaamZonderSpaties
+     * @param type Type highscore (bijv. date, player)
+     * @param arg Een argument (bijv. 2014-01-01)
+     */
+    public abstract void highscore(String type, String arg);
+}
+package rolit.model.game;
+
+public class Game {
+    public static final int BOARD_WIDTH = 8;
+    public static final int BOARD_HEIGHT = 8;
+
+    // TODO add in implementation by Martijn
+}
+package rolit.model.event;
+
+import rolit.model.networking.server.ClientHandler;
+
+public interface ServerListener {
+    public void serverError(String reason);
+    public void newClient(ClientHandler handler);
+    public void clientError(String reason);
+}
+package rolit.util;
+
+public class Strings {
+    public static String join(String delimiter, String[] strings) {
+        String result = "";
+        boolean first = true;
+
+        for(String string : strings) {
+            if(!first) {
+                result += delimiter;
+            }
+
+            first = false;
+
+            result += string;
+        }
+
+        return result;
+    }
+}

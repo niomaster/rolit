@@ -1,4 +1,4 @@
-Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgende dingen toegevoegd:
+Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgende dingen toegevoegd en veranderd:
 
 * het server-side commando "online name isOnline". Als de applicatie geen chat ondersteund kunnen berichten met
   isOnline=true worden genegeerd en bij isOnline=false moet als diegene een spel heeft dat spel uit de lijst
@@ -12,6 +12,19 @@ Dag lezer! Sinds de versie die we tijdens college hebben gemaakt zijn de volgend
   UniekeNaamVanGroepje_InternVersienummer.
 
 * De line endings zijn nu \r\n, omdat veel lijn-gebaseerde protocollen dit ook gebruiken, waaronder telnet en het http.
+
+* Om authenticatie toe te voegen hebben we de afspraak gemaakt dat alle clientnamen die beginnen met "player_" zich
+  moeten authenticeren. De server stuurt een extra argument bij hello als de clientnaam daarmee begint, namelijk een
+  nonce. Deze moet bestaan uit leesbare karakters en mag geen spaties bevatten, bij voorkeur alleen de karakters van
+  Base64. De client stuurt vervolgens het nieuwe commando "auth" met als argument de Base64-representatie van de bytes
+  van de gesignde versie van de nonce, zoals gespecificeerd in de handleiding van week 8. Als de authenticatie klopt
+  volgens de server stuurt deze het nieuwe commando "authOk" en gaat het protocol verder zoals eerst. Als de
+  authenticatie niet klopt stuurt de server de foutcode ERROR_INVALID_LOGIN (voormalig ERROR_INVALID_NAME) en sluit
+  zoals normaal de verbinding. De server stuurt ook deze foutcode als de client een ander pakket dan auth stuurt direct
+  na een hello met een clientName die begint met player_.
+
+* Argumenten en commando's worden gesplitst door exact één spatie, dat was in de implementatie van CommonProtocol niet
+  zo.
 
 Suggesties zijn welkom en kunnen worden geplaatst als issue in de github repository:
 https://github.com/niomaster/rolit/issues/new, of natuurlijk als pull request.

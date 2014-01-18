@@ -15,6 +15,11 @@ public abstract class ClientProtocol extends CommonProtocol {
     public static final String HANDSHAKE = "hello";
 
     /**
+     * Constante voor het auth-commando
+     */
+    public static final String AUTH = "auth";
+
+    /**
      * Constante voor het create-gamecommando
      */
     public static final String CREATE_GAME = "createGame";
@@ -63,6 +68,16 @@ public abstract class ClientProtocol extends CommonProtocol {
      * @param version Een beschrijving van wat de client kan.
      */
     public abstract void hello(String clientName, int supports, String version);
+
+    /**
+     * Authenticatie van de client.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client de private key heeft opgehaald bij ss-security.student.utwente.nl met de verstuurde
+     * private key en bijbehorend wachtwoord.
+     * @requires Dat de nonce die door de server is gestuurd is gesigned met de private key.
+     * @param signature De gesignde nonce
+     */
+    public abstract void auth(String signature);
 
     /**
      * Maak een spel

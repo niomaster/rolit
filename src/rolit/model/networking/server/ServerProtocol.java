@@ -17,6 +17,11 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final String HANDSHAKE = "hello";
 
     /**
+     * Constante voor het authOk-commando
+     */
+    public static final String AUTH_OK = "authOk";
+
+    /**
      * Constante voor het error-commando
      */
     public static final String ERROR = "error";
@@ -77,7 +82,7 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final String HIGHSCORE = "highscore";
 
     public static final int ERROR_GENERIC = -1;
-    public static final int ERROR_INVALID_NAME = 1;
+    public static final int ERROR_INVALID_LOGIN = 1;
     public static final int ERROR_GAME_FULL = 2;
     public static final int ERROR_TOO_LITTLE_PLAYERS = 3;
     public static final int ERROR_INVALID_MOVE = 4;
@@ -93,10 +98,32 @@ public abstract class ServerProtocol extends CommonProtocol {
      * errors.
      * @requires Dat de handshake van de client is verzonden.
      * @requires Dat de handshake van de client niet een al ingelodge naam kiest.
+     * @requires Dat de clientName niet begint met "player_"
      * @param supports Wat de server ondersteunt.
      * @param version Een beschrijving van wat de server kan
      */
     public abstract void handshake(int supports, String version) throws IOException;
+
+    /**
+     * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
+     * errors.
+     * @requires Dat de requirements van de eerste overload zijn voldaan.
+     * @requires Dat de clientName juist wel begint met "player_"
+     * @param supports
+     * @param version
+     * @param nonce
+     * @throws IOException
+     */
+    public abstract void handshake(int supports, String version, String nonce) throws IOException;
+
+    /**
+     * Antwoord op het auth-pakket van de client.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client een juist gesignde nonce heeft gestuurd.
+     * @requires Dat de nonce gesigned is met de juiste public-key volgens ss-security.student.utwente.nl
+     * @throws IOException
+     */
+    public abstract void authOk() throws IOException;
 
     /**
      * Commando om de client te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden
