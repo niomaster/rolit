@@ -21,6 +21,7 @@ public class ClientHandler extends ServerProtocol implements Runnable {
     private String clientVersion;
     private User user;
     private ServerGame currentGame;
+    private String[] currentChallenge;
 
     public ClientHandler(Server server, Socket client) throws IOException {
         this.server = server;
@@ -209,9 +210,11 @@ public class ClientHandler extends ServerProtocol implements Runnable {
             }
         } else if(command.getCommand().equals(ClientProtocol.CHALLENGE)) {
             server.challenge(user, (String[]) command.getArgument(0));
-
+            currentChallenge = (String[]) command.getArgument(0);
         } else if(command.getCommand().equals(ClientProtocol.CHALLENGE_RESPONSE)) {
-
+            if(currentChallenge == null) {
+                error(ServerProtocol.E)
+            }
         }
     }
 

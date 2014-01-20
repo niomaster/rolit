@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="157bc44f-705c-46ce-9714-3d803413bb9d" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java" afterPath="$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rolit/model/networking/README" afterPath="$PROJECT_DIR$/src/rolit/model/networking/README" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Rolit.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1390037329900" ignored="false" />
+    <file path="/Dummy.txt" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1390211598930" ignored="false" />
     <file path="/ClientProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389938450381" ignored="false" />
     <file path="/CommonProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389941953969" ignored="false" />
     <file path="/Server.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389835506193" ignored="false" />
@@ -18,7 +20,7 @@
     <file path="/ServerListener.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389798673162" ignored="false" />
     <file path="/ServerClientHandler.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389803628563" ignored="false" />
     <file path="/ServerProtocol.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389938229933" ignored="false" />
-    <file path="/ClientHandler.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389940022896" ignored="false" />
+    <file path="/ClientHandler.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1390214179455" ignored="false" />
     <file path="/Game.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389834436192" ignored="false" />
     <file path="/ServerGame.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389834872317" ignored="false" />
     <file path="/User.java" changelist="157bc44f-705c-46ce-9714-3d803413bb9d" time="1389802546211" ignored="false" />
@@ -88,16 +90,25 @@
       <file leaf-file-name="Server.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="156" column="40" selection-start="4770" selection-end="4770" vertical-scroll-proportion="0.0">
+            <state line="160" column="61" selection-start="4951" selection-end="4951" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClientHandler.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ClientHandler.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="223" column="0" selection-start="8377" selection-end="8377" vertical-scroll-proportion="0.9683099">
+            <state line="194" column="67" selection-start="7319" selection-end="7319" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="0" selection-start="3105" selection-end="3105" vertical-scroll-proportion="0.35756853">
               <folding />
             </state>
           </provider>
@@ -133,7 +144,7 @@
       <file leaf-file-name="ServerProtocol.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/ServerProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="47" selection-start="541" selection-end="541" vertical-scroll-proportion="0.0">
+            <state line="36" column="47" selection-start="859" selection-end="859" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -169,10 +180,10 @@
         <option value="$PROJECT_DIR$/src/rolit/TODO" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/server/ServerProtocol.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/client/ClientProtocol.java" />
-        <option value="$PROJECT_DIR$/src/rolit/model/networking/README" />
-        <option value="$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/common/QuickTest.java" />
         <option value="$PROJECT_DIR$/src/rolit/model/networking/common/CommonProtocol.java" />
+        <option value="$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java" />
+        <option value="$PROJECT_DIR$/src/rolit/model/networking/README" />
       </list>
     </option>
   </component>
@@ -227,7 +238,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -538,6 +548,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -548,15 +559,15 @@
     <property name="options.lastSelected" value="vcs.Git" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../nio" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -676,19 +687,6 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -714,6 +712,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -833,7 +844,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="27" width="1682" height="1024" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -999,7 +1010,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/ServerProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="47" selection-start="541" selection-end="541" vertical-scroll-proportion="0.0">
+        <state line="36" column="47" selection-start="859" selection-end="859" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -1007,18 +1018,6 @@
     <entry file="file://$PROJECT_DIR$/src/rolit/TODO">
       <provider selected="true" editor-type-id="text-editor">
         <state line="2" column="22" selection-start="82" selection-end="82" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="5" selection-start="2169" selection-end="2169" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="156" column="40" selection-start="4770" selection-end="4770" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/client/ClientProtocol.java">
@@ -1037,9 +1036,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="160" column="61" selection-start="4951" selection-end="4951" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/server/ClientHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="223" column="0" selection-start="8377" selection-end="8377" vertical-scroll-proportion="0.9683099">
+        <state line="194" column="67" selection-start="7319" selection-end="7319" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rolit/model/networking/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="0" selection-start="3105" selection-end="3105" vertical-scroll-proportion="0.35756853">
           <folding />
         </state>
       </provider>
