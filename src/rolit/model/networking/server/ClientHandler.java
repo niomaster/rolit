@@ -106,4 +106,8 @@ public class ClientHandler implements Runnable {
     public void setClientName(String clientName) {
         this.clientName = clientName;
     }
+
+    public void write(Packet packet) {
+        packet.writeTo(output);
+    }
 }
