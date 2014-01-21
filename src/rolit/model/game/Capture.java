@@ -20,4 +20,6 @@ public class Capture {
     public Vector getDirection(){
         return direction;
     }
+
+
 }

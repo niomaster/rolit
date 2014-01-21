@@ -26,4 +26,10 @@ public class Vector {
         Vector result = new Vector(this.getX() + direction.getX(), this.getY() + direction.getY());
         return result;
     }
+
+    public Vector runVector(Vector vector){
+        int x = vector.getX();
+        int y = vector.getY();
+        return new Vector(x,y);
+    }
 }
