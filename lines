@@ -818,6 +818,10 @@ public class GamePanel extends JPanel {
 package rolit.model.networking.common;
 
 import java.io.*;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 
 /**
  * @author Pieter Bos
@@ -870,6 +874,13 @@ public class CommonProtocol {
      * Delimiter van commando's
      */
     public static final String COMMAND_DELIMITER = " ";
+
+    /**
+     * Alle characters van base64 in volgorde.
+     */
+    private static final String BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    private static final char BASE64_PADDING = '=';
 
     /**
      * Methode om van een {@code OutputStream} een correcte {@code PrintStream} te maken.
@@ -929,7 +940,236 @@ public class CommonProtocol {
     public String[] readCommandFrom(BufferedReader input) throws IOException {
         String line = input.readLine();
 
-        return line.split(" +");
+        return line.split(" ");
+    }
+
+    /**
+     * Converteert bytes naar een Base64-String. Er is namelijk geen standaardmethode in Java om dit te doen.
+     * @param data De bytes
+     * @return De String
+     */
+    public String base64Encode(byte[] data) {
+        String result = "";
+
+        for(int i = 0; i < data.length / 3; i++) {
+            byte byte1 = data[i * 3], byte2 = data[i * 3 + 1], byte3 = data[i * 3 + 2];
+
+            result += BASE64_CHARS.charAt(byte1 / 4);
+            result += BASE64_CHARS.charAt((byte1 % 4) * 16 + byte2 / 16);
+            result += BASE64_CHARS.charAt((byte2 % 16) * 4 + byte3 / 64);
+            result += BASE64_CHARS.charAt(byte3 % 64);
+        }
+
+        if(data.length % 3 == 1) {
+            byte byte1 = data[data.length - 1];
+
+            result += BASE64_CHARS.charAt(byte1 / 4);
+            result += BASE64_CHARS.charAt((byte1 % 4) * 16);
+            result += BASE64_PADDING;
+            result += BASE64_PADDING;
+        } else if(data.length % 3 == 2) {
+            byte byte1 = data[data.length - 2], byte2 = data[data.length - 1];
+
+            result += BASE64_CHARS.charAt(byte1 / 4);
+            result += BASE64_CHARS.charAt((byte1 % 4) * 16 + byte2 / 16);
+            result += BASE64_CHARS.charAt((byte2 % 16) * 4);
+            result += BASE64_PADDING;
+        }
+
+        return result;
+    }
+
+    /**
+     * Converteert een Bas64-String naar bytes.
+     * @param data De String
+     * @return De bytes
+     */
+    public byte[] base64Decode(String data) {
+        byte[] result = new byte[data.length() / 4 * 3];
+
+        for(int i = 0; i < data.length() / 4; i++) {
+            char char1 = data.charAt(i * 4), char2 = data.charAt(i * 4 + 1),
+                    char3 = data.charAt(i * 4 + 2), char4 = data.charAt(i * 4 + 3);
+
+            result[i * 3] = (byte) (BASE64_CHARS.indexOf(char1) * 4 + BASE64_CHARS.indexOf(char2) / 16);
+            result[i * 3 + 1] = (byte) ((BASE64_CHARS.indexOf(char2) % 16) * 16 + BASE64_CHARS.indexOf(char3) / 4);
+            result[i * 3 + 2] = (byte) (((BASE64_CHARS.indexOf(char3) + 4) % 4) * 64 + BASE64_CHARS.indexOf(char4));
+        }
+
+        if(data.charAt(data.length() - 2) == '=') {
+            return Arrays.copyOfRange(result, 0, result.length - 2);
+        } else if(data.charAt(data.length() - 1) == '=') {
+            return Arrays.copyOfRange(result, 0, result.length - 1);
+        } else {
+            return result;
+        }
+    }
+
+    /**
+     * Converteert een String van de ss-security-server naar een {@code PrivateKey}
+     * @param data De data van de ss-security-server
+     * @return De {@code PrivateKey}
+     * @throws InvalidKeySpecException Als de data van de ss-security-server niet klopt.
+     */
+    public PrivateKey stringToPrivateKey(String data) throws InvalidKeySpecException {
+        try {
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(data.getBytes());
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePrivate(keySpec);
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Signt een bericht met een {@code PrivateKey} en retourneert het resultaat in Base64
+     * @param message Het bericht
+     * @param key De {@code PrivateKey}
+     * @return Het resultaat in Base64
+     * @throws InvalidKeyException
+     */
+    public String sign(String message, PrivateKey key) throws InvalidKeyException {
+        try {
+            Signature signature = Signature.getInstance("SHA1withRSA");
+            signature.initSign(key);
+            signature.update(message.getBytes());
+            return base64Encode(signature.sign());
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        } catch (SignatureException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Converteert een String van de ss-security-server naar een {@code PublicKey}
+     * @param data De data van de ss-security-server
+     * @return De {@code PublicKey}
+     * @throws InvalidKeySpecException
+     */
+    public PublicKey stringToPublicKey(String data) throws InvalidKeySpecException {
+        try {
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(data.getBytes());
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(keySpec);
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Verifieert een gesignd bericht voor een {@code PublicKey}.
+     * @param message Het bericht
+     * @param signedMessage Het gesignde bericht
+     * @param key De {@code PublicKey}
+     * @return Of het signen goed is gegaan
+     * @throws InvalidKeyException
+     */
+    public boolean verify(String message, String signedMessage, PublicKey key) throws InvalidKeyException {
+        try {
+            Signature signature = Signature.getInstance("SHA1withRSA");
+            signature.initVerify(key);
+            signature.update(message.getBytes());
+            return signature.verify(base64Decode(signedMessage));
+        } catch (NoSuchAlgorithmException e) {
+            return false;
+        } catch (SignatureException e) {
+            return false;
+        }
+    }
+}
+package rolit.model.networking.common;
+
+import rolit.model.networking.client.*;
+import rolit.model.networking.client.ChallengePacket;
+import rolit.model.networking.client.HandshakePacket;
+import rolit.model.networking.client.HighscorePacket;
+import rolit.model.networking.client.MessagePacket;
+import rolit.model.networking.client.MovePacket;
+import rolit.model.networking.server.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+
+public abstract class Packet {
+    private static final LinkedHashMap<String, Class<? extends Packet>> CLIENT_PACKETS = new LinkedHashMap<String, Class<? extends Packet>>();
+    private static final LinkedHashMap<String, Class<? extends Packet>> SERVER_PACKETS = new LinkedHashMap<String, Class<? extends Packet>>();
+
+    static {
+        CLIENT_PACKETS.put(ClientProtocol.HANDSHAKE, HandshakePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.AUTH, AuthPacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.CREATE_GAME, CreateGamePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.JOIN_GAME, JoinGamePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.START_GAME, StartGamePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.MOVE, MovePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.MESSAGE, rolit.model.networking.client.MessagePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.CHALLENGE, rolit.model.networking.client.ChallengePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.CHALLENGE_RESPONSE, rolit.model.networking.client.ChallengeResponsePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.HIGHSCORE, rolit.model.networking.client.HighscorePacket.class);
+
+        SERVER_PACKETS.put(ServerProtocol.HANDSHAKE, HandshakePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.ERROR, ErrorPacket.class);
+        SERVER_PACKETS.put(ServerProtocol.GAME, GamePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.START, StartGamePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.MOVE, MovePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.MOVE_DONE, MoveDonePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.GAME_OVER, GameOverPacket.class);
+        SERVER_PACKETS.put(ServerProtocol.MESSAGE, rolit.model.networking.server.MessagePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.CHALLENGE, rolit.model.networking.server.ChallengePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.CHALLENGE_RESPONSE, rolit.model.networking.server.ChallengeResponsePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.CAN_BE_CHALLENGED, CanBeChallengedPacket.class);
+        SERVER_PACKETS.put(ServerProtocol.HIGHSCORE, rolit.model.networking.server.HighscorePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.ONLINE, OnlinePacket.class);
+    }
+
+    protected abstract void readFromArgs(PacketArgs args);
+
+    protected abstract PacketArgs.ArgumentType[] getArgumentTypes();
+
+    protected abstract Object[] getData();
+
+    private static Packet readFrom(BufferedReader input, LinkedHashMap<String, Class<? extends Packet>> packets) throws IOException, ProtocolException {
+        String[] parts = input.readLine().split(CommonProtocol.COMMAND_DELIMITER);
+        String command = parts[0];
+        parts = Arrays.copyOfRange(parts, 1, parts.length);
+
+        Packet result = null;
+
+        try {
+            Class<? extends Packet> packetClass = packets.get(command);
+
+            if(packetClass == null) {
+                throw new ProtocolException("Can't parse unregistered command " + command, ServerProtocol.ERROR_GENERIC);
+            } else {
+                result = packetClass.newInstance();
+            }
+        } catch (InstantiationException e) {
+
+        } catch (IllegalAccessException e) {
+
+        }
+
+        PacketArgs.ArgumentType[] args = result.getArgumentTypes();
+
+        result.readFromArgs(PacketArgs.fromParts(parts, args));
+
+        return result;
+    }
+
+    public static Packet readClientPacketFrom(BufferedReader input) throws IOException, ProtocolException {
+        return readFrom(input, CLIENT_PACKETS);
+    }
+
+    public static Packet readServerPacketFrom(BufferedReader input) throws IOException, ProtocolException {
+        return readFrom(input, SERVER_PACKETS);
+    }
+
+    public void writeTo(PrintStream output) {
+        output.print(new PacketArgs(getData()).toString());
+        output.print(CommonProtocol.LINE_ENDING);
     }
 }
 package rolit.model.networking.common;
@@ -992,12 +1232,7 @@ public class Command {
     private final Object[] arguments;
     private final String command;
 
-    public enum ArgumentType {
-        Integer,
-        Boolean,
-        String,
-        MultiString
-    }
+
 
     public Command(String command, Object... arguments) {
         this.command = command;
@@ -1114,6 +1349,136 @@ public class Command {
         return new Command(command, result);
     }
 }
+package rolit.model.networking.common;
+
+import rolit.model.networking.server.ServerProtocol;
+import rolit.util.Strings;
+
+import java.util.Arrays;
+
+public class PacketArgs {
+    public enum ArgumentType {
+        Integer,
+        Boolean,
+        String,
+        MultiString
+    }
+
+    private Object[] data;
+
+    public PacketArgs(Object[] data) {
+        this.data = data;
+    }
+
+    private static Object parse(String data, ArgumentType arg) throws ProtocolException {
+        switch(arg) {
+            case Integer:
+                return Integer.parseInt(data);
+            case Boolean:
+                if(!data.equals(CommonProtocol.T_BOOLEAN_TRUE) && !data.equals(CommonProtocol.T_BOOLEAN_FALSE)) {
+                    throw new ProtocolException("Boolean must be true or false.", ServerProtocol.ERROR_GENERIC);
+                }
+
+                return data.equals(CommonProtocol.T_BOOLEAN_TRUE);
+            case String:
+                return data;
+            case MultiString:
+                throw new ProtocolException("Cannot parse a MultiString as a singular argument.", ServerProtocol.ERROR_GENERIC);
+        }
+
+        // Impossible
+        return null;
+    }
+
+    public int getInt(int i) {
+        return (Integer) data[i];
+    }
+
+    public boolean getBool(int i) {
+        return (Boolean) data[i];
+    }
+
+    public String getString(int i) {
+        return (String) data[i];
+    }
+
+    public String[] getMultiString(int i) {
+        return (String[]) data[i];
+    }
+
+    public String getSpacedString(int i) {
+        return Strings.join(CommonProtocol.COMMAND_DELIMITER, getMultiString(i));
+    }
+
+    public static PacketArgs fromParts(String[] parts, ArgumentType[] args) throws ProtocolException {
+        boolean multiString = false;
+        int multiStringLocation = -1;
+
+        for(int i = 0; i < args.length; i++) {
+            if(args[i] == ArgumentType.MultiString) {
+                multiString = true;
+                multiStringLocation = i;
+                break;
+            }
+        }
+
+        Object[] result = new Object[args.length];
+
+        if(multiString) {
+            for(int i = 0; i < multiStringLocation; i++) {
+                result[i] = parse(parts[i], args[i]);
+            }
+
+            int left = args.length - multiStringLocation - 1;
+
+            for(int i = parts.length - left, resultI = multiStringLocation + 1; i < parts.length; i++, resultI++) {
+                result[resultI] = parse(parts[i], args[resultI]);
+            }
+
+            result[multiStringLocation] = Arrays.copyOfRange(parts, multiStringLocation, multiStringLocation + parts.length - args.length + 1);
+        } else {
+            if(parts.length > args.length) {
+                throw new ProtocolException("Length of parts exceeds argument count.", ServerProtocol.ERROR_GENERIC);
+            }
+
+            for(int i = 0; i < parts.length; i++) {
+                result[i] = parse(parts[i], args[i]);
+            }
+        }
+
+        return new PacketArgs(result);
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        boolean first = true;
+
+        for(Object unit : data) {
+            if(!first) {
+                result += CommonProtocol.COMMAND_DELIMITER;
+            }
+
+            first = false;
+
+            if(unit instanceof Integer) {
+                result += Integer.toString((Integer) unit);
+            } else if(unit instanceof Boolean) {
+                result += Boolean.toString((Boolean) unit);
+            } else if(unit instanceof String) {
+                result += (String) unit;
+            } else {
+                result += Strings.join(CommonProtocol.COMMAND_DELIMITER, (String[]) unit);
+            }
+        }
+
+        return result;
+    }
+
+    public static String[] spacedToMulti(String s) {
+        return s.split(CommonProtocol.COMMAND_DELIMITER);
+    }
+}
 package rolit.model.networking.extensions;
 
 import rolit.model.networking.client.ClientProtocol;
@@ -1156,6 +1521,128 @@ import rolit.model.networking.server.ServerProtocol;
  */
 public abstract class WebSocketServerProtocol extends ServerProtocol {
 
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class CanBeChallengedPacket extends Packet {
+    private String user;
+    private boolean canBeChallenged;
+
+    public CanBeChallengedPacket(String user, boolean canBeChallenged) {
+        this.user = user;
+        this.canBeChallenged = canBeChallenged;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public boolean isCanBeChallenged() {
+        return canBeChallenged;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.user = args.getString(0);
+        this.canBeChallenged = args.getBool(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Boolean };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { user, canBeChallenged };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class ErrorPacket extends Packet {
+    private int code;
+
+    public ErrorPacket(int code) {
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.code = args.getInt(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { this.code };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.StartGamePacket;
+
+public class WaitForGameClientHandlerState extends ClientHandlerState {
+    private final String creator;
+
+    public WaitForGameClientHandlerState(ClientHandler handler, String creator) {
+        super(handler);
+        this.creator = creator;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    @Override
+    public ClientHandlerState startGame(StartGamePacket packet) {
+        return new GameClientHandlerState(getHandler(), getCreator());
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.ClientProtocol;
+import rolit.model.networking.client.HandshakePacket;
+import rolit.model.networking.common.CommonProtocol;
+import rolit.model.networking.common.ProtocolException;
+
+public class InitialClientHandlerState extends ClientHandlerState {
+    public InitialClientHandlerState(ClientHandler handler) {
+        super(handler);
+    }
+
+    @Override
+    public ClientHandlerState handshake(HandshakePacket packet) throws ProtocolException {
+        if(packet.getSupports() < CommonProtocol.SUPPORTS_BAREBONE || packet.getSupports() > CommonProtocol.SUPPORTS_CHAT_CHALLENGE) {
+            throw new ProtocolException("Invalid supports integer", ServerProtocol.ERROR_GENERIC);
+        }
+
+        if(packet.getName().length() < 2 || packet.getName().length() > 32) {
+            throw new ProtocolException("Invalid name length or format", ServerProtocol.ERROR_INVALID_LOGIN);
+        }
+
+        getHandler().setClientName(packet.getName());
+        getHandler().setClientSupports(packet.getSupports());
+
+        if(packet.getName().startsWith("player_")) {
+            return new AuthClientHandlerState(getHandler());
+        } else {
+            return new GameLobbyClientHandlerState(getHandler());
+        }
+    }
 }
 package rolit.model.networking.server;
 
@@ -1271,17 +1758,17 @@ public class Server extends ServerSocket implements Runnable {
     }
 
     public synchronized void gameMessage(User user, String join, ServerGame game) {
-        for(User gameUser : game.getPlayers()) {
-            for(ClientHandler client : clients) {
-                if(client.getUser() == gameUser) {
-                    try {
-                        client.message(user.getUsername(), join);
-                    } catch (IOException e) {
-
-                    }
-                }
-            }
-        }
+//        for(User gameUser : game.getPlayers()) {
+//            for(ClientHandler client : clients) {
+//                if(client.getUser() == gameUser) {
+//                    try {
+//                        client.message(user.getUsername(), join);
+//                    } catch (IOException e) {
+//
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void challenge(User user, String[] others) {
@@ -1323,6 +1810,37 @@ public class Server extends ServerSocket implements Runnable {
 }
 package rolit.model.networking.server;
 
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class StartPacket extends Packet {
+    private String[] players;
+
+    public StartPacket(String[] players) {
+        this.players = players;
+    }
+
+    public String[] getPlayers() {
+        return players;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.players = args.getMultiString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { players };
+    }
+}
+package rolit.model.networking.server;
+
 import rolit.model.game.Game;
 
 import java.util.LinkedList;
@@ -1333,6 +1851,7 @@ public class ServerGame extends Game {
     private boolean started;
 
     public ServerGame(User creator) {
+        super(1);
         this.creator = creator;
         players.add(creator);
     }
@@ -1349,11 +1868,11 @@ public class ServerGame extends Game {
         players.remove(player);
     }
 
-    public User[] getPlayers() {
-        User[] result = new User[players.size()];
-        players.toArray(result);
-        return result;
-    }
+//    public User[] getPlayers() {
+//        User[] result = new User[players.size()];
+//        players.toArray(result);
+//        return result;
+//    }
 
     public boolean isStarted() {
         return started;
@@ -1394,247 +1913,419 @@ public class User {
 }
 package rolit.model.networking.server;
 
-import rolit.model.game.Game;
-import rolit.model.networking.client.ClientProtocol;
-import rolit.model.networking.common.Command;
-import rolit.model.networking.common.CommonProtocol;
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class MessagePacket extends Packet {
+    private String user;
+    private String message;
+
+    public MessagePacket(String user, String message) {
+        this.user = user;
+        this.message = message;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.user = args.getString(0);
+        this.message = args.getSpacedString(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { user, message };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.ChallengePacket;
+import rolit.model.networking.client.ChallengeResponsePacket;
+import rolit.model.networking.client.CreateGamePacket;
+import rolit.model.networking.client.HandshakePacket;
+import rolit.model.networking.client.JoinGamePacket;
+import rolit.model.networking.client.MovePacket;
+import rolit.model.networking.client.StartGamePacket;
 import rolit.model.networking.common.ProtocolException;
+
+public abstract class ClientHandlerState {
+    private ClientHandler handler;
+
+    public ClientHandlerState(ClientHandler handler) {
+        this.handler = handler;
+    }
+
+    private void error(String commandName) throws ProtocolException {
+        throw new ProtocolException("Cannot do " + commandName + " while in state " + this.getClass().getName(), ServerProtocol.ERROR_GENERIC);
+    }
+
+    public ClientHandlerState challenge(ChallengePacket packet) throws ProtocolException {
+        error("challenge");
+        return null;
+    }
+
+    public ClientHandlerState challengeResponse(ChallengeResponsePacket packet) throws ProtocolException {
+        error("challenge response");
+        return null;
+    }
+
+    public ClientHandlerState createGame(CreateGamePacket packet) throws ProtocolException {
+        error("create game");
+        return null;
+    }
+
+    public ClientHandlerState handshake(HandshakePacket packet) throws ProtocolException {
+        error("hello");
+        return null;
+    }
+
+    public ClientHandlerState joinGame(JoinGamePacket packet) throws ProtocolException {
+        error("join game");
+        return null;
+    }
+
+    public ClientHandlerState move(MovePacket packet) throws ProtocolException {
+        error("move");
+        return null;
+    }
+
+    public ClientHandlerState startGame(StartGamePacket packet) throws ProtocolException {
+        error("start game");
+        return null;
+    }
+
+    public ClientHandler getHandler() {
+        return handler;
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class ChallengeResponsePacket extends Packet {
+    private String user;
+    private boolean accept;
+
+    public ChallengeResponsePacket(String user, boolean accept) {
+        this.user = user;
+        this.accept = accept;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public boolean isAccept() {
+        return accept;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.user = args.getString(0);
+        this.accept = args.getBool(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Boolean };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { user, accept };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class GameOverPacket extends Packet {
+    private int score;
+    private String[] winners;
+
+    public GameOverPacket(int score, String[] winners) {
+        this.score = score;
+        this.winners = winners;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public String[] getWinners() {
+        return winners;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.score = args.getInt(0);
+        this.winners = args.getMultiString(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { score, winners };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.ClientProtocol;
+import rolit.model.networking.client.CreateGamePacket;
+import rolit.model.networking.client.JoinGamePacket;
+import rolit.model.networking.client.StartGamePacket;
+import rolit.model.networking.common.Command;
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.ProtocolException;
+import rolit.model.networking.client.ChallengePacket;
+import rolit.model.networking.client.ChallengeResponsePacket;
+import rolit.model.networking.client.HandshakePacket;
+import rolit.model.networking.client.MovePacket;
 import rolit.util.Strings;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 
-public class ClientHandler extends ServerProtocol implements Runnable {
+public class ClientHandler implements Runnable {
     private final Server server;
     private final Socket client;
     private BufferedReader input;
     private PrintStream output;
     private final Thread thread;
 
+    private ClientHandlerState state;
+
     private int clientSupports;
-    private String clientVersion;
-    private User user;
-    private ServerGame currentGame;
+    private String clientName;
 
     public ClientHandler(Server server, Socket client) throws IOException {
         this.server = server;
         this.client = client;
         thread = new Thread(this);
-    }
-
-    public int getClientSupports() {
-        return clientSupports;
-    }
-
-    public String getClientVersion() {
-        return clientVersion;
-    }
-
-    public boolean isInGame() {
-        return currentGame != null;
-    }
-
-    public User getUser() {
-        return user;
+        state = new InitialClientHandlerState(this);
     }
 
     public void start() {
         thread.start();
     }
 
-    @Override
-    public synchronized void handshake(int supports, String version) throws IOException {
-        new Command(ServerProtocol.HANDSHAKE, supports, version).writeTo(output);
-    }
-
-    @Override
-    public synchronized void error(int errorCode) throws IOException {
-        new Command(ServerProtocol.ERROR, errorCode).writeTo(output);
-    }
-
-    @Override
-    public synchronized void game(String creator, boolean hasStarted, int noPlayers) throws IOException {
-        new Command(ServerProtocol.GAME, creator, hasStarted, noPlayers).writeTo(output);
-    }
-
-    @Override
-    public synchronized void start(String playerOne, String playerTwo) throws IOException {
-        new Command(ServerProtocol.START, playerOne, playerTwo).writeTo(output);
-    }
-
-    @Override
-    public synchronized void start(String playerOne, String playerTwo, String playerThree) throws IOException {
-        new Command(ServerProtocol.START, playerOne, playerTwo, playerThree).writeTo(output);
-    }
-
-    @Override
-    public synchronized void start(String playerOne, String playerTwo, String playerThree, String playerFour) throws IOException {
-        new Command(ServerProtocol.START, playerOne, playerTwo, playerThree, playerFour).writeTo(output);
-    }
-
-    @Override
-    public synchronized void move() throws IOException {
-        new Command(ServerProtocol.MOVE).writeTo(output);
-    }
-
-    @Override
-    public synchronized void moveDone(String name, int x, int y) throws IOException {
-        new Command(ServerProtocol.MOVE_DONE, x, y).writeTo(output);
-    }
-
-    @Override
-    public synchronized void gameOver(int score, String[] winners) throws IOException {
-        new Command(ServerProtocol.GAME_OVER, score, winners).writeTo(output);
-    }
-
-    @Override
-    public synchronized void message(String name, String body) throws IOException {
-        new Command(ServerProtocol.MESSAGE, name, body).writeTo(output);
-    }
-
-    @Override
-    public synchronized void challenge(String challenger, String other1) throws IOException {
-        new Command(ServerProtocol.CHALLENGE, challenger, other1).writeTo(output);
-    }
-
-    @Override
-    public synchronized void challenge(String challenger, String other1, String other2) throws IOException {
-        new Command(ServerProtocol.CHALLENGE, challenger, other1, other2).writeTo(output);
-    }
-
-    @Override
-    public synchronized void challenge(String challenger, String other1, String other2, String other3) throws IOException {
-        new Command(ServerProtocol.CHALLENGE, challenger, other1, other2, other3).writeTo(output);
-    }
-
-    @Override
-    public synchronized void challengeResponse(String name, boolean accept) throws IOException {
-        new Command(ServerProtocol.CHALLENGE_RESPONSE, name, accept).writeTo(output);
-    }
-
-    @Override
-    public synchronized void canBeChallenged(String name, boolean flag) throws IOException {
-        new Command(ServerProtocol.CAN_BE_CHALLENGED, name, flag).writeTo(output);
-    }
-
-    @Override
-    public synchronized void highscore(String[] args) throws IOException {
-        new Command(ServerProtocol.HIGHSCORE, args).writeTo(output);
-    }
-
-    @Override
-    public synchronized void online(String name, boolean isOnline) throws IOException {
-       new Command(ServerProtocol.ONLINE, name, isOnline).writeTo(output);
-    }
-
-    private void handlePacket(Command command) throws ProtocolException {
-        if(command.getCommand().equals(ClientProtocol.HANDSHAKE)) {
-            throw new ProtocolException("Client must not send a handshake after the initial handshake.", ServerProtocol.ERROR_GENERIC);
-        } else if(command.getCommand().equals(ClientProtocol.CREATE_GAME)) {
-            if(isInGame()) {
-                throw new ProtocolException("Client must not start a game while in a game.", ServerProtocol.ERROR_USER_ALREADY_HAS_GAME);
-            }
-
-            ServerGame game = new ServerGame(user);
-
-            server.addGame(game);
-            currentGame = game;
-        } else if(command.getCommand().equals(ClientProtocol.JOIN_GAME)) {
-            if(isInGame()) {
-                throw new ProtocolException("Client must not start a game while in a game.", ServerProtocol.ERROR_USER_ALREADY_HAS_GAME);
-            }
-
-            ServerGame game = server.getGame((String) command.getArgument(0));
-
-            if(game == null) {
-                throw new ProtocolException("Client tried to join a game that doesn't exist.", ServerProtocol.ERROR_NO_SUCH_GAME);
-            }
-
-            game.addPlayer(user);
-
-            currentGame = game;
-        } else if(command.getCommand().equals(ClientProtocol.START_GAME)) {
-            if(currentGame == null) {
-                throw new ProtocolException("Client must not try to start while not in a game.", ServerProtocol.ERROR_USER_HAS_NO_GAME);
-            }
-
-            if(currentGame.getCreator() != user) {
-                throw new ProtocolException("Client must be the creator of the game to start.", ServerProtocol.ERROR_GENERIC);
-            }
-
-            if(currentGame.isStarted()) {
-                throw new ProtocolException("Client must be in a game that is not started to start", ServerProtocol.ERROR_GENERIC);
-            }
-
-            currentGame.start();
-        } else if(command.getCommand().equals(ClientProtocol.MOVE)) {
-            int x = (Integer) command.getArgument(0), y = (Integer) command.getArgument(1);
-
-            if(currentGame == null) {
-                throw new ProtocolException("Client must be in a game to do a move.", ServerProtocol.ERROR_USER_HAS_NO_GAME);
-            }
-
-            if(!currentGame.isNext(user)) {
-                throw new ProtocolException("Client must be next to do a move.", ServerProtocol.ERROR_GENERIC);
-            }
-
-            if(!currentGame.canDoMove(x, y)) {
-                throw new ProtocolException("Client must do a move within the board.", ServerProtocol.ERROR_INVALID_MOVE);
-            }
-
-            currentGame.doMove(x, y);
-        } else if(command.getCommand().equals(ClientProtocol.MESSAGE)) {
-            String message = Strings.join(" ", (String[]) command.getArgument(0));
-
-            if(currentGame == null) {
-                server.broadcastMessage(user, message);
-            } else {
-                server.gameMessage(user, message, currentGame);
-            }
-        } else if(command.getCommand().equals(ClientProtocol.CHALLENGE)) {
-            server.challenge(user, (String[]) command.getArgument(0));
-
-        } else if(command.getCommand().equals(ClientProtocol.CHALLENGE_RESPONSE)) {
-
+    private void handlePacket(Packet packet) throws ProtocolException {
+        if(packet instanceof ChallengePacket) {
+            state = state.challenge((ChallengePacket) packet);
+        } else if(packet instanceof ChallengeResponsePacket) {
+            state = state.challengeResponse((ChallengeResponsePacket) packet);
+        } else if(packet instanceof CreateGamePacket) {
+            state = state.createGame((CreateGamePacket) packet);
+        } else if(packet instanceof HandshakePacket) {
+            state = state.handshake((HandshakePacket) packet);
+        } else if(packet instanceof HighscorePacket) {
+            highscore((HighscorePacket) packet);
+        } else if(packet instanceof JoinGamePacket) {
+            state = state.joinGame((JoinGamePacket) packet);
+        } else if(packet instanceof MessagePacket) {
+            message((MessagePacket) packet);
+        } else if(packet instanceof MovePacket) {
+            state = state.move((MovePacket) packet);
+        } else if(packet instanceof StartGamePacket) {
+            state = state.startGame((StartGamePacket) packet);
+        } else {
+            throw new ProtocolException("Client caused the server to be in an impossible condition", ServerProtocol.ERROR_GENERIC);
         }
+    }
+
+    private void message(MessagePacket packet) {
+
+    }
+
+    private void highscore(HighscorePacket packet) {
+
     }
 
     @Override
     public void run() {
         try {
             try {
-                this.input = getBufferedReader(client.getInputStream());
-                this.output = getPrintStream(client.getOutputStream());
-
-                Command handshake = Command.readFromClient(input);
-
-                if(!handshake.getCommand().equals(ServerProtocol.HANDSHAKE)) {
-                    throw new ProtocolException("Client did not send a handshake as first packet", ServerProtocol.ERROR_HANDSHAKE_MISSING);
-                }
-
-                user = server.authenticateUser((String) handshake.getArgument(0));
-                clientSupports = (Integer) handshake.getArgument(1);
-                clientVersion = (String) handshake.getArgument(2);
-
-                if(user == null) {
-                    throw new ProtocolException("Invalid authentication for user " + ((String) handshake.getArgument(0)), ServerProtocol.ERROR_INVALID_NAME);
-                }
-
-                handshake(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION);
+                this.input = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8"));
+                this.output = new PrintStream(client.getOutputStream(), true, "UTF-8");
 
                 while(true) {
-                    handlePacket(Command.readFromClient(input));
+                    handlePacket(Packet.readClientPacketFrom(input));
                 }
             } catch (ProtocolException e) {
                 server.fireClientError("ProtocolException: " + e.getMessage());
-                error(e.getCode());
+                new ErrorPacket(e.getCode()).writeTo(output);
                 client.close();
             }
         } catch (IOException e) {
             server.fireClientError("IOException: " + e.getMessage());
         }
+    }
+
+    public int getClientSupports() {
+        return clientSupports;
+    }
+
+    public void setClientSupports(int clientSupports) {
+        this.clientSupports = clientSupports;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public void write(Packet packet) {
+        packet.writeTo(output);
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class MovePacket extends Packet {
+    public MovePacket() {
+
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] {  };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] {  };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class ChallengePacket extends Packet {
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class GamePacket extends Packet {
+    private String game;
+    private int status;
+    private int players;
+
+    public GamePacket(String game, int status, int players) {
+        this.game = game;
+        this.status = status;
+        this.players = players;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public int getPlayers() {
+        return players;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.game = args.getString(0);
+        this.status = args.getInt(1);
+        this.players = args.getInt(2);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { game, status, players };
+    }
+}
+package rolit.model.networking.server;
+
+public class AuthClientHandlerState extends ClientHandlerState {
+    public AuthClientHandlerState(ClientHandler handler) {
+        super(handler);
+        getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION, "hallo"));
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class OnlinePacket extends Packet {
+    private String user;
+    private boolean online;
+
+    public OnlinePacket(String user, boolean online) {
+        this.user = user;
+        this.online = online;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.user = args.getString(0);
+        this.online = args.getBool(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Boolean }
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { user, online };
     }
 }
 package rolit.model.networking.server;
@@ -1654,6 +2345,11 @@ public abstract class ServerProtocol extends CommonProtocol {
      * Constante voor het handshake-commando
      */
     public static final String HANDSHAKE = "hello";
+
+    /**
+     * Constante voor het authOk-commando
+     */
+    public static final String AUTH_OK = "authOk";
 
     /**
      * Constante voor het error-commando
@@ -1716,7 +2412,7 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final String HIGHSCORE = "highscore";
 
     public static final int ERROR_GENERIC = -1;
-    public static final int ERROR_INVALID_NAME = 1;
+    public static final int ERROR_INVALID_LOGIN = 1;
     public static final int ERROR_GAME_FULL = 2;
     public static final int ERROR_TOO_LITTLE_PLAYERS = 3;
     public static final int ERROR_INVALID_MOVE = 4;
@@ -1728,14 +2424,51 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final int HIGHSCORE_UNAVAILABLE = -1;
 
     /**
+     * Status om aan te geven dat de creator voortijdig is weggegaan
+     */
+    public static final int STATUS_PREMATURE_LEAVE = -1;
+
+    /**
+     * Status om aan te geven dat het spel nog niet is gestart.
+     */
+    public static final int STATUS_NOT_STARTED = 0;
+
+    /**
+     * Status om aan te geven dat het spel is gestart.
+     */
+    public static final int STATUS_STARTED = 1;
+
+    /**
      * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
      * errors.
      * @requires Dat de handshake van de client is verzonden.
      * @requires Dat de handshake van de client niet een al ingelodge naam kiest.
+     * @requires Dat de clientName niet begint met "player_"
      * @param supports Wat de server ondersteunt.
      * @param version Een beschrijving van wat de server kan
      */
     public abstract void handshake(int supports, String version) throws IOException;
+
+    /**
+     * Antwoord op de handshake van de client. Moet altijd het eerst verzonden commando zijn, met uitzondering van
+     * errors.
+     * @requires Dat de requirements van de eerste overload zijn voldaan.
+     * @requires Dat de clientName juist wel begint met "player_"
+     * @param supports
+     * @param version
+     * @param nonce
+     * @throws IOException
+     */
+    public abstract void handshake(int supports, String version, String nonce) throws IOException;
+
+    /**
+     * Antwoord op het auth-pakket van de client.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client een juist gesignde nonce heeft gestuurd.
+     * @requires Dat de nonce gesigned is met de juiste public-key volgens ss-security.student.utwente.nl
+     * @throws IOException
+     */
+    public abstract void authOk() throws IOException;
 
     /**
      * Commando om de client te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden
@@ -1755,10 +2488,10 @@ public abstract class ServerProtocol extends CommonProtocol {
      * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client
      * nog niet de volledige lijst met spellen heeft ontvangen direct na de handshake.
      * @param creator De maker van het spel.
-     * @param hasStarted Of het spel al begonnen is.
+     * @param hasStarted De status van het spel.
      * @param noPlayers Het aantal spelers in het spel.
      */
-    public abstract void game(String creator, boolean hasStarted, int noPlayers) throws IOException;
+    public abstract void game(String creator, int status, int noPlayers) throws IOException;
 
     /**
      * Commando om een spel te starten met twee spelers, die in die volgorde een zet moeten doen.
@@ -1817,10 +2550,10 @@ public abstract class ServerProtocol extends CommonProtocol {
      * score hebben.
      * @requires Dat de handshake is gedaan.
      * @requires Dat de speler in een spel zit.
+     * @requires Dat het spel is gestart.
      * @requires Dat:
      *           * Als het spel is gestart: ofwel het spel is afgelopen volgens de regels van de server ofwel één van de
      *                 mensen is weggegaan
-     *           * Als het spel niet is gestart: de creator is weggegaan.
      * @param score De hoogste score
      * @param winners De mensen met die score
      */
@@ -1897,6 +2630,181 @@ public abstract class ServerProtocol extends CommonProtocol {
      */
     public abstract void online(String name, boolean isOnline) throws IOException;
 }
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.MovePacket;
+
+public class GameClientHandlerState extends ClientHandlerState {
+    private final String creator;
+
+    public GameClientHandlerState(ClientHandler handler, String creator) {
+        super(handler);
+        this.creator = creator;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    @Override
+    public ClientHandlerState move(MovePacket packet) {
+        return this;
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class HandshakePacket extends Packet {
+    private int supports;
+    private String version;
+    private String nonce;
+
+    public HandshakePacket(int supports, String version, String nonce) {
+        this.supports = supports;
+        this.version = version;
+        this.nonce = nonce;
+    }
+
+    public HandshakePacket(int supports, String version) {
+        this(supports, version, null);
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.supports = args.getInt(0);
+        this.version = args.getString(1);
+        this.nonce = args.getMultiString(2).length == 1 ? args.getMultiString(2)[0] : null;
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { supports, version, nonce == null ? new String[] {  } : new String[] { nonce } };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.StartGamePacket;
+
+public class ChallengerClientHandlerState extends ClientHandlerState {
+    public ChallengerClientHandlerState(ClientHandler handler) {
+        super(handler);
+    }
+
+    @Override
+    public ClientHandlerState startGame(StartGamePacket packet) {
+        return new GameClientHandlerState();
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class HighscorePacket extends Packet {
+    private String[] data;
+
+    public HighscorePacket(String[] data) {
+        this.data = data;
+    }
+
+    public String[] getDataField() {
+        return data;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.data = args.getMultiString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { data };
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.client.ChallengePacket;
+import rolit.model.networking.client.CreateGamePacket;
+import rolit.model.networking.client.JoinGamePacket;
+
+public class GameLobbyClientHandlerState extends ClientHandlerState {
+    public GameLobbyClientHandlerState(ClientHandler handler) {
+        super(handler);
+        getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
+    }
+
+    @Override
+    public ClientHandlerState challenge(ChallengePacket packet) {
+        return new ChallengerClientHandlerState(getHandler());
+    }
+
+    @Override
+    public ClientHandlerState joinGame(JoinGamePacket packet) {
+        return new WaitForGameClientHandlerState(getHandler(), packet.getCreator());
+    }
+
+    @Override
+    public ClientHandlerState createGame(CreateGamePacket packet) {
+        return new WaitForGameClientHandlerState(getHandler(), getHandler().getClientName());
+    }
+}
+package rolit.model.networking.server;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class MoveDonePacket extends Packet {
+    private String user;
+    private int x;
+    private int y;
+
+    public MoveDonePacket(String user, int x, int y) {
+        this.user = user;
+        this.x = x;
+        this.y = y;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.user = args.getString(0);
+        this.x = args.getInt(1);
+        this.y = args.getInt(2);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { user, x, y };
+    }
+}
 package rolit.model.networking.client;
 
 import rolit.model.networking.common.CommonProtocol;
@@ -1912,6 +2820,11 @@ public abstract class ClientProtocol extends CommonProtocol {
      * Constante voor het handshake-commando
      */
     public static final String HANDSHAKE = "hello";
+
+    /**
+     * Constante voor het auth-commando
+     */
+    public static final String AUTH = "auth";
 
     /**
      * Constante voor het create-gamecommando
@@ -1962,6 +2875,16 @@ public abstract class ClientProtocol extends CommonProtocol {
      * @param version Een beschrijving van wat de client kan.
      */
     public abstract void hello(String clientName, int supports, String version);
+
+    /**
+     * Authenticatie van de client.
+     * @requires Dat de handshake is gedaan.
+     * @requires Dat de client de private key heeft opgehaald bij ss-security.student.utwente.nl met de verstuurde
+     * private key en bijbehorend wachtwoord.
+     * @requires Dat de nonce die door de server is gestuurd is gesigned met de private key.
+     * @param signature De gesignde nonce
+     */
+    public abstract void auth(String signature);
 
     /**
      * Maak een spel
@@ -2053,13 +2976,744 @@ public abstract class ClientProtocol extends CommonProtocol {
      */
     public abstract void highscore(String type, String arg);
 }
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class StartGamePacket extends Packet {
+    public StartGamePacket() {
+
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] {  };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] {  };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class MessagePacket extends Packet {
+    private String message;
+
+    public MessagePacket(String message) {
+
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.message = args.getString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { message };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class ChallengeResponsePacket extends Packet {
+    private boolean response;
+
+    public ChallengeResponsePacket(boolean response) {
+        this.response = response;
+    }
+
+    public boolean isResponse() {
+        return response;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.response = args.getBool(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Boolean };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { response };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class MovePacket extends Packet {
+    private int x;
+    private int y;
+
+    public MovePacket(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.x = args.getInt(0);
+        this.y = args.getInt(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { x, y };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class CreateGamePacket extends Packet {
+    public CreateGamePacket() {
+
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] {  };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] {  };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class ChallengePacket extends Packet {
+
+    private String[] challenged;
+
+    public ChallengePacket(String[] challenged) {
+        this.challenged = challenged;
+    }
+
+    public String[] getChallenged() {
+        return challenged;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.challenged = args.getMultiString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.MultiString };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { challenged };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class JoinGamePacket extends Packet {
+
+    private String creator;
+
+    public JoinGamePacket(String creator) {
+        this.creator = creator;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.creator = args.getString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { creator };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class HandshakePacket extends Packet {
+    private String name;
+    private int supports;
+    private String version;
+
+    public HandshakePacket(String name, int supports, String version) {
+
+        this.name = name;
+        this.supports = supports;
+        this.version = version;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.name = args.getString(0);
+        this.supports = args.getInt(1);
+        this.version = args.getString(2);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.String };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { name, supports, version };
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSupports() {
+        return supports;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class AuthPacket extends Packet {
+    private String cypherText;
+
+    public AuthPacket(String cypherText) {
+        this.cypherText = cypherText;
+    }
+
+    public String getCypherText() {
+        return cypherText;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.cypherText = args.getString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { cypherText };
+    }
+}
+package rolit.model.networking.client;
+
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketArgs;
+
+public class HighscorePacket extends Packet {
+    private String type;
+    private String arg;
+
+    public HighscorePacket(String type, String arg) {
+        this.type = type;
+        this.arg = arg;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getArg() {
+        return arg;
+    }
+
+    @Override
+    protected void readFromArgs(PacketArgs args) {
+        this.type = args.getString(0);
+        this.arg = args.getString(1);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.String };
+    }
+
+    @Override
+    protected Object[] getData() {
+        return new Object[] { type, arg };
+    }
+}
+package rolit.model.game;
+
+/**
+ * Created by Martijn on 20-1-14.
+ */
+public class Player {
+
+    private final int color;
+
+    public Player(int nummer) {
+        this.color = nummer;
+    }
+
+
+    public int getColor() {
+        return color;
+    }
+}
+package rolit.model.game;
+
+/**
+ * Created by Martijn on 20-1-14.
+ */
+public class Position {
+
+    private int y;
+    private int x;
+
+    public Position(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+
+    public Position add(Position direction) {
+        Position result = new Position(this.getX() + direction.getX(), this.getY() + direction.getY());
+        return result;
+    }
+
+    public Position runVector(Position position){
+        int x = position.getX();
+        int y = position.getY();
+        return new Position(x,y);
+    }
+}
 package rolit.model.game;
 
 public class Game {
-    public static final int BOARD_WIDTH = 8;
-    public static final int BOARD_HEIGHT = 8;
 
-    // TODO add in implementation by Martijn
+    private final int players;
+    private final Board board;
+    private int currentPlayer;
+
+    public Game(int players){
+        this.players = players;
+        board = new Board();
+        currentPlayer = 0;
+    }
+
+    public int getPlayers() {
+        return players;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public boolean legalMove(Board board){
+        return true;
+    }
+
+
+
+}
+package rolit.model.game;
+
+import java.util.LinkedList;
+
+/**
+ * The board class
+ *
+ * @author Martijn de Bijl
+ */
+public class Board {
+    /**
+     * De standaard hoogte voor het bord.
+     */
+    public static final int BOARD_WIDTH = 8;
+    /**
+     * De standaard breedte van het bord.
+     */
+    public static final int BOARD_HEIGHT = 8;
+    /**
+     * De variabele die een leeg veld aangeeft.
+     */
+    public static final int EMPTY_FIELD = 9;
+
+    /**
+     * De array waarin de informatie van het bord is opgeslagen.
+     */
+    private int[][] array;
+
+    /**
+     * Alle richtingen waarin gekeken moet worden naar aanliggende kleuren
+     */
+    private static Position[] DIRECTIONS = {
+            new Position(-1, -1),
+            new Position(-1, 0),
+            new Position(-1, 1),
+            new Position(1, 0),
+            new Position(1, -1),
+            new Position(1, 1),
+            new Position(0, 1),
+            new Position(0, -1)
+    };
+
+    /**
+     * Constructor voor klasse bord. Hierin wordt de array aangemaakt en gevuld met legen velden en de 4 balletje in
+     * het midden.
+     */
+    public Board() {
+        array = new int[BOARD_WIDTH][BOARD_HEIGHT];
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
+                array[x][y] = EMPTY_FIELD;
+                array[x][y] = EMPTY_FIELD;
+            }
+        }
+        array[3][3] = 0;
+        array[4][3] = 1;
+        array[4][4] = 2;
+        array[3][4] = 3;
+
+    }
+
+    /**
+     * Geeft terug waarmee een bepaald veld gevuld is.
+     *
+     * @param x de x-coördinaat, oftewel horizontale positie op het bord.
+     * @param y de y-coördinaat, oftwel vericale positie op het bord.
+     * @return geeft een integer terug die de kleur van de speler, of een leeg veld aangeeft.
+     */
+    public int getField(int x, int y) {
+        return array[x][y];
+    }
+
+    /**
+     * Geeft terug waarmee een bepaald veld gevuld is.
+     *
+     * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
+     * @return geeft een integer terug die de kleur van de speler, of een leeg veld aangeeft.
+     */
+    public int getField(Position position) {
+        int x = (position.getX());
+        int y = (position.getY());
+        return array[x][y];
+    }
+
+    /**
+     * Vult een bepaald veld met een kleur van een speler.
+     * @param x     de x-coördinaat, oftewel horizontale positie op het bord.
+     * @param y     de y-coördinaat, oftwel vericale positie op het bord.
+     * @param field de integer die de kleur van de speler aangeeft.
+     */
+    public void setField(int x, int y, int field) {
+        array[x][y] = field;
+    }
+
+    /**
+     * Vult een bepaald veld met een kleur van een speler.
+     * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
+     * @param field de integer die de kleur van de speler aangeeft.
+     */
+    public void setField(Position position, int field){
+        array[position.getX()][position.getY()] = field;
+    }
+
+    /**
+     * Geeft terug of een veld leeg is.
+     * @param x de x-coördinaat, oftewel horizontale positie op het bord.
+     * @param y de y-coördinaat, oftwel vericale positie op het bord.
+     * @return een boolean of het veld leeg is.
+     */
+    public boolean isEmpty(int x, int y) {
+        if (array[x][y] == EMPTY_FIELD) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Geeft terug of een veld leeg is.
+     * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
+     * @return een boolean of het veld leeg is.
+     */
+    public boolean isEmpty(Position position) {
+        if (array[position.getX()][position.getY()] == EMPTY_FIELD) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Maakt een kopie van het huidige bord.
+     * @return een nieuw bord met alle informatie van het huidige bord.
+     */
+    public Board copy() {
+        Board copy = new Board();
+        for (int x = 0; x <= BOARD_WIDTH; x++) {
+            for (int y = 0; y <= BOARD_HEIGHT; y++) {
+                copy.setField(x, y, getField(x, y));
+            }
+        }
+        return copy;
+    }
+
+    /**
+     * Kijkt op een bepaald veld in alle richtingen welke slagen mogelijk zijn.
+     *
+     * @param player       de speler die de zet wil doen.
+     * @param movePosition het veld waarop de speler de zet wil doen.
+     * @return een array met alle slagen die mogelijk zijn.
+     */
+    public Capture[] getCapture(Player player, Position movePosition) {
+        Position position = new Position(movePosition.getX(), movePosition.getY());
+        LinkedList<Capture> captures = new LinkedList<Capture>();
+        int length = 0;
+
+        if (this.isEmpty(position) == false) {
+            Capture[] capture = new Capture[0];
+            return capture;
+        } else {
+            for (Position direction : DIRECTIONS) {
+                Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
+                while (this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD) {
+                    checkField = checkField.add(direction);
+                    length++;
+                }
+                if (this.getField(checkField.add(direction)) == player.getColor() && length > 1) {
+                    captures.add(new Capture(checkField, length));
+                }
+            }
+
+            Capture[] result = new Capture[captures.size()];
+            captures.toArray(result);
+            return result;
+        }
+    }
+
+    /**
+     * Kijkt of een zet legaal is.
+     *
+     * @param player       de speler die de zet wil doen.
+     * @param movePosition het veld waarop de speler de zet wil doen.
+     * @return een boolean of de zet legaal is.
+     */
+    public boolean isLegalMove(Player player, Position movePosition) {
+        Position position = new Position(movePosition.getX(), movePosition.getY());
+        Capture[] captures = getCapture(player, position);
+
+        if (captures.length != 0) {
+            return true;
+        }
+
+        for (Position directions : DIRECTIONS) {
+            if (this.getField(position.add(directions)) == EMPTY_FIELD) {
+                return false;
+            }
+        }
+
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                Position checkField = new Position(x, y);
+                if (getCapture(player, checkField).length > 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Doet de zet van een speler, en verandert alle kleuren naar zijn kleur van de geslagen balletjes.
+     * @param player de speler die de zet doet.
+     * @param movePosition het veld waarop de speler de zet wil doen.
+     * @return een boolean of de zet gelukt is.
+     */
+    public boolean doMove(Player player, Position movePosition){
+        if (isLegalMove(player,movePosition) == true){
+            Capture[] captures = getCapture(player, movePosition);
+            setField(movePosition, player.getColor());
+
+            for(Capture capture : captures){
+                for (int i = 0; i < captures.length; i++){
+                    int x = (capture.getDirection().getX() + i * (capture.getDirection().getX()));
+                    int y = (capture.getDirection().getY() + i * (capture.getDirection().getY()));
+                    Position seize = new Position(x,y);
+                    setField(seize, player.getColor());
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Maakt een visuele representatie van het huidige bord.
+     *
+     * @return een string zo geformat dat het bord leesbaar is.
+     */
+    public String toString() {
+        String result = "+-+-+-+-+-+-+-+-+\n";
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            boolean first = true;
+
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                if (first) {
+                    result += "|";
+                }
+
+                first = false;
+
+                result += getField(x, y) == EMPTY_FIELD ? " " : getField(x, y);
+
+                result += "|";
+            }
+
+            result += "\n+-+-+-+-+-+-+-+-+\n";
+        }
+        return result;
+    }
+
+}
+package rolit.model.game;
+
+/**
+ * Created by Martijn on 20-1-14.
+ */
+public class Capture {
+
+    private int length;
+    private Position direction;
+
+    public Capture(Position direction, int length){
+        this.length = length;
+        this.direction = direction;
+    }
+
+    public int getLength(){
+        return length;
+    }
+
+    public Position getDirection(){
+        return direction;
+    }
+
+
+}
+package rolit.model.game;
+
+/**
+ * Created by Martijn on 20-1-14.
+ */
+public class Vector {
+
+    private int y;
+    private int x;
+
+    public Vector(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+
+    public Vector add(Vector direction) {
+        Vector result = new Vector(this.getX() + direction.getX(), this.getY() + direction.getY());
+        return result;
+    }
+
+    public Vector runVector(Vector vector){
+        int x = vector.getX();
+        int y = vector.getY();
+        return new Vector(x,y);
+    }
 }
 package rolit.model.event;
 
@@ -2069,6 +3723,209 @@ public interface ServerListener {
     public void serverError(String reason);
     public void newClient(ClientHandler handler);
     public void clientError(String reason);
+}
+package rolit.model.pietergame;
+
+/**
+ * Created by Martijn on 20-1-14.
+ */
+public class Position {
+    public Position(int x, int y) {
+
+    }
+}
+package rolit.model.pietergame;
+
+import rolit.common.Position;
+
+import java.util.LinkedList;
+
+public class Board {
+    public static int WIDTH = 8;
+    public static int HEIGHT = 8;
+
+    public static int NO_PLAYER = -1;
+
+    private static Position[] DIRECTIONS = {
+        new Position(-1, -1),
+        new Position(0, -1),
+        new Position(1, -1),
+        new Position(-1, 0),
+        new Position(1, 0),
+        new Position(-1, 1),
+        new Position(0, 1),
+        new Position(1, 1),
+    };
+
+    private int[][] board = new int[WIDTH][HEIGHT];
+
+    public Board() {
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
+                board[x][y] = NO_PLAYER;
+            }
+        }
+
+        int middleX = WIDTH / 2 - 1;
+        int middleY = HEIGHT / 2 - 1;
+
+        board[middleX][middleY] = 0;
+        board[middleX + 1][middleY] = 1;
+        board[middleX][middleY + 1] = 2;
+        board[middleX + 1][middleY + 1] = 3;
+    }
+
+    public int get(Position position) {
+        return board[position.getX()][position.getY()];
+    }
+
+    private void set(Position position, int player) {
+        board[position.getX()][position.getY()] = player;
+    }
+
+    public Capture[] getCaptures(int player, Position movePosition) {
+        LinkedList<Capture> captures = new LinkedList<Capture>();
+
+        for(Position direction : DIRECTIONS) {
+            for(int length = Math.max(WIDTH, HEIGHT); length >= 2; length--) {
+                Position position = movePosition.add(direction.scalarMultiply(length));
+
+                if(position.inRectangle(WIDTH, HEIGHT) && get(position) == player) {
+                    boolean anyOther = false;
+                    boolean filled = true;
+
+                    for(int i = 1; i < length; i++) {
+                        Position innerPosition = movePosition.add(direction.scalarMultiply(i));
+
+                        if(innerPosition.inRectangle(WIDTH, HEIGHT)) {
+                            if(get(innerPosition) == NO_PLAYER) {
+                                filled = false;
+                            } else if(get(innerPosition) != player) {
+                                anyOther = true;
+                            }
+                        }
+                    }
+
+                    if(filled && anyOther) {
+                        captures.add(new Capture(direction, length));
+                        break;
+                    }
+                }
+            }
+        }
+
+        Capture[] result = new Capture[captures.size()];
+        captures.toArray(result);
+        return result;
+    }
+
+    public boolean isValidMove(int player, Position movePosition) {
+        boolean adjacent = false;
+
+        for(Position direction : DIRECTIONS) {
+            Position position = movePosition.add(direction);
+
+            if(position.inRectangle(WIDTH, HEIGHT) && get(position) != NO_PLAYER) {
+                adjacent = true;
+                break;
+            }
+        }
+
+        if(!adjacent) {
+            return false;
+        }
+
+        // Ensured that the move is adjacent to any other ball
+
+        if(getCaptures(player, movePosition).length > 0) {
+            return true;
+        }
+
+        // Player didn't do a block and capture
+
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
+                Position currentPosition = new Position(x, y);
+
+                if(get(currentPosition) != NO_PLAYER) {
+                    continue;
+                }
+
+                if(getCaptures(player, movePosition).length > 0) {
+                    // Block and capture was possible, but player didn't do it
+                    return false;
+                }
+            }
+        }
+
+        // Block and capture impossible, so the move is valid
+        return true;
+    }
+
+    public boolean doMove(int player, Position movePosition) {
+        if(isValidMove(player, movePosition)) {
+            Capture[] captures = getCaptures(player, movePosition);
+
+            set(movePosition, player);
+
+            for(Capture capture : captures) {
+                for(int i = 1; i < capture.getLength(); i++) {
+                    Position position = movePosition.add(capture.getDirection().scalarMultiply(i));
+                    set(position, player);
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+
+        for(int y = 0; y < HEIGHT; y++) {
+            for(int x = 0; x < WIDTH; x++) {
+                result += " 0123".charAt(board[x][y] + 1);
+            }
+
+            result += "\n";
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Board b = new Board();
+
+        System.out.print(b);
+
+        System.out.println(b.doMove(2, new Position(5, 2)));
+
+        System.out.print(b);
+    }
+}
+import rolit.common.Position;
+
+public class Capture {
+
+    private final int length;
+    private final Position direction;
+
+    public Capture(Position direction, int length) {
+        this.length = length;
+        this.direction = direction;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public Position getDirection() {
+        return direction;
+    }
+
 }
 package rolit.util;
 

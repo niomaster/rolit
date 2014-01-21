@@ -20,6 +20,7 @@ public abstract class Packet {
 
     static {
         CLIENT_PACKETS.put(ClientProtocol.HANDSHAKE, HandshakePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.AUTH, AuthPacket.class);
         CLIENT_PACKETS.put(ClientProtocol.CREATE_GAME, CreateGamePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.JOIN_GAME, JoinGamePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.START_GAME, StartGamePacket.class);
