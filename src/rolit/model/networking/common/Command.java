@@ -44,12 +44,7 @@ public class Command {
     private final Object[] arguments;
     private final String command;
 
-    public enum ArgumentType {
-        Integer,
-        Boolean,
-        String,
-        MultiString
-    }
+
 
     public Command(String command, Object... arguments) {
         this.command = command;
