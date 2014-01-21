@@ -9,7 +9,7 @@ public class InitialClientHandlerState extends ClientHandlerState {
 
     @Override
     public ClientHandlerState handshake(HandshakePacket packet) {
-
+        
 
         return this;
     }
