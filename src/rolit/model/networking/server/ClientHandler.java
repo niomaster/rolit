@@ -63,6 +63,14 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void message(MessagePacket packet) {
+
+    }
+
+    private void highscore(HighscorePacket packet) {
+
+    }
+
     @Override
     public void run() {
         try {

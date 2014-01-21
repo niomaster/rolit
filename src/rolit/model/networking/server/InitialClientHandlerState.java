@@ -9,8 +9,9 @@ public class InitialClientHandlerState extends ClientHandlerState {
 
     @Override
     public ClientHandlerState handshake(HandshakePacket packet) {
-        
+        getHandler().setClientName(packet.getName());
+        getHandler().setClientSupports(packet.getSupports());
 
-        return this;
+        return new GameLobbyClientHandlerState(getHandler());
     }
 }

@@ -16,11 +16,11 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
 
     @Override
     public ClientHandlerState joinGame(JoinGamePacket packet) {
-        return new GameClientHandlerState(getHandler(), packet.getCreator());
+        return new WaitForGameClientHandlerState(getHandler(), packet.getCreator());
     }
 
     @Override
     public ClientHandlerState createGame(CreateGamePacket packet) {
-        return new GameClientHandlerState(getHandler(), getHandler().);
+        return new WaitForGameClientHandlerState(getHandler(), getHandler().getClientName());
     }
 }
