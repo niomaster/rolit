@@ -4,18 +4,29 @@ import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
 public class MessagePacket extends Packet {
-    @Override
-    protected void readFromArgs(PacketArgs args) {
-        
+    private String message;
+
+    public MessagePacket(String message) {
+
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     @Override
-    protected ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[0];  //To change body of implemented methods use File | Settings | File Templates.
+    protected void readFromArgs(PacketArgs args) {
+        this.message = args.getString(0);
+    }
+
+    @Override
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
     }
 
     @Override
     protected Object[] getData() {
-        return new Object[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return new Object[] { message };
     }
 }

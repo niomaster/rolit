@@ -23,8 +23,8 @@ public class HandshakePacket extends Packet {
     }
 
     @Override
-    protected ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[] { ArgumentType.Integer, ArgumentType.String };
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.String };
     }
 
     @Override

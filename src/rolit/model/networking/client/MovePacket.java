@@ -27,8 +27,8 @@ public class MovePacket extends Packet {
     }
 
     @Override
-    protected ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[] { ArgumentType.Integer, ArgumentType.Integer };
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };
     }
 
     @Override

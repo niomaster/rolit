@@ -14,8 +14,8 @@ public class CreateGamePacket extends Packet {
     }
 
     @Override
-    protected ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[] {  };
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] {  };
     }
 
     @Override

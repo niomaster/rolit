@@ -12,7 +12,7 @@ public class PacketArgs {
         this.data = data;
     }
 
-    private static Object parse(String data, Packet.ArgumentType arg) throws ProtocolException {
+    private static Object parse(String data, ArgumentType arg) throws ProtocolException {
         switch(arg) {
             case Integer:
                 return Integer.parseInt(data);
@@ -52,12 +52,12 @@ public class PacketArgs {
         return Strings.join(CommonProtocol.COMMAND_DELIMITER, getMultiString(i));
     }
 
-    public static PacketArgs fromParts(String[] parts, Packet.ArgumentType[] args) throws ProtocolException {
+    public static PacketArgs fromParts(String[] parts, ArgumentType[] args) throws ProtocolException {
         boolean multiString = false;
         int multiStringLocation = -1;
 
         for(int i = 0; i < args.length; i++) {
-            if(args[i] == Packet.ArgumentType.MultiString) {
+            if(args[i] == ArgumentType.MultiString) {
                 multiString = true;
                 multiStringLocation = i;
                 break;
@@ -115,5 +115,12 @@ public class PacketArgs {
         }
 
         return result;
+    }
+
+    public enum ArgumentType {
+        Integer,
+        Boolean,
+        String,
+        MultiString
     }
 }

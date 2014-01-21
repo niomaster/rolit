@@ -21,8 +21,8 @@ public class JoinGamePacket extends Packet {
     }
 
     @Override
-    protected ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[] { ArgumentType.String };
+    protected PacketArgs.ArgumentType[] getArgumentTypes() {
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
     }
 
     @Override
