@@ -82,4 +82,20 @@ public class ClientHandler implements Runnable {
             server.fireClientError("IOException: " + e.getMessage());
         }
     }
+
+    public int getClientSupports() {
+        return clientSupports;
+    }
+
+    public void setClientSupports(int clientSupports) {
+        this.clientSupports = clientSupports;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
 }
