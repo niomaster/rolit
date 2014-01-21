@@ -112,17 +112,17 @@ public class Server extends ServerSocket implements Runnable {
     }
 
     public synchronized void gameMessage(User user, String join, ServerGame game) {
-        for(User gameUser : game.getPlayers()) {
-            for(ClientHandler client : clients) {
-                if(client.getUser() == gameUser) {
-                    try {
-                        client.message(user.getUsername(), join);
-                    } catch (IOException e) {
-
-                    }
-                }
-            }
-        }
+//        for(User gameUser : game.getPlayers()) {
+//            for(ClientHandler client : clients) {
+//                if(client.getUser() == gameUser) {
+//                    try {
+//                        client.message(user.getUsername(), join);
+//                    } catch (IOException e) {
+//
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void challenge(User user, String[] others) {

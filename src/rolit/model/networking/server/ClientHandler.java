@@ -70,9 +70,14 @@ public class ClientHandler extends ServerProtocol implements Runnable {
     }
 
     @Override
-    public synchronized void game(String creator, boolean hasStarted, int noPlayers) throws IOException {
-        new Command(ServerProtocol.GAME, creator, hasStarted, noPlayers).writeTo(output);
+    public void game(String creator, int status, int noPlayers) throws IOException {
+
     }
+
+//    @Override
+//    public synchronized void game(String creator, boolean hasStarted, int noPlayers) throws IOException {
+//        new Command(ServerProtocol.GAME, creator, hasStarted, noPlayers).writeTo(output);
+//    }
 
     @Override
     public synchronized void start(String playerOne, String playerTwo) throws IOException {
@@ -213,7 +218,7 @@ public class ClientHandler extends ServerProtocol implements Runnable {
             currentChallenge = (String[]) command.getArgument(0);
         } else if(command.getCommand().equals(ClientProtocol.CHALLENGE_RESPONSE)) {
             if(currentChallenge == null) {
-                error(ServerProtocol.E)
+//                error(ServerProtocol.E)
             }
         }
     }

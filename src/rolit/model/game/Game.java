@@ -6,7 +6,6 @@ public class Game {
     private final Board board;
     private int currentPlayer;
 
-
     public Game(int players){
         this.players = players;
         board = new Board();
@@ -26,6 +25,9 @@ public class Game {
     }
 
     public boolean legalMove(Board board){
-
+        return true;
     }
+
+
+
 }

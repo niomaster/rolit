@@ -10,6 +10,7 @@ public class ServerGame extends Game {
     private boolean started;
 
     public ServerGame(User creator) {
+        super(1);
         this.creator = creator;
         players.add(creator);
     }
@@ -26,11 +27,11 @@ public class ServerGame extends Game {
         players.remove(player);
     }
 
-    public User[] getPlayers() {
-        User[] result = new User[players.size()];
-        players.toArray(result);
-        return result;
-    }
+//    public User[] getPlayers() {
+//        User[] result = new User[players.size()];
+//        players.toArray(result);
+//        return result;
+//    }
 
     public boolean isStarted() {
         return started;
