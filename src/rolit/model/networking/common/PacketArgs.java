@@ -6,6 +6,13 @@ import rolit.util.Strings;
 import java.util.Arrays;
 
 public class PacketArgs {
+    public enum ArgumentType {
+        Integer,
+        Boolean,
+        String,
+        MultiString
+    }
+
     private Object[] data;
 
     public PacketArgs(Object[] data) {
@@ -117,10 +124,7 @@ public class PacketArgs {
         return result;
     }
 
-    public enum ArgumentType {
-        Integer,
-        Boolean,
-        String,
-        MultiString
+    public static String[] spacedToMulti(String s) {
+        return s.split(CommonProtocol.COMMAND_DELIMITER);
     }
 }
