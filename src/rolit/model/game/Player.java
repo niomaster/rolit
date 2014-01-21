@@ -1,9 +1,10 @@
 package rolit.model.game;
 
 /**
- * Created by Martijn on 20-1-14.
+ * The player class
+ * @author Martijn de Bijl
  */
-public class Player {
+public abstract class Player {
 
     private final int color;
 
@@ -11,8 +12,13 @@ public class Player {
         this.color = nummer;
     }
 
-
     public int getColor() {
         return color;
     }
+
+    public void doMove(Board board, Position move){
+        board.doMove(this, move);
+    }
+
+
 }

@@ -27,7 +27,7 @@ public class Board {
     private int[][] array;
 
     /**
-     * Alle richtingen waarin gekeken moet worden naar aanliggende kleuren
+     * Alle richtingen waarin gekeken moet worden naar aanliggende velden.
      */
     private static Position[] DIRECTIONS = {
             new Position(-1, -1),
@@ -108,11 +108,7 @@ public class Board {
      * @return een boolean of het veld leeg is.
      */
     public boolean isEmpty(int x, int y) {
-        if (array[x][y] == EMPTY_FIELD) {
-            return true;
-        } else {
-            return false;
-        }
+        return array[x][y] == EMPTY_FIELD;
     }
 
     /**
@@ -121,11 +117,7 @@ public class Board {
      * @return een boolean of het veld leeg is.
      */
     public boolean isEmpty(Position position) {
-        if (array[position.getX()][position.getY()] == EMPTY_FIELD) {
-            return true;
-        } else {
-            return false;
-        }
+        return array[position.getX()][position.getY()] == EMPTY_FIELD;
     }
 
     /**
@@ -154,7 +146,7 @@ public class Board {
         LinkedList<Capture> captures = new LinkedList<Capture>();
         int length = 0;
 
-        if (this.isEmpty(position) == false) {
+        if (!this.isEmpty(position)) {
             Capture[] capture = new Capture[0];
             return capture;
         } else {
@@ -214,7 +206,7 @@ public class Board {
      * @return een boolean of de zet gelukt is.
      */
     public boolean doMove(Player player, Position movePosition){
-        if (isLegalMove(player,movePosition) == true){
+        if (isLegalMove(player, movePosition)){
             Capture[] captures = getCapture(player, movePosition);
             setField(movePosition, player.getColor());
 
@@ -235,7 +227,6 @@ public class Board {
 
     /**
      * Maakt een visuele representatie van het huidige bord.
-     *
      * @return een string zo geformat dat het bord leesbaar is.
      */
     public String toString() {
