@@ -7,6 +7,7 @@ import rolit.model.networking.client.JoinGamePacket;
 public class GameLobbyClientHandlerState extends ClientHandlerState {
     public GameLobbyClientHandlerState(ClientHandler handler) {
         super(handler);
+        getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
     }
 
     @Override
