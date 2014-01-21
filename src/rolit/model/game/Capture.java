@@ -6,9 +6,9 @@ package rolit.model.game;
 public class Capture {
 
     private int length;
-    private Vector direction;
+    private Position direction;
 
-    public Capture(Vector direction, int length){
+    public Capture(Position direction, int length){
         this.length = length;
         this.direction = direction;
     }
@@ -17,7 +17,7 @@ public class Capture {
         return length;
     }
 
-    public Vector getDirection(){
+    public Position getDirection(){
         return direction;
     }
 

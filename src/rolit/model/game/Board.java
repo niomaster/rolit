@@ -1,8 +1,5 @@
 package rolit.model.game;
 
-import com.sun.deploy.config.VerboseDefaultConfig;
-import rolit.model.pietergame.Position;
-
 import java.util.LinkedList;
 
 /**
@@ -32,15 +29,15 @@ public class Board {
     /**
      * Alle richtingen waarin gekeken moet worden naar aanliggende kleuren
      */
-    private static Vector[] DIRECTIONS = {
-            new Vector(-1, -1),
-            new Vector(-1, 0),
-            new Vector(-1, 1),
-            new Vector(1, 0),
-            new Vector(1, -1),
-            new Vector(1, 1),
-            new Vector(0, 1),
-            new Vector(0, -1)
+    private static Position[] DIRECTIONS = {
+            new Position(-1, -1),
+            new Position(-1, 0),
+            new Position(-1, 1),
+            new Position(1, 0),
+            new Position(1, -1),
+            new Position(1, 1),
+            new Position(0, 1),
+            new Position(0, -1)
     };
 
     /**
@@ -79,7 +76,7 @@ public class Board {
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
      * @return geeft een integer terug die de kleur van de speler, of een leeg veld aangeeft.
      */
-    public int getField(Vector position) {
+    public int getField(Position position) {
         int x = (position.getX());
         int y = (position.getY());
         return array[x][y];
@@ -100,7 +97,7 @@ public class Board {
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
      * @param field de integer die de kleur van de speler aangeeft.
      */
-    public void setField(Vector position, int field){
+    public void setField(Position position, int field){
         array[position.getX()][position.getY()] = field;
     }
 
@@ -123,7 +120,7 @@ public class Board {
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
      * @return een boolean of het veld leeg is.
      */
-    public boolean isEmpty(Vector position) {
+    public boolean isEmpty(Position position) {
         if (array[position.getX()][position.getY()] == EMPTY_FIELD) {
             return true;
         } else {
@@ -152,8 +149,8 @@ public class Board {
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een array met alle slagen die mogelijk zijn.
      */
-    public Capture[] getCapture(Player player, Vector movePosition) {
-        Vector position = new Vector(movePosition.getX(), movePosition.getY());
+    public Capture[] getCapture(Player player, Position movePosition) {
+        Position position = new Position(movePosition.getX(), movePosition.getY());
         LinkedList<Capture> captures = new LinkedList<Capture>();
         int length = 0;
 
@@ -161,8 +158,8 @@ public class Board {
             Capture[] capture = new Capture[0];
             return capture;
         } else {
-            for (Vector direction : DIRECTIONS) {
-                Vector checkField = new Vector(position.add(direction).getX(), position.add(direction).getY());
+            for (Position direction : DIRECTIONS) {
+                Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
                 while (this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD) {
                     checkField = checkField.add(direction);
                     length++;
@@ -185,15 +182,15 @@ public class Board {
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet legaal is.
      */
-    public boolean isLegalMove(Player player, Vector movePosition) {
-        Vector position = new Vector(movePosition.getX(), movePosition.getY());
+    public boolean isLegalMove(Player player, Position movePosition) {
+        Position position = new Position(movePosition.getX(), movePosition.getY());
         Capture[] captures = getCapture(player, position);
 
         if (captures.length != 0) {
             return true;
         }
 
-        for (Vector directions : DIRECTIONS) {
+        for (Position directions : DIRECTIONS) {
             if (this.getField(position.add(directions)) == EMPTY_FIELD) {
                 return false;
             }
@@ -201,7 +198,7 @@ public class Board {
 
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                Vector checkField = new Vector(x, y);
+                Position checkField = new Position(x, y);
                 if (getCapture(player, checkField).length > 0) {
                     return false;
                 }
@@ -216,7 +213,7 @@ public class Board {
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet gelukt is.
      */
-    public boolean doMove(Player player, Vector movePosition){
+    public boolean doMove(Player player, Position movePosition){
         if (isLegalMove(player,movePosition) == true){
             Capture[] captures = getCapture(player, movePosition);
             setField(movePosition, player.getColor());
@@ -225,7 +222,7 @@ public class Board {
                 for (int i = 0; i < captures.length; i++){
                     int x = (capture.getDirection().getX() + i * (capture.getDirection().getX()));
                     int y = (capture.getDirection().getY() + i * (capture.getDirection().getY()));
-                    Vector seize = new Vector(x,y);
+                    Position seize = new Position(x,y);
                     setField(seize, player.getColor());
                 }
             }
