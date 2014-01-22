@@ -3,6 +3,7 @@ package rolit.model.networking.server;
 import rolit.model.networking.client.ChallengePacket;
 import rolit.model.networking.client.CreateGamePacket;
 import rolit.model.networking.client.JoinGamePacket;
+import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.ProtocolException;
 
 /**
@@ -40,7 +41,11 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
             throw new ProtocolException("Client tried to join a game that does not exist", ServerProtocol.ERROR_NO_SUCH_GAME);
         }
 
-        if(game.getPlayerCount() )
+        if(game.getPlayerCount() >= CommonProtocol.MAXIMUM_PLAYER_COUNT) {
+            throw new ProtocolException("Client tried to join a game that is already full", ServerProtocol.ERROR_GAME_FULL);
+        }
+
+        game.addPlayer(getHandler().getUser());
 
         return new WaitForGameClientHandlerState(getHandler(), packet.getCreator());
     }
@@ -52,6 +57,8 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
      */
     @Override
     public ClientHandlerState createGame(CreateGamePacket packet) {
+        getHandler().createGame();
+
         return new WaitForGameClientHandlerState(getHandler(), getHandler().getClientName());
     }
 

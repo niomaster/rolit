@@ -112,4 +112,20 @@ public class Server extends ServerSocket implements Runnable {
     public ServerGame getGameByCreator(String creator) {
         return games.get(creator);
     }
+
+    public User getUser(String userName) {
+        return users.get(userName);
+    }
+
+    public void createGame(String userName) {
+        games.put(userName, new ServerGame(users.get(userName), this));
+    }
+
+    public void notifyOfGameChange(ServerGame game) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getUsername() != null) {
+                user.getClient().notifyOfGameChange(game);;
+            }
+        }
+    }
 }
