@@ -117,7 +117,7 @@ public class Server extends ServerSocket implements Runnable {
         return users.get(userName);
     }
 
-    public void createGame(String userName) {
+    public void createGame(String userName) throws ProtocolException {
         games.put(userName, new ServerGame(users.get(userName), this));
     }
 
@@ -125,6 +125,36 @@ public class Server extends ServerSocket implements Runnable {
         for(User user : users.values()) {
             if(user.getClient() != null && user.getUsername() != null) {
                 user.getClient().notifyOfGameChange(game);;
+            }
+        }
+    }
+
+    public void writeInfo(String clientName) {
+        User user = users.get(clientName);
+
+        for(ServerGame game : games.values()) {
+            user.getClient().notifyOfGameChange(game);
+        }
+
+        for(User other : users.values()) {
+            if(other.getClient() != null && other.getClient().getClientName() != null && other.getClient().canChat()) {
+                user.getClient().notifyOnlineOf(other.getUsername());
+            }
+        }
+    }
+
+    public void notifyOnline(String clientName) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
+                user.getClient().notifyOnlineOf(clientName);
+            }
+        }
+    }
+
+    public void notifyOffline(String clientName) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
+                user.getClient().notifyOfflineOf(clientName);
             }
         }
     }

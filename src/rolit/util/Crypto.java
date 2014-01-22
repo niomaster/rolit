@@ -70,10 +70,10 @@ public class Crypto {
             char char1 = data.charAt(i * 4), char2 = data.charAt(i * 4 + 1),
                     char3 = data.charAt(i * 4 + 2), char4 = data.charAt(i * 4 + 3);
 
-            boolean char1Valid = BASE64_CHARS.indexOf(char1) != -1;
-            boolean char2Valid = BASE64_CHARS.indexOf(char2) != -1;
-            boolean char3Valid = BASE64_CHARS.indexOf(char3) != -1;
-            boolean char4Valid = BASE64_CHARS.indexOf(char4) != -1;
+            boolean char1Valid = BASE64_CHARS.indexOf(char1) != -1 || char1 == BASE64_PADDING;
+            boolean char2Valid = BASE64_CHARS.indexOf(char2) != -1 || char2 == BASE64_PADDING;
+            boolean char3Valid = BASE64_CHARS.indexOf(char3) != -1 || char3 == BASE64_PADDING;
+            boolean char4Valid = BASE64_CHARS.indexOf(char4) != -1 || char4 == BASE64_PADDING;
 
             if(!(char1Valid && char2Valid && char3Valid && char4Valid)) {
                 return null;

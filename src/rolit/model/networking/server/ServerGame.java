@@ -12,11 +12,12 @@ public class ServerGame extends Game {
     private boolean started;
     private boolean aborted;
 
-    public ServerGame(User creator, Server server) {
+    public ServerGame(User creator, Server server) throws ProtocolException {
         super(1);
         this.creator = creator;
         this.server = server;
         players.add(creator);
+        notifyOfChange();
     }
 
     public User getCreator() {
@@ -29,10 +30,12 @@ public class ServerGame extends Game {
 
     public void addPlayer(User player) throws ProtocolException {
         players.add(player);
+        notifyOfChange();
     }
 
     public void removePlayer(User player) throws ProtocolException {
         players.remove(player);
+        notifyOfChange();
     }
 
     public int getPlayerCount() {

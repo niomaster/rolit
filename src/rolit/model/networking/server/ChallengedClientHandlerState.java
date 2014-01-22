@@ -36,4 +36,13 @@ public class ChallengedClientHandlerState extends ClientHandlerState {
     public String[] getOthers() {
         return others;
     }
+
+    @Override
+    public ClientHandlerState exit() {
+        try {
+            getHandler().notifyChallengeResponse(false, getChallenger(), getOthers());
+        } catch (ProtocolException e) {  }
+
+        return null;
+    }
 }

@@ -93,6 +93,12 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             server.fireClientError("IOException: " + e.getMessage());
         }
+
+        state = state.exit();
+
+        if(getClientName() != null) {
+            server.notifyOffline(getClientName());
+        }
     }
 
     public int getClientSupports() {
@@ -120,6 +126,10 @@ public class ClientHandler implements Runnable {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHALLENGE) != 0;
     }
 
+    public boolean canChat() {
+        return (getClientSupports() & CommonProtocol.SUPPORTS_CHAT) != 0;
+    }
+
     public void notifyChallengedBy(String challenger, String[] others) throws ProtocolException {
         state = state.notifyChallengedBy(challenger, others);
     }
@@ -140,11 +150,27 @@ public class ClientHandler implements Runnable {
         return server.getUser(getClientName());
     }
 
-    public void createGame() {
+    public void createGame() throws ProtocolException {
         server.createGame(getClientName());
     }
 
     public void notifyOfGameChange(ServerGame game) {
         state.notifyOfGameChange(game);
+    }
+
+    public void writeInfo() {
+        server.writeInfo(this.getClientName());
+    }
+
+    public void notifyOnline() {
+        server.notifyOnline(getClientName());
+    }
+
+    public void notifyOnlineOf(String clientName) {
+        write(new OnlinePacket(clientName, true));
+    }
+
+    public void notifyOfflineOf(String clientName) {
+        write(new OnlinePacket(clientName, false));
     }
 }

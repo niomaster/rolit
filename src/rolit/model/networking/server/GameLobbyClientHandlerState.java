@@ -35,7 +35,7 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     }
 
     @Override
-    public ClientHandlerState createGame(CreateGamePacket packet) {
+    public ClientHandlerState createGame(CreateGamePacket packet) throws ProtocolException {
         getHandler().createGame();
 
         return new WaitForGameClientHandlerState(getHandler(), getHandler().getClientName());
@@ -51,5 +51,10 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     public ClientHandlerState notifyChallengeResponseBy(boolean response, String challenged) {
         getHandler().write(new ChallengeResponsePacket(challenged, response));
         return this;
+    }
+
+    @Override
+    public ClientHandlerState exit() {
+        return null;
     }
 }

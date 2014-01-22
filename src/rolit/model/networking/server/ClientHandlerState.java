@@ -77,4 +77,10 @@ public abstract class ClientHandlerState {
         getHandler().write(new GamePacket(game.getCreator().getUsername(), game.getStatus(), game.getPlayerCount()));
         return this;
     }
+
+    public ClientHandlerState exit() {
+        // TODO add to logging service
+        System.out.println("Warning: exit not implemented in state " + this.getClass().getName());
+        return null;
+    }
 }

@@ -29,7 +29,14 @@ public class InitialClientHandlerState extends ClientHandlerState {
         } else {
             getHandler().setClientName(packet.getName());
             getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
+            getHandler().writeInfo();
+            getHandler().notifyOnline();
             return new GameLobbyClientHandlerState(getHandler());
         }
+    }
+
+    @Override
+    public ClientHandlerState exit() {
+        return null;
     }
 }

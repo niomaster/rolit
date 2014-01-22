@@ -35,4 +35,9 @@ public class AuthClientHandlerState extends ClientHandlerState {
 
         return new GameLobbyClientHandlerState(getHandler());
     }
+
+    @Override
+    public ClientHandlerState exit() {
+        return null;
+    }
 }
