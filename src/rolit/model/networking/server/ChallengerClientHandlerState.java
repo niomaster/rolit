@@ -9,6 +9,6 @@ public class ChallengerClientHandlerState extends ClientHandlerState {
 
     @Override
     public ClientHandlerState startGame(StartGamePacket packet) {
-        return new GameClientHandlerState();
+        return new GameClientHandlerState(getHandler(), getHandler().getClientName());
     }
 }

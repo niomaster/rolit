@@ -4,7 +4,6 @@ import rolit.model.networking.client.ClientProtocol;
 import rolit.model.networking.client.CreateGamePacket;
 import rolit.model.networking.client.JoinGamePacket;
 import rolit.model.networking.client.StartGamePacket;
-import rolit.model.networking.common.Command;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.ProtocolException;
 import rolit.model.networking.client.ChallengePacket;
@@ -40,22 +39,22 @@ public class ClientHandler implements Runnable {
     }
 
     private void handlePacket(Packet packet) throws ProtocolException {
-        if(packet instanceof ChallengePacket) {
-            state = state.challenge((ChallengePacket) packet);
-        } else if(packet instanceof ChallengeResponsePacket) {
-            state = state.challengeResponse((ChallengeResponsePacket) packet);
+        if(packet instanceof rolit.model.networking.client.ChallengePacket) {
+            state = state.challenge((rolit.model.networking.client.ChallengePacket) packet);
+        } else if(packet instanceof rolit.model.networking.client.ChallengeResponsePacket) {
+            state = state.challengeResponse((rolit.model.networking.client.ChallengeResponsePacket) packet);
         } else if(packet instanceof CreateGamePacket) {
             state = state.createGame((CreateGamePacket) packet);
-        } else if(packet instanceof HandshakePacket) {
-            state = state.handshake((HandshakePacket) packet);
+        } else if(packet instanceof rolit.model.networking.client.HandshakePacket) {
+            state = state.handshake((rolit.model.networking.client.HandshakePacket) packet);
         } else if(packet instanceof HighscorePacket) {
             highscore((HighscorePacket) packet);
         } else if(packet instanceof JoinGamePacket) {
             state = state.joinGame((JoinGamePacket) packet);
         } else if(packet instanceof MessagePacket) {
             message((MessagePacket) packet);
-        } else if(packet instanceof MovePacket) {
-            state = state.move((MovePacket) packet);
+        } else if(packet instanceof rolit.model.networking.client.MovePacket) {
+            state = state.move((rolit.model.networking.client.MovePacket) packet);
         } else if(packet instanceof StartGamePacket) {
             state = state.startGame((StartGamePacket) packet);
         } else {
