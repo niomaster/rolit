@@ -6,11 +6,15 @@ import rolit.model.networking.common.PacketArgs;
 public class ChallengeResponsePacket extends Packet {
     private boolean response;
 
+    protected ChallengeResponsePacket() {
+
+    }
+
     public ChallengeResponsePacket(boolean response) {
         this.response = response;
     }
 
-    public boolean isResponse() {
+    public boolean getResponse() {
         return response;
     }
 

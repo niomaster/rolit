@@ -3,25 +3,24 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
-public class MessagePacket extends Packet {
-    private String message;
+public class AuthPacket extends Packet {
+    private String cypherText;
 
-    protected MessagePacket() {
+    protected AuthPacket() {
 
     }
 
-    public MessagePacket(String message) {
-
-        this.message = message;
+    public AuthPacket(String cypherText) {
+        this.cypherText = cypherText;
     }
 
-    public String getMessage() {
-        return message;
+    public String getCypherText() {
+        return cypherText;
     }
 
     @Override
     protected void readFromArgs(PacketArgs args) {
-        this.message = args.getString(0);
+        this.cypherText = args.getString(0);
     }
 
     @Override
@@ -31,6 +30,6 @@ public class MessagePacket extends Packet {
 
     @Override
     protected Object[] getData() {
-        return new Object[] { message };
+        return new Object[] { cypherText };
     }
 }

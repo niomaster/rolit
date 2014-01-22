@@ -7,6 +7,10 @@ public class MessagePacket extends Packet {
     private String user;
     private String message;
 
+    protected MessagePacket() {
+
+    }
+
     public MessagePacket(String user, String message) {
         this.user = user;
         this.message = message;

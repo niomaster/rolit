@@ -7,6 +7,10 @@ public class ChallengeResponsePacket extends Packet {
     private String user;
     private boolean accept;
 
+    protected ChallengeResponsePacket() {
+
+    }
+
     public ChallengeResponsePacket(String user, boolean accept) {
         this.user = user;
         this.accept = accept;

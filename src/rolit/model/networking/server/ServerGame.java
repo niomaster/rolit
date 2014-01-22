@@ -27,11 +27,9 @@ public class ServerGame extends Game {
         players.remove(player);
     }
 
-//    public User[] getPlayers() {
-//        User[] result = new User[players.size()];
-//        players.toArray(result);
-//        return result;
-//    }
+    public int getPlayerCount() {
+        return players.size();
+    }
 
     public boolean isStarted() {
         return started;
