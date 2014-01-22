@@ -66,10 +66,15 @@ public class Server extends ServerSocket implements Runnable {
             while(true) {
                 Socket client = accept();
                 ClientHandler handler = new ClientHandler(this, client);
+                handler.start();
                 fireNewClient(handler);
             }
         } catch(IOException e) {
             fireServerError("IOException: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        new Server("0.0.0.0", 1234).serveForever();
     }
 }

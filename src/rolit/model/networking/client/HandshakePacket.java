@@ -8,6 +8,10 @@ public class HandshakePacket extends Packet {
     private int supports;
     private String version;
 
+    protected HandshakePacket() {
+
+    }
+
     public HandshakePacket(String name, int supports, String version) {
 
         this.name = name;
@@ -24,7 +28,7 @@ public class HandshakePacket extends Packet {
 
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
-        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.String };
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.String };
     }
 
     @Override

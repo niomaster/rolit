@@ -8,6 +8,10 @@ public class MoveDonePacket extends Packet {
     private int x;
     private int y;
 
+    protected MoveDonePacket() {
+
+    }
+
     public MoveDonePacket(String user, int x, int y) {
         this.user = user;
         this.x = x;

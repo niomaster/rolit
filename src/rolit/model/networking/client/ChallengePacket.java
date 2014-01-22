@@ -5,6 +5,10 @@ import rolit.model.networking.common.PacketArgs;
 
 public class ChallengePacket extends Packet {
 
+    protected ChallengePacket() {
+
+    }
+
     private String[] challenged;
 
     public ChallengePacket(String[] challenged) {

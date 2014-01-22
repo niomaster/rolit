@@ -8,6 +8,10 @@ public class HandshakePacket extends Packet {
     private String version;
     private String nonce;
 
+    protected HandshakePacket() {
+
+    }
+
     public HandshakePacket(int supports, String version, String nonce) {
         this.supports = supports;
         this.version = version;
