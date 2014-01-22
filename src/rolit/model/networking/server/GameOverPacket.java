@@ -7,6 +7,10 @@ public class GameOverPacket extends Packet {
     private int score;
     private String[] winners;
 
+    protected GameOverPacket() {
+
+    }
+
     public GameOverPacket(int score, String[] winners) {
         this.score = score;
         this.winners = winners;

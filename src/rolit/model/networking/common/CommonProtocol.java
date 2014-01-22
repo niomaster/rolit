@@ -50,6 +50,16 @@ public class CommonProtocol {
     public static final String VERSION_NONE = "Standaard";
 
     /**
+     * Minimum aantal spelers om een spel te laten beginnen
+     */
+    public static final int MINIMUM_PLAYER_COUNT = 2;
+
+    /**
+     * Maximum aantal spelers om een spel te kunnen laten beginnen
+      */
+    public static final int MAXIMUM_PLAYER_COUNT = 4;
+
+    /**
      * Einde van regels
      */
     public static final String LINE_ENDING = "\r\n";

@@ -7,6 +7,10 @@ public class OnlinePacket extends Packet {
     private String user;
     private boolean online;
 
+    protected OnlinePacket() {
+
+    }
+
     public OnlinePacket(String user, boolean online) {
         this.user = user;
         this.online = online;

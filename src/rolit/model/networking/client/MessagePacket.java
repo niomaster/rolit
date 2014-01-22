@@ -6,6 +6,10 @@ import rolit.model.networking.common.PacketArgs;
 public class MessagePacket extends Packet {
     private String message;
 
+    protected MessagePacket() {
+
+    }
+
     public MessagePacket(String message) {
 
         this.message = message;

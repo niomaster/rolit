@@ -7,6 +7,10 @@ public class HighscorePacket extends Packet {
     private String type;
     private String arg;
 
+    protected HighscorePacket() {
+        
+    }
+
     public HighscorePacket(String type, String arg) {
         this.type = type;
         this.arg = arg;

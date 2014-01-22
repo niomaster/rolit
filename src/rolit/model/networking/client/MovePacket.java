@@ -7,6 +7,10 @@ public class MovePacket extends Packet {
     private int x;
     private int y;
 
+    protected MovePacket() {
+
+    }
+
     public MovePacket(int x, int y) {
         this.x = x;
         this.y = y;

@@ -6,6 +6,10 @@ import rolit.model.networking.common.PacketArgs;
 public class HighscorePacket extends Packet {
     private String[] data;
 
+    protected HighscorePacket() {
+
+    }
+
     public HighscorePacket(String[] data) {
         this.data = data;
     }

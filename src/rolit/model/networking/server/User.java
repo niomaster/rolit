@@ -2,16 +2,26 @@ package rolit.model.networking.server;
 
 public class User {
     private final String username;
+    private ClientHandler client;
 
-    public User(String username) {
+    public User(String username, ClientHandler client) {
         this.username = username;
-    }
-
-    public boolean isValidAuthentication() {
-        return true;
+        this.client = client;
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public ClientHandler getClient() {
+        return client;
+    }
+
+    public void setClient(ClientHandler client) {
+        this.client = client;
+    }
+
+    public boolean isOnline() {
+        return getClient() != null;
     }
 }

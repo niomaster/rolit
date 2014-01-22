@@ -3,11 +3,15 @@ package rolit.model.networking.server;
 import rolit.model.event.ServerListener;
 import rolit.model.game.Game;
 import rolit.model.networking.common.CommonProtocol;
+import rolit.model.networking.common.ProtocolException;
+import rolit.util.Strings;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public class Server extends ServerSocket implements Runnable {
@@ -18,8 +22,8 @@ public class Server extends ServerSocket implements Runnable {
     private Thread serverThread;
     private LinkedList<ServerListener> listeners = new LinkedList<ServerListener>();
     private LinkedList<ClientHandler> clients = new LinkedList<ClientHandler>();
-    private LinkedList<User> users = new LinkedList<User>();
-    private LinkedList<ServerGame> games = new LinkedList<ServerGame>();
+    private HashMap<String, User> users = new LinkedHashMap<String, User>();
+    private HashMap<String, ServerGame> games = new LinkedHashMap<String, ServerGame>();
 
     public Server(String bindAddress, int port) throws IOException {
         super(port, DEFAULT_BACKLOG, InetAddress.getByName(bindAddress));
@@ -60,105 +64,52 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
-    public synchronized User authenticateUser(String username) {
-        boolean exists = false;
-        User theUser = null;
-
-        for(User user : users) {
-            if(user.getUsername().equals(username)) {
-                exists = true;
-                theUser = user;
-                break;
-            }
-        }
-
-        if(!exists) {
-            User user = new User(username);
-            users.add(user);
-            return user;
-        } else {
-            for(ClientHandler client : clients) {
-                if(client.getUser() == theUser) {
-                    return null;
-                }
-            }
-
-            return theUser;
-        }
-    }
-
-    public synchronized void addGame(ServerGame game) {
-        games.add(game);
-    }
-
-    public synchronized ServerGame getGame(String creator) {
-        for(ServerGame game : games) {
-            if(game.getCreator().getUsername().equals(creator)) {
-                return game;
-            }
-        }
-
-        return null;
-    }
-
-    public synchronized void broadcastMessage(User user, String message) {
-        for(ClientHandler client : clients) {
-            try {
-                client.message(user.getUsername(), message);
-            } catch(IOException e) {
-                // Wait for client to be removed by ClientHandler
-            }
-        }
-    }
-
-    public synchronized void gameMessage(User user, String join, ServerGame game) {
-//        for(User gameUser : game.getPlayers()) {
-//            for(ClientHandler client : clients) {
-//                if(client.getUser() == gameUser) {
-//                    try {
-//                        client.message(user.getUsername(), join);
-//                    } catch (IOException e) {
-//
-//                    }
-//                }
-//            }
-//        }
-    }
-
-    public void challenge(User user, String[] others) {
-        for(String userName : others) {
-            for(ClientHandler client : clients) {
-                if(client.getUser().getUsername().equals(userName)) {
-                    try {
-                        switch(others.length) {
-                            case 1:
-                                client.challenge(user.getUsername(), others[0]);
-                                break;
-                            case 2:
-                                client.challenge(user.getUsername(), others[0], others[1]);
-                                break;
-                            case 3:
-                                client.challenge(user.getUsername(), others[0], others[1], others[2]);
-                        }
-                    } catch (IOException e) {
-
-                    }
-                }
-            }
-        }
-
-    }
-
     @Override
     public void run() {
         try {
             while(true) {
                 Socket client = accept();
                 ClientHandler handler = new ClientHandler(this, client);
+                handler.start();
                 fireNewClient(handler);
             }
         } catch(IOException e) {
             fireServerError("IOException: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        new Server("0.0.0.0", 1234).serveForever();
+    }
+
+    public void notifyChallenged(String[] challengedUsers, String challenger) throws ProtocolException {
+        for(String challengedUser : challengedUsers) {
+            if(users.get(challengedUser) == null || users.get(challengedUser).getUsername() == null || !users.get(challengedUser).getClient().canBeChallenged()) {
+                throw new ProtocolException("Client tried to challenge users that cannot be challenged or are not online or do not exist.", ServerProtocol.ERROR_GENERIC);
+            }
+        }
+
+        for(String challengedUser : challengedUsers) {
+            User user = users.get(challengedUser);
+            user.getClient().notifyChallengedBy(challenger, Strings.remove(challengedUsers, challengedUser));
+        }
+    }
+
+    public void setClientHandler(String clientName, ClientHandler clientHandler) {
+        if(users.get(clientName) == null) {
+            users.put(clientName, new User(clientName, clientHandler));
+        } else {
+            users.get(clientName).setClient(clientHandler);
+        }
+    }
+
+    public void notifyChallengeResponse(boolean response, String[] userNames, String challenged) throws ProtocolException {
+        for(String userName : userNames) {
+            users.get(userName).getClient().notifyChallengeResponseBy(response, challenged);
+        }
+    }
+
+    public ServerGame getGameByCreator(String creator) {
+        return games.get(creator);
     }
 }

@@ -11,6 +11,10 @@ public class ChallengePacket extends Packet {
     /**
      * De array met de spelers die gechallenged worden.
      */
+    protected ChallengePacket() {
+
+    }
+
     private String[] challenged;
 
     /**
