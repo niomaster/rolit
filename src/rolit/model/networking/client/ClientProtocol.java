@@ -60,6 +60,13 @@ public abstract class ClientProtocol extends CommonProtocol {
     public static final String HIGHSCORE = "highscore";
 
     /**
+     * Constant voor het errorcommando
+     */
+    public static final String ERROR = "error";
+
+    public static final int ERROR_GENERIC = -1;
+
+    /**
      * Handshake voor de server. Moet altijd het eerste verzonden pakket zijn, met uitzondering van de errors.
      * @requires Dat de handshake nog niet is ontvangen
      * @requires Dat dit het eerste pakket op de communicatelijn is.
@@ -168,4 +175,12 @@ public abstract class ClientProtocol extends CommonProtocol {
      * @param arg Een argument (bijv. 2014-01-01)
      */
     public abstract void highscore(String type, String arg);
+
+    /**
+     * Commando om de server te laten weten dat hij iets fout heeft gedaan, waardoor de verbinding moet worden verbroken.
+     * @requires Dat de server iets fout heeft gedaan...
+     * @requires Dat dit het enige en eerste pakket na de fout is.
+     * @param errorCode De error-code, op te zoeken in de errorCode-tabel.
+     */
+    public abstract void error(int errorCode);
 }
