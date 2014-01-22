@@ -67,4 +67,14 @@ public abstract class ClientHandlerState {
         error("challenge response");
         return null;
     }
+
+    /**
+     * Standaardgedrag is om gewoon het pakket door te sturen.
+     * @param game het desbetreffende spel
+     * @return zichzelf, aangezien de staat niet verandert.
+     */
+    public ClientHandlerState notifyOfGameChange(ServerGame game) {
+        getHandler().write(new GamePacket(game.getCreator().getUsername(), game.getStatus(), game.getPlayerCount()));
+        return this;
+    }
 }

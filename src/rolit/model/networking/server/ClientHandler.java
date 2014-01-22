@@ -135,4 +135,16 @@ public class ClientHandler implements Runnable {
     public ServerGame getGameByCreator(String creator) {
         return server.getGameByCreator(creator);
     }
+
+    public User getUser() {
+        return server.getUser(getClientName());
+    }
+
+    public void createGame() {
+        server.createGame(getClientName());
+    }
+
+    public void notifyOfGameChange(ServerGame game) {
+        state.notifyOfGameChange(game);
+    }
 }
