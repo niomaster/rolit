@@ -11,7 +11,7 @@ public class InitialClientHandlerState extends ClientHandlerState {
     }
 
     @Override
-    public ClientHandlerState handshake(HandshakePacket packet) throws ProtocolException {
+    public ClientHandlerState handshake(rolit.model.networking.client.HandshakePacket packet) throws ProtocolException {
         if(packet.getSupports() < CommonProtocol.SUPPORTS_BAREBONE || packet.getSupports() > CommonProtocol.SUPPORTS_CHAT_CHALLENGE) {
             throw new ProtocolException("Invalid supports integer", ServerProtocol.ERROR_GENERIC);
         }
