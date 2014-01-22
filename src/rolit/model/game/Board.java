@@ -1,5 +1,7 @@
 package rolit.model.game;
 
+import rolit.view.client.MainView;
+
 import java.util.LinkedList;
 
 /**
@@ -41,6 +43,11 @@ public class Board {
     };
 
     /**
+     * De variabele die bijhoudt of het spel al voorbij is.
+     */
+    private boolean gameOver;
+
+    /**
      * Constructor voor klasse bord. Hierin wordt de array aangemaakt en gevuld met legen velden en de 4 balletje in
      * het midden.
      */
@@ -56,7 +63,7 @@ public class Board {
         array[4][3] = 1;
         array[4][4] = 2;
         array[3][4] = 3;
-
+        gameOver = false;
     }
 
     /**
@@ -84,6 +91,7 @@ public class Board {
 
     /**
      * Vult een bepaald veld met een kleur van een speler.
+     *
      * @param x     de x-coördinaat, oftewel horizontale positie op het bord.
      * @param y     de y-coördinaat, oftwel vericale positie op het bord.
      * @param field de integer die de kleur van de speler aangeeft.
@@ -94,15 +102,17 @@ public class Board {
 
     /**
      * Vult een bepaald veld met een kleur van een speler.
+     *
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
-     * @param field de integer die de kleur van de speler aangeeft.
+     * @param field    de integer die de kleur van de speler aangeeft.
      */
-    public void setField(Position position, int field){
+    public void setField(Position position, int field) {
         array[position.getX()][position.getY()] = field;
     }
 
     /**
      * Geeft terug of een veld leeg is.
+     *
      * @param x de x-coördinaat, oftewel horizontale positie op het bord.
      * @param y de y-coördinaat, oftwel vericale positie op het bord.
      * @return een boolean of het veld leeg is.
@@ -113,6 +123,7 @@ public class Board {
 
     /**
      * Geeft terug of een veld leeg is.
+     *
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
      * @return een boolean of het veld leeg is.
      */
@@ -122,6 +133,7 @@ public class Board {
 
     /**
      * Maakt een kopie van het huidige bord.
+     *
      * @return een nieuw bord met alle informatie van het huidige bord.
      */
     public Board copy() {
@@ -201,32 +213,33 @@ public class Board {
 
     /**
      * Doet de zet van een speler, en verandert alle kleuren naar zijn kleur van de geslagen balletjes.
-     * @param player de speler die de zet doet.
+     *
+     * @param player       de speler die de zet doet.
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet gelukt is.
      */
-    public boolean doMove(Player player, Position movePosition){
-        if (isLegalMove(player, movePosition)){
+    public boolean doMove(Player player, Position movePosition) {
+        if (isLegalMove(player, movePosition)) {
             Capture[] captures = getCapture(player, movePosition);
             setField(movePosition, player.getColor());
 
-            for(Capture capture : captures){
-                for (int i = 0; i < captures.length; i++){
+            for (Capture capture : captures) {
+                for (int i = 0; i < captures.length; i++) {
                     int x = (capture.getDirection().getX() + i * (capture.getDirection().getX()));
                     int y = (capture.getDirection().getY() + i * (capture.getDirection().getY()));
-                    Position seize = new Position(x,y);
+                    Position seize = new Position(x, y);
                     setField(seize, player.getColor());
                 }
             }
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
      * Maakt een visuele representatie van het huidige bord.
+     *
      * @return een string zo geformat dat het bord leesbaar is.
      */
     public String toString() {
@@ -251,4 +264,64 @@ public class Board {
         return result;
     }
 
+    /**
+     * Kijkt of alle velden gevuld zijn, dus of het spel is afgelopen.
+     * @return een boolean of het spel al voorbij is.
+     */
+    public boolean gameOver() {
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                if (getField(x, y) != EMPTY_FIELD) {
+                    gameOver = true;
+                } else {
+                    gameOver = false;
+                }
+            }
+        }
+        return gameOver;
+    }
+
+    /**
+     * Bepaald de winneer van het spel, als het spel is afgelopen.
+     * @return een integer die de kleur van de winnaar representateerd.
+     */
+    public int determineWinner() {
+        int rood = 0;
+        int geel = 0;
+        int groen = 0;
+        int blauw = 0;
+
+        if (gameOver == true) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
+                for (int x = 0; x < BOARD_WIDTH; x++) {
+                    if (getField(x, y) == 0) {
+                        rood++;
+                    } else if (getField(x, y) == 1) {
+                        geel++;
+                    } else if (getField(x, y) == 2) {
+                        groen++;
+                    } else {
+                        blauw++;
+                    }
+                }
+            }
+
+        }
+        if ( Math.max(rood,geel) > Math.max(groen, blauw)){
+            if ( rood > geel){
+                return 0;
+            }
+            else {
+                return 1;
+            }
+        }
+        else {
+            if (groen > blauw) {
+                return 2;
+            }
+            else {
+                return 3;
+            }
+        }
+    }
 }

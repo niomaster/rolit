@@ -4,17 +4,48 @@ import java.util.LinkedList;
 import java.util.Random;
 
 /**
+ * De klasse makkelijke computer tegenstander.
  * Created by Martijn on 21-1-14.
  */
-public class EasyComputerPlayer extends Player {
+public class EasyComputerPlayer implements Player {
+    /**
+     * De kleur van de computer speler.
+     */
+    private int color;
+    /**
+     * De naam de de computer speler.
+     */
+    private final String naam = "Easy computer";
 
-    private final int color;
-
+    /**
+     * De constructor van de computer speler.
+     * @param nummer het nummer van de computer speler, die de kleur aangeeft.
+     */
     public EasyComputerPlayer(int nummer) {
-        super(nummer);
         this.color = nummer;
     }
 
+    /**
+     * Geeft de kleur terug van de computer speler.
+     * @return een integer die de kleur van de speler representateerd.
+     */
+    public int getColor() {
+        return color;
+    }
+
+    /**
+     * Geeft de naam van de computer speler terug.
+     * @return een string van de naam, altijd Easy computer.
+     */
+    public String getNaam() {
+        return naam;
+    }
+
+    /**
+     * Bepaald de volgende zet op een bepaald bord.
+     * @param board het bord waarop de zet zal worden gedaan.
+     * @return een positie op het bord.
+     */
     public Position determineMove(Board board) {
         LinkedList<Position> possibleMoves = new LinkedList<Position>();
         for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
@@ -30,8 +61,11 @@ public class EasyComputerPlayer extends Player {
         return randomPosition;
     }
 
-    public void doMove(Board board, Position move) {
+    /**
+     * Doet de zet bepaald met determineMove.
+     * @param board het bord waarop de zet gedaan wordt.
+     */
+    public void doMove(Board board) {
         board.doMove(this, determineMove(board));
     }
-
 }
