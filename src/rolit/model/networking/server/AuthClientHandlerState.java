@@ -12,10 +12,9 @@ import rolit.util.Crypto;
 public class AuthClientHandlerState extends ClientHandlerState {
     private String nonce;
 
-    public AuthClientHandlerState(ClientHandler handler) {
+    public AuthClientHandlerState(ClientHandler handler, String nonce) {
         super(handler);
-        nonce = Crypto.getNonce();
-        getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
+        this.nonce = nonce;
     }
 
     @Override

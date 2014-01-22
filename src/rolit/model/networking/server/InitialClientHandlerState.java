@@ -1,9 +1,9 @@
 package rolit.model.networking.server;
 
 import rolit.model.networking.client.ClientProtocol;
-import rolit.model.networking.client.HandshakePacket;
 import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.ProtocolException;
+import rolit.util.Crypto;
 
 public class InitialClientHandlerState extends ClientHandlerState {
     public InitialClientHandlerState(ClientHandler handler) {
@@ -24,8 +24,12 @@ public class InitialClientHandlerState extends ClientHandlerState {
         getHandler().setClientSupports(packet.getSupports());
 
         if(packet.getName().startsWith("player_")) {
-            return new AuthClientHandlerState(getHandler());
+            String nonce = Crypto.getNonce();
+            getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION, nonce));
+            return new AuthClientHandlerState(getHandler(), nonce);
         } else {
+
+            getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
             return new GameLobbyClientHandlerState(getHandler());
         }
     }

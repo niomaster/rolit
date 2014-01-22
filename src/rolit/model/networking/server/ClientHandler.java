@@ -1,15 +1,12 @@
 package rolit.model.networking.server;
 
-import rolit.model.networking.client.ClientProtocol;
-import rolit.model.networking.client.CreateGamePacket;
-import rolit.model.networking.client.JoinGamePacket;
-import rolit.model.networking.client.StartGamePacket;
-import rolit.model.networking.common.Packet;
-import rolit.model.networking.common.ProtocolException;
+import rolit.model.networking.client.*;
 import rolit.model.networking.client.ChallengePacket;
 import rolit.model.networking.client.ChallengeResponsePacket;
 import rolit.model.networking.client.HandshakePacket;
 import rolit.model.networking.client.MovePacket;
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.ProtocolException;
 import rolit.util.Strings;
 
 import java.io.*;
@@ -57,6 +54,8 @@ public class ClientHandler implements Runnable {
             state = state.move((rolit.model.networking.client.MovePacket) packet);
         } else if(packet instanceof StartGamePacket) {
             state = state.startGame((StartGamePacket) packet);
+        } else if(packet instanceof AuthPacket) {
+            state = state.auth((AuthPacket) packet);
         } else {
             throw new ProtocolException("Client caused the server to be in an impossible condition", ServerProtocol.ERROR_GENERIC);
         }
@@ -81,6 +80,7 @@ public class ClientHandler implements Runnable {
                     handlePacket(Packet.readClientPacketFrom(input));
                 }
             } catch (ProtocolException e) {
+                System.out.println("ProtocolException: " + e.getMessage());
                 server.fireClientError("ProtocolException: " + e.getMessage());
                 new ErrorPacket(e.getCode()).writeTo(output);
                 client.close();

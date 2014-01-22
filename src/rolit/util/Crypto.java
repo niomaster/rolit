@@ -1,9 +1,10 @@
 package rolit.util;
 
+import java.nio.charset.MalformedInputException;
 import java.security.*;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-gimport java.util.Arrays;
+import java.util.Arrays;
 
 /**
  * Created by laurens on 1/21/14.
@@ -38,14 +39,15 @@ public class Crypto {
         }
 
         if(data.length % 3 == 1) {
-            byte byte1 = data[data.length - 1];
+            int byte1 = (data[data.length - 1] + 256) % 256;
 
             result += BASE64_CHARS.charAt(byte1 / 4);
             result += BASE64_CHARS.charAt((byte1 % 4) * 16);
             result += BASE64_PADDING;
             result += BASE64_PADDING;
         } else if(data.length % 3 == 2) {
-            byte byte1 = data[data.length - 2], byte2 = data[data.length - 1];
+            int byte1 = (data[data.length - 2] + 256) % 256,
+                    byte2 = (data[data.length - 1] + 256) % 256;
 
             result += BASE64_CHARS.charAt(byte1 / 4);
             result += BASE64_CHARS.charAt((byte1 % 4) * 16 + byte2 / 16);
@@ -67,6 +69,15 @@ public class Crypto {
         for(int i = 0; i < data.length() / 4; i++) {
             char char1 = data.charAt(i * 4), char2 = data.charAt(i * 4 + 1),
                     char3 = data.charAt(i * 4 + 2), char4 = data.charAt(i * 4 + 3);
+
+            boolean char1Valid = BASE64_CHARS.indexOf(char1) != -1;
+            boolean char2Valid = BASE64_CHARS.indexOf(char2) != -1;
+            boolean char3Valid = BASE64_CHARS.indexOf(char3) != -1;
+            boolean char4Valid = BASE64_CHARS.indexOf(char4) != -1;
+
+            if(!(char1Valid && char2Valid && char3Valid && char4Valid)) {
+                return null;
+            }
 
             int result1 = BASE64_CHARS.indexOf(char1) * 4 + BASE64_CHARS.indexOf(char2) / 16;
             int result2 = (BASE64_CHARS.indexOf(char2) % 16) * 16 + BASE64_CHARS.indexOf(char3) / 4;
@@ -96,6 +107,10 @@ public class Crypto {
 
     public static boolean verify(byte[] cypherText, byte[] original, PublicKey publicKey) {
         try {
+            if(cypherText == null || original == null || publicKey == null) {
+                return false;
+            }
+
             Signature signature = Signature.getInstance("SHA1withRSA");
             signature.initVerify(publicKey);
             signature.update(original);
