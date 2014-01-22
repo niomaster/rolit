@@ -106,7 +106,11 @@ public class ClientHandler implements Runnable {
         this.clientName = clientName;
     }
 
+<<<<<<< HEAD
     public synchronized void write(Packet packet) {
+=======
+    public void write(Packet packet) {
+>>>>>>> 36fc60f0ae5b7a5b75407da3b9e14fb26b6e9f04
         packet.writeTo(output);
     }
 }

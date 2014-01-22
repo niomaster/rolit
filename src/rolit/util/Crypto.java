@@ -1,6 +1,8 @@
 package rolit.util;
 
 import java.security.*;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
