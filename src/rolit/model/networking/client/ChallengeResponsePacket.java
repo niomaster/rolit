@@ -14,7 +14,7 @@ public class ChallengeResponsePacket extends Packet {
         this.response = response;
     }
 
-    public boolean isResponse() {
+    public boolean getResponse() {
         return response;
     }
 

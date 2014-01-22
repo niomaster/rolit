@@ -57,4 +57,14 @@ public abstract class ClientHandlerState {
         error("auth");
         return null;
     }
+
+    public ClientHandlerState notifyChallengedBy(String challenger, String[] others) throws ProtocolException {
+        error("challenged");
+        return null;
+    }
+
+    public ClientHandlerState notifyChallengeResponseBy(boolean response, String challenged) throws ProtocolException {
+        error("challenge response");
+        return null;
+    }
 }

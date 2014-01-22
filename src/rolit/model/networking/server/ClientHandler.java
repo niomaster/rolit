@@ -5,6 +5,7 @@ import rolit.model.networking.client.ChallengePacket;
 import rolit.model.networking.client.ChallengeResponsePacket;
 import rolit.model.networking.client.HandshakePacket;
 import rolit.model.networking.client.MovePacket;
+import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.ProtocolException;
 import rolit.util.Strings;
@@ -69,6 +70,10 @@ public class ClientHandler implements Runnable {
 
     }
 
+    public void notifyChallenged(String[] challenged) throws ProtocolException {
+        server.notifyChallenged(challenged, getClientName());
+    }
+
     @Override
     public void run() {
         try {
@@ -104,9 +109,26 @@ public class ClientHandler implements Runnable {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+        server.setClientHandler(clientName, this);
     }
 
     public synchronized void write(Packet packet) {
         packet.writeTo(output);
+    }
+
+    public boolean canBeChallenged() {
+        return (getClientSupports() & CommonProtocol.SUPPORTS_CHALLENGE) != 0;
+    }
+
+    public void notifyChallengedBy(String challenger, String[] others) throws ProtocolException {
+        state = state.notifyChallengedBy(challenger, others);
+    }
+
+    public void notifyChallengeResponse(boolean response, String challenger, String[] others) throws ProtocolException {
+        server.notifyChallengeResponse(response, Strings.push(challenger, others), getClientName());
+    }
+
+    public void notifyChallengeResponseBy(boolean response, String challenged) throws ProtocolException {
+        state = state.notifyChallengeResponseBy(response, challenged);
     }
 }

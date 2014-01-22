@@ -20,15 +20,14 @@ public class InitialClientHandlerState extends ClientHandlerState {
             throw new ProtocolException("Invalid name length or format", ServerProtocol.ERROR_INVALID_LOGIN);
         }
 
-        getHandler().setClientName(packet.getName());
         getHandler().setClientSupports(packet.getSupports());
 
         if(packet.getName().startsWith("player_")) {
             String nonce = Crypto.getNonce();
             getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION, nonce));
-            return new AuthClientHandlerState(getHandler(), nonce);
+            return new AuthClientHandlerState(getHandler(), nonce, packet.getName());
         } else {
-
+            getHandler().setClientName(packet.getName());
             getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
             return new GameLobbyClientHandlerState(getHandler());
         }

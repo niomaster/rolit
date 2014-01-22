@@ -11,10 +11,12 @@ import rolit.util.Crypto;
 
 public class AuthClientHandlerState extends ClientHandlerState {
     private String nonce;
+    private String clientName;
 
-    public AuthClientHandlerState(ClientHandler handler, String nonce) {
+    public AuthClientHandlerState(ClientHandler handler, String nonce, String clientName) {
         super(handler);
         this.nonce = nonce;
+        this.clientName = clientName;
     }
 
     @Override
@@ -28,6 +30,8 @@ public class AuthClientHandlerState extends ClientHandlerState {
         }
 
         getHandler().write(new AuthOkPacket());
+
+        getHandler().setClientName(this.clientName);
 
         return new GameLobbyClientHandlerState(getHandler());
     }
