@@ -15,7 +15,7 @@ public class GameClientHandlerState extends ClientHandlerState {
     }
 
     @Override
-    public ClientHandlerState move(MovePacket packet) {
+    public ClientHandlerState move(rolit.model.networking.client.MovePacket packet) {
         return this;
     }
 }

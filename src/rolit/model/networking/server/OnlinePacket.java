@@ -28,7 +28,7 @@ public class OnlinePacket extends Packet {
 
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
-        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Boolean }
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Boolean };
     }
 
     @Override
