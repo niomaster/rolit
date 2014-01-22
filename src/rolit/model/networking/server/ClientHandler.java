@@ -13,6 +13,10 @@ import rolit.util.Strings;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * De ClientHandler
+ * @author Pieter Bos
+ */
 public class ClientHandler implements Runnable {
     private final Server server;
     private final Socket client;
@@ -32,10 +36,18 @@ public class ClientHandler implements Runnable {
         state = new InitialClientHandlerState(this);
     }
 
+    /**
+     * Start een nieuwe thread voor elke nieuwe client.
+     */
     public void start() {
         thread.start();
     }
 
+    /**
+     * Verandert de status van de ClientHandlerState op basis de binnengekomen pakketjes.
+     * @param packet Het pakketje wat ontvangen worden.
+     * @throws ProtocolException wordt gegooid als er bij een van de pakketje die ontvangen wordt iets verkeerd gaat.
+     */
     private void handlePacket(Packet packet) throws ProtocolException {
         if(packet instanceof rolit.model.networking.client.ChallengePacket) {
             state = state.challenge((rolit.model.networking.client.ChallengePacket) packet);
@@ -62,6 +74,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+
     private void message(MessagePacket packet) {
 
     }
@@ -70,6 +83,11 @@ public class ClientHandler implements Runnable {
 
     }
 
+    /**
+     * Notified de spelers die gechallenged worden.
+     * @param challenged de spelers die gechallenged worden.
+     * @throws ProtocolException een exceptie als er iets fout gaat.
+     */
     public void notifyChallenged(String[] challenged) throws ProtocolException {
         server.notifyChallenged(challenged, getClientName());
     }
@@ -134,10 +152,23 @@ public class ClientHandler implements Runnable {
         state = state.notifyChallengedBy(challenger, others);
     }
 
+    /**
+     * Stuurt een notificatie naar de andere spelers die gechallenged waren, en de challenger.
+     * @param response de reactie van de speler
+     * @param challenger de challenger.
+     * @param others de andere spelers die gechallenged zijn.
+     * @throws ProtocolException wordt gegooid als er iets fout gaat.
+     */
     public void notifyChallengeResponse(boolean response, String challenger, String[] others) throws ProtocolException {
         server.notifyChallengeResponse(response, Strings.push(challenger, others), getClientName());
     }
 
+    /**
+     * verandert de status van de speler die reageert op een challenge.
+     * @param response de reactie van de speler.
+     * @param challenged de speler die gechallenged is.
+     * @throws ProtocolException wordt gegooid als er iets fout gaat.
+     */
     public void notifyChallengeResponseBy(boolean response, String challenged) throws ProtocolException {
         state = state.notifyChallengeResponseBy(response, challenged);
     }

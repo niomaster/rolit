@@ -3,6 +3,9 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/** Het pakketje wat de highscores kan opvragen.
+ * @author Pieter Bos
+ */
 public class HighscorePacket extends Packet {
     private String type;
     private String arg;

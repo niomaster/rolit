@@ -3,6 +3,7 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.CommonProtocol;
 
 /**
+ * Het deel van het protocal dat alleen voor de client nodig is.
  * @author Pieter Bos
  * @author Martijn de Bijl
  *

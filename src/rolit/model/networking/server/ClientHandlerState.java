@@ -3,6 +3,10 @@ package rolit.model.networking.server;
 import rolit.model.networking.client.*;
 import rolit.model.networking.common.ProtocolException;
 
+/**
+ * De status van de ClientHandler.
+ * @author Pieter Bos
+ */
 public abstract class ClientHandlerState {
     private ClientHandler handler;
 
@@ -10,6 +14,11 @@ public abstract class ClientHandlerState {
         this.handler = handler;
     }
 
+    /**
+     * Gooit een exceptie als er niet van status verandert kan worden.
+     * @param commandName naam van het commanda.
+     * @throws ProtocolException wordt gegooid van een status niet naar de andere status verandert kan worden.
+     */
     private void error(String commandName) throws ProtocolException {
         throw new ProtocolException("Cannot do " + commandName + " while in state " + this.getClass().getName(), ServerProtocol.ERROR_GENERIC);
     }

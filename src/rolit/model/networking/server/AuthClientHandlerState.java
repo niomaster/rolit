@@ -9,6 +9,10 @@ import java.security.PublicKey;
 
 import rolit.util.Crypto;
 
+/**
+ * De staat van ClientHandler ten aanzien van het authenticeren.
+ * @author Pieter Bos
+ */
 public class AuthClientHandlerState extends ClientHandlerState {
     private String nonce;
     private String clientName;
@@ -19,6 +23,12 @@ public class AuthClientHandlerState extends ClientHandlerState {
         this.clientName = clientName;
     }
 
+    /**
+     * Verandert de status van de ClientHandler als de speler geauthenticeerd wordt.
+     * @param packet het pakket waarin de cypher zit die gecontroleerd moet worden.
+     * @return een nieuwe ClientState met een nieuwe status.
+     * @throws ProtocolException als de speler niet geauthenticeerd kan worden, wordt er een exception gegegooid.
+     */
     @Override
     public ClientHandlerState auth(AuthPacket packet) throws ProtocolException {
         byte[] cypherText = Crypto.base64Decode(packet.getCypherText());

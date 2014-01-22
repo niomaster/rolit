@@ -3,6 +3,9 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/** Het pakketje met een message voor de chat.
+ * @author Pieter Bos
+ */
 public class MessagePacket extends Packet {
     private String message;
 
@@ -39,7 +42,7 @@ public class MessagePacket extends Packet {
 
     /**
      * Geeft de data van het pakket in een object array.
-     * @return de dat
+     * @return een data array van de message.
      */
     @Override
     protected Object[] getData() {

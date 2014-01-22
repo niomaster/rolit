@@ -17,6 +17,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+/**
+ * De basis voor alle pakketjes.
+ * @author Pieter Bos
+ */
 public abstract class Packet {
     private static final BiMap<String, Class<? extends Packet>> CLIENT_PACKETS = new BiMap<String, Class<? extends Packet>>();
     private static final BiMap<String, Class<? extends Packet>> SERVER_PACKETS = new BiMap<String, Class<? extends Packet>>();

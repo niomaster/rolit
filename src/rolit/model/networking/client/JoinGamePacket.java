@@ -3,6 +3,9 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/** Het pakketje dat ervoor zorgt dat een speler een spel joint.
+ * @author Pieter Bos
+ */
 public class JoinGamePacket extends Packet {
 
     private String creator;
@@ -39,7 +42,7 @@ public class JoinGamePacket extends Packet {
 
     /**
      * Geeft de data van het pakket in een object array.
-     * @return een object array
+     * @return een object array met de creator erin.
      */
     @Override
     protected Object[] getData() {

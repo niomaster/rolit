@@ -1,5 +1,7 @@
 package rolit.model.networking.extensions;
-
+/**
+ * @author Pieter Bos
+ */
 import rolit.model.networking.client.ClientProtocol;
 
 public abstract class WebSocketClientProtocol extends ClientProtocol {

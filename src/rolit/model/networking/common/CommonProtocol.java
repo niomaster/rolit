@@ -8,6 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
 /**
+ * Het deel van het protocol dat de server en de client delen.
  * @author Pieter Bos
  * @author Martijn de Bijl
  *

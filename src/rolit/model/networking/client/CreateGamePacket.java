@@ -3,7 +3,7 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
-/**Het pakket wat ervoor zorgt dat er een game gemaakt wordt.
+/** Het pakket wat ervoor zorgt dat er een game gemaakt wordt.
  * @author Pieter Bos
  */
 public class CreateGamePacket extends Packet {

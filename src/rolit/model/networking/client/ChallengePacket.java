@@ -3,7 +3,7 @@ package rolit.model.networking.client;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
-/**
+/** Het pakketje wat de challenge verstuurd naar spelers.
  * @author Pieter Bos
  */
 public class ChallengePacket extends Packet {

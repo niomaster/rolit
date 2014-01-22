@@ -4,7 +4,7 @@ import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
 /**
- * De reactie op de challenge.
+ * Het pakketje met de reactie op de challenge.
  * @author Pieter Bos
  */
 
