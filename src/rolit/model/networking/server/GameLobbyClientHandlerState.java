@@ -17,7 +17,15 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     }
 
     @Override
-    public ClientHandlerState joinGame(JoinGamePacket packet) {
+    public ClientHandlerState joinGame(JoinGamePacket packet) throws ProtocolException {
+        ServerGame game = getHandler().getGameByCreator(packet.getCreator());
+
+        if(game == null) {
+            throw new ProtocolException("Client tried to join a game that does not exist", ServerProtocol.ERROR_NO_SUCH_GAME);
+        }
+
+        if(game.getPlayerCount() )
+
         return new WaitForGameClientHandlerState(getHandler(), packet.getCreator());
     }
 

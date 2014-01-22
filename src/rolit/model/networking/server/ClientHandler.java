@@ -131,4 +131,8 @@ public class ClientHandler implements Runnable {
     public void notifyChallengeResponseBy(boolean response, String challenged) throws ProtocolException {
         state = state.notifyChallengeResponseBy(response, challenged);
     }
+
+    public ServerGame getGameByCreator(String creator) {
+        return server.getGameByCreator(creator);
+    }
 }

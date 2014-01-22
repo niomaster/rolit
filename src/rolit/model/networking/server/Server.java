@@ -23,7 +23,7 @@ public class Server extends ServerSocket implements Runnable {
     private LinkedList<ServerListener> listeners = new LinkedList<ServerListener>();
     private LinkedList<ClientHandler> clients = new LinkedList<ClientHandler>();
     private HashMap<String, User> users = new LinkedHashMap<String, User>();
-    private LinkedList<ServerGame> games = new LinkedList<ServerGame>();
+    private HashMap<String, ServerGame> games = new LinkedHashMap<String, ServerGame>();
 
     public Server(String bindAddress, int port) throws IOException {
         super(port, DEFAULT_BACKLOG, InetAddress.getByName(bindAddress));
@@ -107,5 +107,9 @@ public class Server extends ServerSocket implements Runnable {
         for(String userName : userNames) {
             users.get(userName).getClient().notifyChallengeResponseBy(response, challenged);
         }
+    }
+
+    public ServerGame getGameByCreator(String creator) {
+        return games.get(creator);
     }
 }
