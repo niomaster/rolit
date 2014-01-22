@@ -15,16 +15,28 @@ public class JoinGamePacket extends Packet {
         return creator;
     }
 
+    /**
+     * Zet de argumenten van het pakket in variabele.
+     * @param args de argumenten van het pakket.
+     */
     @Override
     protected void readFromArgs(PacketArgs args) {
         this.creator = args.getString(0);
     }
 
+    /**
+     * Geeft het type van het argument.
+     * @return het type van het argument: string.
+     */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
         return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
     }
 
+    /**
+     * Geeft de data van het pakket in een object array.
+     * @return een object array
+     */
     @Override
     protected Object[] getData() {
         return new Object[] { creator };

@@ -44,10 +44,22 @@ public abstract class Packet {
         SERVER_PACKETS.put(ServerProtocol.ONLINE, OnlinePacket.class);
     }
 
+    /**
+     * Geeft de argumenten uit een bepaald pakket.
+     * @param args de argumenten van het pakket.
+     */
     protected abstract void readFromArgs(PacketArgs args);
 
+    /**
+     * Geeft het type van de argumenten van het pakket.
+     * @return het type van de argumenten.
+     */
     protected abstract PacketArgs.ArgumentType[] getArgumentTypes();
 
+    /**
+     * Geeft de data van het pakket.
+     * @return een array van objeceten met de data.
+     */
     protected abstract Object[] getData();
 
     private static Packet readFrom(BufferedReader input, LinkedHashMap<String, Class<? extends Packet>> packets) throws IOException, ProtocolException {
