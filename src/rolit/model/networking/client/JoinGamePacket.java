@@ -7,6 +7,10 @@ public class JoinGamePacket extends Packet {
 
     private String creator;
 
+    protected JoinGamePacket() {
+
+    }
+
     public JoinGamePacket(String creator) {
         this.creator = creator;
     }

@@ -6,6 +6,10 @@ import rolit.model.networking.common.PacketArgs;
 public class StartPacket extends Packet {
     private String[] players;
 
+    protected StartPacket() {
+
+    }
+
     public StartPacket(String[] players) {
         this.players = players;
     }

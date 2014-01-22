@@ -6,6 +6,10 @@ import rolit.model.networking.common.PacketArgs;
 public class AuthPacket extends Packet {
     private String cypherText;
 
+    protected AuthPacket() {
+
+    }
+
     public AuthPacket(String cypherText) {
         this.cypherText = cypherText;
     }
