@@ -1,5 +1,9 @@
 package rolit.model.networking.common;
 
+/**
+ * De verschillende exceptions die kunnen onstaan in het protocol.
+ * @author Pieter Bos
+ */
 public class ProtocolException extends Exception {
     private final int code;
 

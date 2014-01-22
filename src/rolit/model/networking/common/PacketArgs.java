@@ -5,6 +5,10 @@ import rolit.util.Strings;
 
 import java.util.Arrays;
 
+/**
+ * De vrschillende argumenten die pakketjes kunnen hebben.
+ * @author Pieter Bos
+ */
 public class PacketArgs {
     public enum ArgumentType {
         Integer,
