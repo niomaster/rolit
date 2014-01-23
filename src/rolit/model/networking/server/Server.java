@@ -194,11 +194,17 @@ public class Server extends ServerSocket implements Runnable {
                 user.getClient().notifyOnlineOf(other.getUsername());
             }
         }
+
+        for(User other : users.values()) {
+            if(other.getClient() != null && other.getClient().getClientName() != null && other.getClient().canBeChallenged()) {
+                user.getClient().notifyCanBeChallengedOf(other.getUsername());
+            }
+        }
     }
 
     public void notifyOnline(String clientName) {
         for(User user : users.values()) {
-            if(user.getClient() != null && user.getClient().getClientName() != null) {
+            if(user.getClient() != null && user.getClient().getClientName() != null && !user.getClient().getClientName().equals(clientName)) {
                 user.getClient().notifyOnlineOf(clientName);
             }
         }
@@ -206,7 +212,7 @@ public class Server extends ServerSocket implements Runnable {
 
     public void notifyOffline(String clientName) {
         for(User user : users.values()) {
-            if(user.getClient() != null && user.getClient().getClientName() != null) {
+            if(user.getClient() != null && user.getClient().getClientName() != null && !user.getClient().getClientName().equals(clientName)) {
                 user.getClient().notifyOfflineOf(clientName);
             }
         }
@@ -214,7 +220,7 @@ public class Server extends ServerSocket implements Runnable {
 
     public void notifyCannotBeChallenged(String clientName) {
         for(User user : users.values()) {
-            if(user.getClient() != null && user.getClient().getClientName() != null) {
+            if(user.getClient() != null && user.getClient().getClientName() != null && !user.getClient().getClientName().equals(clientName)) {
                 user.getClient().notifyCannotBeChallengedOf(clientName);
             }
         }
@@ -222,7 +228,7 @@ public class Server extends ServerSocket implements Runnable {
 
     public void notifyCanBeChallenged(String clientName) {
         for(User user : users.values()) {
-            if(user.getClient() != null && user.getClient().getClientName() != null) {
+            if(user.getClient() != null && user.getClient().getClientName() != null  && !user.getClient().getClientName().equals(clientName)) {
                 user.getClient().notifyCanBeChallengedOf(clientName);
             }
         }

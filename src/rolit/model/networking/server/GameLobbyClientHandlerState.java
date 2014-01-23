@@ -94,4 +94,13 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     public ClientHandlerState exit() {
         return null;
     }
+
+    /**
+     * De enige staat waarin een client gechallenged kan worden.
+     * @return true
+     */
+    @Override
+    public boolean canBeChallenged() {
+        return true;
+    }
 }

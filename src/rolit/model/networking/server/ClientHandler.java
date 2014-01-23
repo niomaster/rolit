@@ -150,6 +150,10 @@ public class ClientHandler implements Runnable {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHAT) != 0;
     }
 
+    public boolean canBeChallenged() {
+        return supportsChallenge() && state.canBeChallenged();
+    }
+
     public void notifyChallengedBy(String challenger, String[] others) throws ProtocolException {
         state = state.notifyChallengedBy(challenger, others);
     }
