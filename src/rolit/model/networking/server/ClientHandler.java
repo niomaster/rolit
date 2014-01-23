@@ -1,10 +1,6 @@
 package rolit.model.networking.server;
 
 import rolit.model.networking.client.*;
-import rolit.model.networking.client.ChallengePacket;
-import rolit.model.networking.client.ChallengeResponsePacket;
-import rolit.model.networking.client.HandshakePacket;
-import rolit.model.networking.client.MovePacket;
 import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.ProtocolException;
@@ -115,7 +111,13 @@ public class ClientHandler implements Runnable {
         state = state.exit();
 
         if(getClientName() != null) {
-            server.notifyOffline(getClientName());
+            if(supportsChat()) {
+                server.notifyOffline(getClientName());
+            }
+
+            if(supportsChallenge()) {
+                server.notifyCannotBeChallenged(getClientName());
+            }
         }
     }
 
@@ -140,11 +142,11 @@ public class ClientHandler implements Runnable {
         packet.writeTo(output);
     }
 
-    public boolean canBeChallenged() {
+    public boolean supportsChallenge() {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHALLENGE) != 0;
     }
 
-    public boolean canChat() {
+    public boolean supportsChat() {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHAT) != 0;
     }
 
@@ -194,14 +196,44 @@ public class ClientHandler implements Runnable {
     }
 
     public void notifyOnline() {
-        server.notifyOnline(getClientName());
+        if(supportsChat()) {
+            server.notifyOnline(getClientName());
+        }
     }
 
     public void notifyOnlineOf(String clientName) {
-        write(new OnlinePacket(clientName, true));
+        if(supportsChat()) {
+            write(new OnlinePacket(clientName, true));
+        }
     }
 
     public void notifyOfflineOf(String clientName) {
-        write(new OnlinePacket(clientName, false));
+        if(supportsChat()) {
+            write(new OnlinePacket(clientName, false));
+        }
+    }
+
+    public void notifyCannotBeChallengedOf(String clientName) {
+        if(supportsChallenge()) {
+            write(new CanBeChallengedPacket(clientName, false));
+        }
+    }
+
+    public void notifyCanBeChallenged() {
+        if(supportsChallenge()) {
+            server.notifyCanBeChallenged(getClientName());
+        }
+    }
+
+    public void notifyCanBeChallengedOf(String clientName) {
+        if(supportsChallenge()) {
+            write(new CanBeChallengedPacket(clientName, true));
+        }
+    }
+
+    public void notifyCannotBeChallenged() {
+        if(supportsChallenge()) {
+            server.notifyCannotBeChallenged(getClientName());
+        }
     }
 }

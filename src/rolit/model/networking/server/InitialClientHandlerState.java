@@ -31,6 +31,7 @@ public class InitialClientHandlerState extends ClientHandlerState {
             getHandler().write(new HandshakePacket(Server.GLOBAL_SUPPORTS, Server.GLOBAL_VERSION));
             getHandler().writeInfo();
             getHandler().notifyOnline();
+            getHandler().notifyCanBeChallenged();
             return new GameLobbyClientHandlerState(getHandler());
         }
     }
