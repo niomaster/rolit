@@ -166,7 +166,7 @@ public class Server extends ServerSocket implements Runnable {
      * Maakt een nieuwe game aan.
      * @param userName de naam van de speler die de game aanmaakt.
      */
-    public void createGame(String userName) {
+    public void createGame(String userName) throws ProtocolException {
         games.put(userName, new ServerGame(users.get(userName), this));
     }
 
@@ -251,7 +251,7 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
-    public void notifyMove(String creator, String mover, int x, int y) {
+    public void notifyMove(String creator, String mover, int x, int y) throws ProtocolException {
         ServerGame game = getGameByCreator(creator);
 
         for(User player : game.getPlayers()) {

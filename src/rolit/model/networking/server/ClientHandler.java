@@ -254,7 +254,7 @@ public class ClientHandler implements Runnable {
         state = state.notifyDoMove();
     }
 
-    public void notifyMove(String creator, int x, int y) {
+    public void notifyMove(String creator, int x, int y) throws ProtocolException {
         server.notifyMove(creator, getClientName(), x, y);
     }
 

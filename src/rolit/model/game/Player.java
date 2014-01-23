@@ -33,12 +33,12 @@ public interface Player {
      * @param board het bord waarop de zet zal worden gedaan.
      * @return een positie op het bord, dat een legale zet is.
      */
-    public Position determineMove(Board board) throws IOException;
+    public Position determineMove(Board board);
 
     /**
      * Doet de zet die bepaald is in determineMove.
      * @param board het bord waarop de zet gedaan wordt.
      */
-    public void doMove(Board board) throws IOException;
+    public void doMove(Board board);
 
 }
