@@ -233,4 +233,29 @@ public class Server extends ServerSocket implements Runnable {
             }
         }
     }
+
+    public void createChallengeGame(String challenger, LinkedList<String> others) throws ProtocolException {
+        ServerGame game = new ServerGame(challenger, others, this);
+        game.start();
+    }
+
+    public void notifyOfGameStart(ServerGame serverGame) throws ProtocolException {
+        String[] names = new String[serverGame.getPlayerCount()];
+
+        for(int i = 0; i < names.length; i++) {
+            names[i] = serverGame.getPlayers().get(i).getUsername();
+        }
+
+        for(User player : serverGame.getPlayers()) {
+            player.getClient().notifyOfGameStart(names);
+        }
+    }
+
+    public void notifyMove(String creator, String mover, int x, int y) {
+        ServerGame game = getGameByCreator(creator);
+
+        for(User player : game.getPlayers()) {
+            player.getClient().notifyOfMove(mover, x, y);
+        }
+    }
 }

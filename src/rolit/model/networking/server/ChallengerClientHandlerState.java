@@ -1,12 +1,17 @@
 package rolit.model.networking.server;
 
 import rolit.model.networking.client.StartGamePacket;
+import rolit.model.networking.common.ProtocolException;
+
+import java.util.LinkedList;
 
 /**
  * De staat van de ClientHandler status van de challenger.
  * @author Pieter Bos
  */
 public class ChallengerClientHandlerState extends ClientHandlerState {
+    LinkedList<String> currentlyAccepted = new LinkedList<String>();
+
     public ChallengerClientHandlerState(ClientHandler handler, String[] challenged) {
         super(handler);
     }
@@ -17,7 +22,9 @@ public class ChallengerClientHandlerState extends ClientHandlerState {
      * @return een nieuwe ClientHandler met een nieuwe status.
      */
     @Override
-    public ClientHandlerState startGame(StartGamePacket packet) {
+    public ClientHandlerState startGame(StartGamePacket packet) throws ProtocolException {
+        getHandler().createChallengeGame(currentlyAccepted);
+
         return new GameClientHandlerState(getHandler(), getHandler().getClientName());
     }
 
@@ -30,6 +37,13 @@ public class ChallengerClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState notifyChallengeResponseBy(boolean response, String challenged) {
         getHandler().write(new ChallengeResponsePacket(challenged, response));
+
+        if(response) {
+            currentlyAccepted.add(challenged);
+        } else {
+            currentlyAccepted.remove(challenged);
+        }
+
         return this;
     }
 }

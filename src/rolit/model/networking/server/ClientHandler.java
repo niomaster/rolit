@@ -8,6 +8,7 @@ import rolit.util.Strings;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
 
 /**
  * De ClientHandler
@@ -239,5 +240,25 @@ public class ClientHandler implements Runnable {
         if(supportsChallenge()) {
             server.notifyCannotBeChallenged(getClientName());
         }
+    }
+
+    public void createChallengeGame(LinkedList<String> others) throws ProtocolException {
+        server.createChallengeGame(getClientName(), others);
+    }
+
+    public void notifyOfGameStart(String[] names) throws ProtocolException {
+        state = state.notifyOfGameStart(names);
+    }
+
+    public void notifyDoMove() throws ProtocolException {
+        state = state.notifyDoMove();
+    }
+
+    public void notifyMove(String creator, int x, int y) {
+        server.notifyMove(creator, getClientName(), x, y);
+    }
+
+    public void notifyOfMove(String mover, int x, int y) throws ProtocolException {
+        state = state.notifyOfMove(mover, x, y);
     }
 }
