@@ -38,11 +38,6 @@ public class GameTest {
     }
 
     @Test
-    public void testGetPlayers() throws Exception {
-        assertEquals(2, game2.getPlayers());
-    }
-
-    @Test
     public void testGetBoard() throws Exception {
         Board board = new Board();
         game2.getBoard().equals(board);

@@ -251,7 +251,7 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
-    public void notifyMove(String creator, String mover, int x, int y) {
+    public void notifyMove(String creator, String mover, int x, int y) throws ProtocolException {
         ServerGame game = getGameByCreator(creator);
 
         for(User player : game.getPlayers()) {

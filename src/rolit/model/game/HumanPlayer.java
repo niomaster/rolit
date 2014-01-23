@@ -58,7 +58,7 @@ public class HumanPlayer implements Player{
      * @param board het bord waar de zet op gedaan zal worden.
      * @return een positie op het bord.
      */
-    public Position determineMove(Board board) throws IOException {
+    public Position determineMove(Board board) {
         String prompt = "> " + getNaam() + " (" + getColor() + ")" + ", what is your choice? ";
         Position choice = readPosition(prompt);
         boolean valid = board.isLegalMove(this, choice);
@@ -70,7 +70,7 @@ public class HumanPlayer implements Player{
         return choice;
     }
 
-    public void doMove(Board board) throws IOException {
+    public void doMove(Board board) {
         Position positie = determineMove(board);
         board.doMove(this, positie);
     }
@@ -80,14 +80,21 @@ public class HumanPlayer implements Player{
      * @param prompt de vraag die aan de speler gesteld word.
      * @return een positie die ingevuld is door de speler.
      */
-    private Position readPosition(String prompt) throws IOException {
+    private Position readPosition(String prompt) {
         System.out.print(prompt);
         System.out.flush();
-        String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+        String line = null;
+
+        try {
+            line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+        } catch (IOException e) {
+            line = null;
+        }
+
         return new Position(Integer.parseInt(line.split(" ")[0]), Integer.parseInt(line.split(" ")[1]));
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Board board = new Board();
         Player player = new HumanPlayer("Martijn");
         player.doMove(board);

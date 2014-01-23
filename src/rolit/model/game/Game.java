@@ -41,17 +41,6 @@ public class Game {
         playerArray = new Player[players];
     }
 
-
-
-    /**
-     * Geeft het aantal spelers terug.
-     *
-     * @return de integer van het aantal spelers.
-     */
-    public LinkedList<User> getPlayers() {
-        return players;
-    }
-
     /**
      * Geeft het bord wat bij dit spel hoort.
      *
