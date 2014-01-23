@@ -1,5 +1,6 @@
 package rolit.view.client;
 
+import rolit.view.layout.HSplitLayoutManager;
 import rolit.view.layout.VBoxLayoutManager;
 import rolit.view.layout.VSplitLayoutManager;
 
@@ -11,14 +12,19 @@ public class WaitPanel extends JPanel {
         setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Top));
 
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new VBoxLayoutManager());
+        mainPanel.setLayout(new HSplitLayoutManager(200, HSplitLayoutManager.HSplitType.Right));
+
+        JPanel startPanel = new JPanel();
 
         JLabel status = new JLabel("Het spel van Pieter is nog niet begonnen. Er zitten nu 3 mensen in het spel.");
         JButton actionButton = new JButton("Beginnen");
         actionButton.setEnabled(false);
 
-        mainPanel.add(status);
-        mainPanel.add(actionButton);
+        startPanel.add(status);
+        startPanel.add(actionButton);
+
+        mainPanel.add(startPanel);
+        mainPanel.add(new ChatPanel());
 
         add(new ServerPanel());
         add(mainPanel);

@@ -287,6 +287,11 @@ public abstract class ServerProtocol extends CommonProtocol {
      * Commando om de client op de hoogte te stellen van de gevraagde highscores.
      * @requires Dat de handshake is gedaan.
      * @requires Dat de client heeft gevraagd om highscores.
+     * @requries Dat als het eerste argument van highscore een van player of date is, args respectievelijk van het
+     * volgende formaat is:
+     *  - lengte een met als enige argument een integer, de hoogste score van de speler
+     *  - lengte twee met als eerste argument een speler en als tweede argument de score van die speler op de
+     *    desbetreffende dag.
      * @param args Argumenten
      */
     public abstract void highscore(String[] args) throws IOException;
