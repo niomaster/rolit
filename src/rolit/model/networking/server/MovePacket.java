@@ -3,6 +3,10 @@ package rolit.model.networking.server;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/**
+ * Het pakketje wat verstuurd wordt naar de speler die aan de beurt is.
+ * @author Pieter Bos
+ */
 public class MovePacket extends Packet {
     public MovePacket() {
 

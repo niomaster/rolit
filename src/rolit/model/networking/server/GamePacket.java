@@ -3,6 +3,10 @@ package rolit.model.networking.server;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/**
+ * Het pakketje met de informatie van een game.
+ * @author Pieter Bos
+ */
 public class GamePacket extends Packet {
     private String game;
     private int status;
@@ -26,6 +30,10 @@ public class GamePacket extends Packet {
         return players;
     }
 
+    /**
+     * Zet de argumten van het pakketje in variabele.
+     * @param args de argumenten van het pakket.
+     */
     @Override
     protected void readFromArgs(PacketArgs args) {
         this.game = args.getString(0);
@@ -33,6 +41,10 @@ public class GamePacket extends Packet {
         this.players = args.getInt(2);
     }
 
+    /**
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
+     */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
         return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };

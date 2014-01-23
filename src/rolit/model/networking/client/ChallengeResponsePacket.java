@@ -33,8 +33,8 @@ public class ChallengeResponsePacket extends Packet {
     }
 
     /**
-     * Geeft het type argument van het pakketje
-     * @return het type argument: boolean.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {

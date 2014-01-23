@@ -49,4 +49,14 @@ public class Position {
         Position result = new Position(this.getX() + direction.getX(), this.getY() + direction.getY());
         return result;
     }
+
+    public boolean outOfBounds(){
+        if (getX() >= Board.BOARD_WIDTH || getY() >= Board.BOARD_HEIGHT){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
 }

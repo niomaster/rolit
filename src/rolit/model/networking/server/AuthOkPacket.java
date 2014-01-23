@@ -22,8 +22,8 @@ public class AuthOkPacket extends Packet {
     }
 
     /**
-     * Geeft het type van het argument terug.
-     * @return het type van het argument.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {

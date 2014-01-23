@@ -3,6 +3,10 @@ package rolit.model.networking.server;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
+/**
+ * Het pakketje wat verstuurd wordt als een speler een zet heeft gedaan.
+ * @author Pieter Bos
+ */
 public class MoveDonePacket extends Packet {
     private String user;
     private int x;
@@ -30,6 +34,10 @@ public class MoveDonePacket extends Packet {
         return y;
     }
 
+    /**
+     * Zet de argumenten van het pakketje in variabele.
+     * @param args de argumenten van het pakket.
+     */
     @Override
     protected void readFromArgs(PacketArgs args) {
         this.user = args.getString(0);
@@ -37,11 +45,19 @@ public class MoveDonePacket extends Packet {
         this.y = args.getInt(2);
     }
 
+    /**
+     * Geeft het type van de argumenten van het pakketje.
+     * @return het type argument.
+     */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
         return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String, PacketArgs.ArgumentType.Integer, PacketArgs.ArgumentType.Integer };
     }
 
+    /**
+     * Geeft de data van het pakket in een object array.
+     * @return een object array met de speler, en de coördinaten van de zet.
+     */
     @Override
     protected Object[] getData() {
         return new Object[] { user, x, y };

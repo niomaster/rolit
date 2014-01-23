@@ -1,5 +1,7 @@
 package rolit.model.game;
 
+import java.util.Objects;
+
 /**
  * Created by Martijn on 20-1-14.
  */
@@ -40,5 +42,13 @@ public class Capture {
         return direction;
     }
 
-
+    @Override
+    public boolean equals(Object object){
+      if (object instanceof Capture){
+          Capture capture = (Capture)object;
+          return (this.getDirection() == ((Capture) object).getDirection() && this.getLength() == ((Capture) object).getLength());
+    } else{
+          return false;
+      }
+    }
 }

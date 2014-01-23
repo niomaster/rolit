@@ -5,6 +5,7 @@ import rolit.model.networking.common.CommonProtocol;
 import java.io.IOException;
 
 /**
+ * Het protocol specifiek voor de server.
  * @author Pieter Bos
  * @author Martijn de Bijl
  *

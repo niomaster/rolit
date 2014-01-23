@@ -3,6 +3,9 @@ package rolit.model.networking.server;
 import rolit.model.networking.client.StartGamePacket;
 import rolit.model.networking.common.ProtocolException;
 
+/**
+ * @author Pieter Bos
+ */
 public class WaitForGameClientHandlerState extends ClientHandlerState {
     private final String creator;
 
@@ -15,6 +18,12 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
         return creator;
     }
 
+    /**
+     * Verandert de status van de ClientHandler als het pakketje StartGame binnenkomt.
+     * @param packet het ontvangen pakketje.
+     * @return een nieuwe status van de ClientHandler.
+     * @throws ProtocolException
+     */
     @Override
     public ClientHandlerState startGame(StartGamePacket packet) throws ProtocolException {
         if(!getHandler().getClientName().equals(getCreator())) {
@@ -24,6 +33,12 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
         return new GameClientHandlerState(getHandler(), getCreator());
     }
 
+    /**
+     * Verandert de status van de ClientHandler als er een response van een speler die gechallenged is binnenkomt.
+     * @param response de reactie van de speler die gechallenged is.
+     * @param challenged de speler die gechallenged is.
+     * @return een nieuwe status van de ClientHandler.
+     */
     @Override
     public ClientHandlerState notifyChallengeResponseBy(boolean response, String challenged) {
         getHandler().write(new ChallengeResponsePacket(challenged, response));

@@ -32,8 +32,8 @@ public class MessagePacket extends Packet {
     }
 
     /**
-     * Geeft het type van het argument.
-     * @return het type argument: string.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {

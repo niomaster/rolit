@@ -38,8 +38,8 @@ public class HighscorePacket extends Packet {
     }
 
     /**
-     * Geeft het type van de argumenten van het pakket.
-     * @return het type argument: String.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {

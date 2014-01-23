@@ -28,6 +28,11 @@ public class SSSecurity {
         return new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
     }
 
+    /**
+     * Vraagt een publickey van een bepaalde speler op bij de server.
+     * @param user de speler waarvan de publickey opgevraagt moet worden.
+     * @return een publickey
+     */
     public static PublicKey getPublicKey(String user) {
         try {
             byte[] data = Crypto.base64Decode(get("PUBLICKEY " + user).split(" ")[1]);

@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+/**
+ * De server
+ * @author Pieter Bos
+ */
 public class Server extends ServerSocket implements Runnable {
     private static final int DEFAULT_BACKLOG = 5;
     public static final int GLOBAL_SUPPORTS = CommonProtocol.SUPPORTS_CHAT_CHALLENGE;
@@ -34,30 +38,53 @@ public class Server extends ServerSocket implements Runnable {
         return serverThread;
     }
 
+    /**
+     * Voegt een nieuwe listener toe aan de lijst van listeners
+     * @param listener de nieuwe listener.
+     */
     public void addListener(ServerListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Verwijdert een listener uit de lijst van listeners.
+     * @param listener de listener die verwijders moet worden.
+     */
     public void removeListener(ServerListener listener) {
         listeners.remove(listener);
     }
 
+    /**
+     * Start een nieuwe server thread.
+     */
     public void serveForever() {
         serverThread.start();
     }
 
+    /**
+     * verstuurd een nieuwe error.
+     * @param reason de rede voor de error.
+     */
     public void fireServerError(String reason) {
         for(ServerListener listener : listeners) {
             listener.serverError(reason);
         }
     }
 
+    /**
+     * Voegt voor alle listeners de nieuwe ClientHandler toe.
+     * @param handler de nieuwe ClientHandler.
+     */
     private void fireNewClient(ClientHandler handler) {
         for(ServerListener listener : listeners) {
             listener.newClient(handler);
         }
     }
 
+    /**
+     * Verstuurd een error voor alle listeners.
+     * @param reason de rede voor de error.
+     */
     public void fireClientError(String reason) {
         for(ServerListener listener : listeners) {
             listener.clientError(reason);
@@ -82,6 +109,12 @@ public class Server extends ServerSocket implements Runnable {
         new Server("0.0.0.0", 1234).serveForever();
     }
 
+    /**
+     * Notified alle spelers die zijn uitgedaagd.
+     * @param challengedUsers de spelers die zijn uitgedaag.
+     * @param challenger de speler die uitdaagd.
+     * @throws ProtocolException
+     */
     public void notifyChallenged(String[] challengedUsers, String challenger) throws ProtocolException {
         for(String challengedUser : challengedUsers) {
             if(users.get(challengedUser) == null || users.get(challengedUser).getUsername() == null || !users.get(challengedUser).getClient().canBeChallenged()) {
@@ -95,6 +128,11 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
+    /**
+     * Geeft een client een ClientHandler.
+     * @param clientName de naam van de speler
+     * @param clientHandler de ClientHandler.
+     */
     public void setClientHandler(String clientName, ClientHandler clientHandler) {
         if(users.get(clientName) == null) {
             users.put(clientName, new User(clientName, clientHandler));
@@ -103,13 +141,21 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
+    /**
+     * Verstuurd een notificatie naar de challenger, en de andere speler die challenged zijn over de reactie van een
+     * speler die gechallenged is.
+     * @param response de reactie van de speler.
+     * @param userNames de andere spelers die zijn uitgedaagd.
+     * @param challenged de naam van de speler die een reactie geeft.
+     * @throws ProtocolException wordt gegooid als er iets fout gaat.
+     */
     public void notifyChallengeResponse(boolean response, String[] userNames, String challenged) throws ProtocolException {
         for(String userName : userNames) {
             users.get(userName).getClient().notifyChallengeResponseBy(response, challenged);
         }
     }
 
-    public ServerGame getGameByCreator(String creator) {
+   public ServerGame getGameByCreator(String creator) {
         return games.get(creator);
     }
 
@@ -117,10 +163,18 @@ public class Server extends ServerSocket implements Runnable {
         return users.get(userName);
     }
 
-    public void createGame(String userName) throws ProtocolException {
+    /**
+     * Maakt een nieuwe game aan.
+     * @param userName de naam van de speler die de game aanmaakt.
+     */
+    public void createGame(String userName) {
         games.put(userName, new ServerGame(users.get(userName), this));
     }
 
+    /**
+     * Stuurt een notificatie aan alle andere clients over de verandering van het spel.
+     * @param game de spel waarover de verandering gaat.
+     */
     public void notifyOfGameChange(ServerGame game) {
         for(User user : users.values()) {
             if(user.getClient() != null && user.getUsername() != null) {

@@ -23,6 +23,18 @@ public class HandshakePacket extends Packet {
         this.version = version;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getSupports() {
+        return supports;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
     /**
      * Zet de argumenten van het pakket in variabele.
      * @param args de argumenten van het pakket.
@@ -35,8 +47,8 @@ public class HandshakePacket extends Packet {
     }
 
     /**
-     * Geeft het type van het argument
-     * @return het type argument: integer en string.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
@@ -44,23 +56,13 @@ public class HandshakePacket extends Packet {
     }
 
     /**
-     * Geeft de data van het pakket in een object array.
-     * @return een object array met de naam van de client, wat de client ondersteunt, en zijn versie.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected Object[] getData() {
         return new Object[] { name, supports, version };
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public int getSupports() {
-        return supports;
-    }
-
-    public String getVersion() {
-        return version;
-    }
 }

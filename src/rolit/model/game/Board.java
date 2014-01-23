@@ -3,6 +3,7 @@ package rolit.model.game;
 import rolit.view.client.MainView;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * The board class
@@ -43,11 +44,6 @@ public class Board {
     };
 
     /**
-     * De variabele die bijhoudt of het spel al voorbij is.
-     */
-    private boolean gameOver;
-
-    /**
      * Constructor voor klasse bord. Hierin wordt de array aangemaakt en gevuld met legen velden en de 4 balletje in
      * het midden.
      */
@@ -63,7 +59,6 @@ public class Board {
         array[4][3] = 1;
         array[4][4] = 2;
         array[3][4] = 3;
-        gameOver = false;
     }
 
     /**
@@ -138,8 +133,8 @@ public class Board {
      */
     public Board copy() {
         Board copy = new Board();
-        for (int x = 0; x <= BOARD_WIDTH; x++) {
-            for (int y = 0; y <= BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
                 copy.setField(x, y, getField(x, y));
             }
         }
@@ -163,12 +158,14 @@ public class Board {
             return capture;
         } else {
             for (Position direction : DIRECTIONS) {
+                length = 1;
+
                 Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
-                while (this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD) {
+                while (this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD && checkField.outOfBounds()) {
                     checkField = checkField.add(direction);
                     length++;
                 }
-                if (this.getField(checkField.add(direction)) == player.getColor() && length > 1) {
+                if (this.getField(checkField) == player.getColor() && length > 1) {
                     captures.add(new Capture(checkField, length));
                 }
             }
@@ -269,15 +266,16 @@ public class Board {
      * @return een boolean of het spel al voorbij is.
      */
     public boolean gameOver() {
+        boolean gameOver = true;
+
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                if (getField(x, y) != EMPTY_FIELD) {
-                    gameOver = true;
-                } else {
+                if (getField(x, y) == EMPTY_FIELD) {
                     gameOver = false;
                 }
             }
         }
+
         return gameOver;
     }
 
@@ -291,7 +289,7 @@ public class Board {
         int groen = 0;
         int blauw = 0;
 
-        if (gameOver == true) {
+        if (gameOver() == true) {
             for (int y = 0; y < BOARD_HEIGHT; y++) {
                 for (int x = 0; x < BOARD_WIDTH; x++) {
                     if (getField(x, y) == 0) {
@@ -322,6 +320,24 @@ public class Board {
             else {
                 return 3;
             }
+        }
+    }
+
+    @Override
+    public boolean equals(Object object){
+        if(object instanceof Board){
+            for (int y = 0; y < BOARD_HEIGHT; y++){
+                for (int x = 0; x < BOARD_WIDTH; x++){
+                    if (this.getField(x,y) != ((Board) object).getField(x,y)){
+                        return false;
+                    }
+
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
         }
     }
 }

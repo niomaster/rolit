@@ -1,5 +1,9 @@
 package rolit.model.networking.server;
 
+/**
+ *
+ * @author Pieter Bos
+ */
 public class User {
     private final String username;
     private ClientHandler client;

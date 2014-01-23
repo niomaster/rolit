@@ -43,8 +43,8 @@ public class ChallengePacket extends Packet {
     }
 
     /**
-     * Geeft het type argumenten uit het pakket.
-     * @return het type argument: meerdere string objecten.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
@@ -52,8 +52,8 @@ public class ChallengePacket extends Packet {
     }
 
     /**
-     * Geeft de data van het pakket in een object array.
-     * @return een object array van de spelers die gechallenged worden.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected Object[] getData() {

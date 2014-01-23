@@ -5,6 +5,10 @@ import rolit.model.networking.common.ProtocolException;
 
 import java.util.LinkedList;
 
+/**
+ * Het spel waarin gespeeld gaat worden.
+ * @author Pieter Bos
+ */
 public class ServerGame extends Game {
     private final LinkedList<User> players = new LinkedList<User>();
     private final User creator;
@@ -24,15 +28,29 @@ public class ServerGame extends Game {
         return creator;
     }
 
+    /**
+     * Verstuurd een notificatie als de status van het spel verandert.
+     * @throws ProtocolException wordt gegooid als er iets fout gaat.
+     */
     public void notifyOfChange() throws ProtocolException {
         server.notifyOfGameChange(this);
     }
 
+    /**
+     * Voegt een speler toe aan het spel.
+     * @param player de speler die wordt toegevoegd.
+     * @throws ProtocolException wordt gegooid als er iets fout gaat.
+     */
     public void addPlayer(User player) throws ProtocolException {
         players.add(player);
         notifyOfChange();
     }
 
+    /**
+     * Verwijdert een speler uit het spel.
+     * @param player de speler die wordt verwijdert.
+     * @throws ProtocolException
+     */
     public void removePlayer(User player) throws ProtocolException {
         players.remove(player);
         notifyOfChange();
@@ -74,6 +92,10 @@ public class ServerGame extends Game {
         return aborted;
     }
 
+    /**
+     * Breekt het spel af, als er iets mis gaat.
+     * @throws ProtocolException wordt gegooid als er iets mis gaat.
+     */
     public void abort() throws ProtocolException {
         this.aborted = true;
         notifyOfChange();

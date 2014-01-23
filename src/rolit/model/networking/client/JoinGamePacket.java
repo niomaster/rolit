@@ -32,8 +32,8 @@ public class JoinGamePacket extends Packet {
     }
 
     /**
-     * Geeft het type van het argument.
-     * @return het type van het argument: string.
+     * Geeft het type van het argument van het pakketje.
+     * @return type argument.
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
