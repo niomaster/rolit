@@ -70,7 +70,7 @@ public abstract class ServerProtocol extends CommonProtocol {
     /**
      * Constante voor het can-be-challenged-commando
      */
-    public static final String CAN_BE_CHALLENGED = "canBeChallenged";
+    public static final String CAN_BE_CHALLENGED = "supportsChallenge";
 
     /**
      *

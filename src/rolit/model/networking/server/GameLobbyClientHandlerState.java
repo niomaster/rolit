@@ -24,6 +24,7 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState challenge(ChallengePacket packet) throws ProtocolException {
         getHandler().notifyChallenged(packet.getChallenged());
+        getHandler().notifyCannotBeChallenged();
         return new ChallengerClientHandlerState(getHandler(), packet.getChallenged());
     }
 
@@ -47,6 +48,8 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
 
         game.addPlayer(getHandler().getUser());
 
+        getHandler().notifyCannotBeChallenged();
+
         return new WaitForGameClientHandlerState(getHandler(), packet.getCreator());
     }
 
@@ -58,7 +61,7 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState createGame(CreateGamePacket packet) throws ProtocolException {
         getHandler().createGame();
-
+        getHandler().notifyCannotBeChallenged();
         return new WaitForGameClientHandlerState(getHandler(), getHandler().getClientName());
     }
 
@@ -71,6 +74,7 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState notifyChallengedBy(String challenger, String[] others) {
         getHandler().write(new rolit.model.networking.server.ChallengePacket(challenger, others));
+        getHandler().notifyCannotBeChallenged();
         return new ChallengedClientHandlerState(getHandler(), challenger, others);
     }
 

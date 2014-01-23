@@ -44,4 +44,18 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
         getHandler().write(new ChallengeResponsePacket(challenged, response));
         return this;
     }
+
+    @Override
+    public ClientHandlerState notifyOfGameChange(ServerGame game) {
+        super.notifyOfGameChange(game);
+
+        if(game.getStatus() == ServerProtocol.STATUS_PREMATURE_LEAVE) {
+            getHandler().notifyCannotBeChallenged();
+            return new GameLobbyClientHandlerState(getHandler());
+        } else if(game.getStatus() == ServerProtocol.STATUS_STARTED) {
+            return new GameClientHandlerState(getHandler(), getCreator());
+        }
+
+        return this;
+    }
 }

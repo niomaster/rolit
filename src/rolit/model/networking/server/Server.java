@@ -1,7 +1,6 @@
 package rolit.model.networking.server;
 
 import rolit.model.event.ServerListener;
-import rolit.model.game.Game;
 import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.ProtocolException;
 import rolit.util.Strings;
@@ -117,7 +116,7 @@ public class Server extends ServerSocket implements Runnable {
      */
     public void notifyChallenged(String[] challengedUsers, String challenger) throws ProtocolException {
         for(String challengedUser : challengedUsers) {
-            if(users.get(challengedUser) == null || users.get(challengedUser).getUsername() == null || !users.get(challengedUser).getClient().canBeChallenged()) {
+            if(users.get(challengedUser) == null || users.get(challengedUser).getUsername() == null || !users.get(challengedUser).getClient().supportsChallenge()) {
                 throw new ProtocolException("Client tried to challenge users that cannot be challenged or are not online or do not exist.", ServerProtocol.ERROR_GENERIC);
             }
         }
@@ -191,7 +190,7 @@ public class Server extends ServerSocket implements Runnable {
         }
 
         for(User other : users.values()) {
-            if(other.getClient() != null && other.getClient().getClientName() != null && other.getClient().canChat()) {
+            if(other.getClient() != null && other.getClient().getClientName() != null && other.getClient().supportsChat()) {
                 user.getClient().notifyOnlineOf(other.getUsername());
             }
         }
@@ -209,6 +208,22 @@ public class Server extends ServerSocket implements Runnable {
         for(User user : users.values()) {
             if(user.getClient() != null && user.getClient().getClientName() != null) {
                 user.getClient().notifyOfflineOf(clientName);
+            }
+        }
+    }
+
+    public void notifyCannotBeChallenged(String clientName) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
+                user.getClient().notifyCannotBeChallengedOf(clientName);
+            }
+        }
+    }
+
+    public void notifyCanBeChallenged(String clientName) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
+                user.getClient().notifyCanBeChallengedOf(clientName);
             }
         }
     }

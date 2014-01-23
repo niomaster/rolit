@@ -29,6 +29,7 @@ public class ChallengedClientHandlerState extends ClientHandlerState {
         if(packet.getResponse()) {
             return new WaitForGameClientHandlerState(getHandler(), getChallenger());
         } else {
+            getHandler().notifyCannotBeChallenged();
             return new GameLobbyClientHandlerState(getHandler());
         }
     }
