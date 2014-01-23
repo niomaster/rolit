@@ -30,6 +30,8 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
             throw new ProtocolException("Client tried to start a game that is not his.", ServerProtocol.ERROR_GENERIC);
         }
 
+        getHandler().getGameByCreator(getHandler().getClientName()).start();
+
         return new GameClientHandlerState(getHandler(), getCreator());
     }
 
@@ -49,13 +51,20 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
     public ClientHandlerState notifyOfGameChange(ServerGame game) {
         super.notifyOfGameChange(game);
 
-        if(game.getStatus() == ServerProtocol.STATUS_PREMATURE_LEAVE) {
-            getHandler().notifyCannotBeChallenged();
-            return new GameLobbyClientHandlerState(getHandler());
-        } else if(game.getStatus() == ServerProtocol.STATUS_STARTED) {
-            return new GameClientHandlerState(getHandler(), getCreator());
+        if(game.getCreator().equals(creator)) {
+            if(game.getStatus() == ServerProtocol.STATUS_PREMATURE_LEAVE) {
+                getHandler().notifyCanBeChallenged();
+                return new GameLobbyClientHandlerState(getHandler());
+            }
         }
 
         return this;
+    }
+
+    @Override
+    public ClientHandlerState notifyOfGameStart(String[] users) throws ProtocolException {
+        getHandler().write(new StartPacket(users));
+        getHandler().getGameByCreator(creator).getPlayers().get(0).getClient().notifyDoMove();
+        return new GameClientHandlerState(getHandler(), creator);
     }
 }

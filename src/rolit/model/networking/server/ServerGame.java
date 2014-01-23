@@ -24,6 +24,16 @@ public class ServerGame extends Game {
         notifyOfChange();
     }
 
+    public ServerGame(String challenger, LinkedList<String> others, Server server) {
+        super(1 + others.size());
+        creator = server.getUser(challenger);
+        players.add(creator);
+
+        for(String other : others) {
+            players.add(server.getUser(other));
+        }
+    }
+
     public User getCreator() {
         return creator;
     }
@@ -60,12 +70,19 @@ public class ServerGame extends Game {
         return players.size();
     }
 
+    public LinkedList<User> getPlayers() {
+        return players;
+    }
+
     public boolean isStarted() {
         return started;
     }
 
-    public void start() {
+    public void start() throws ProtocolException {
         started = true;
+
+        notifyOfChange();
+        server.notifyOfGameStart(this);
     }
 
     public boolean isNext(User user) {
@@ -99,5 +116,19 @@ public class ServerGame extends Game {
     public void abort() throws ProtocolException {
         this.aborted = true;
         notifyOfChange();
+    }
+
+    public int getIndex(User user) {
+        int index = 0;
+
+        for(User player : players) {
+            if(player == user) {
+                return index;
+            }
+
+            index++;
+        }
+
+        return -1;
     }
 }

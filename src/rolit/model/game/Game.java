@@ -6,6 +6,11 @@ import java.io.IOException;
  * Start het spel, houdt de spelers en het bord bij.
  * @author Martijn de Bijl
  */
+import rolit.model.networking.common.ProtocolException;
+import rolit.model.networking.server.User;
+
+import java.util.LinkedList;
+
 public class Game {
     /**
      * Aantal spelers in het spel.
@@ -43,7 +48,7 @@ public class Game {
      *
      * @return de integer van het aantal spelers.
      */
-    public int getPlayers() {
+    public LinkedList<User> getPlayers() {
         return players;
     }
 
@@ -68,8 +73,7 @@ public class Game {
     /**
      * Start het spel, en laat de spelers spelen, zolang het bord niet vol is.
      */
-    public void start() throws IOException {
-        currentPlayer = 0;
+    public void start() throws ProtocolException {
         while (!board.gameOver()) {
             playerArray[currentPlayer].doMove(board);
             currentPlayer = (currentPlayer + 1) % players;

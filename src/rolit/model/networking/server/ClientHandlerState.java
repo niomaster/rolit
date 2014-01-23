@@ -100,4 +100,19 @@ public abstract class ClientHandlerState {
     public boolean canBeChallenged() {
         return false;
     }
+
+    public ClientHandlerState notifyOfGameStart(String[] users) throws ProtocolException {
+        error("game start by other");
+        return null;
+    }
+
+    public ClientHandlerState notifyDoMove() throws ProtocolException {
+        error("notify of move");
+        return null;
+    }
+
+    public ClientHandlerState notifyOfMove(String mover, int x, int y) throws ProtocolException {
+        error("notify of move by other");
+        return null;
+    }
 }
