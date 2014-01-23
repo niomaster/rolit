@@ -92,4 +92,12 @@ public abstract class ClientHandlerState {
         System.out.println("Warning: exit not implemented in state " + this.getClass().getName());
         return null;
     }
+
+    /**
+     * Wordt gebruikt om de initiele lijst met supportsChallenge's te sturen naar een nieuwe client.
+     * @return false
+     */
+    public boolean canBeChallenged() {
+        return false;
+    }
 }
