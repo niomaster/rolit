@@ -1,6 +1,7 @@
 package rolit.model.game;
 
 /**
+ * Een positie met een x en y coördinaat.
  * Created by Martijn on 20-1-14.
  */
 public class Position {
@@ -51,12 +52,7 @@ public class Position {
     }
 
     public boolean outOfBounds(){
-        if (getX() >= Board.BOARD_WIDTH || getY() >= Board.BOARD_HEIGHT){
-            return false;
-        }
-        else {
-            return true;
-        }
+        return getX() >= Board.BOARD_WIDTH || getY() >= Board.BOARD_HEIGHT || getX() < 0 || getY() < 0;
     }
 
 }

@@ -3,6 +3,7 @@ package rolit.model.game;
 import rolit.view.client.MainView;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -99,10 +100,10 @@ public class Board {
      * Vult een bepaald veld met een kleur van een speler.
      *
      * @param position de positie van het veld, gegeven in een vector met een x en y coördinaat.
-     * @param field    de integer die de kleur van de speler aangeeft.
+     * @param color    de integer die de kleur van de speler aangeeft.
      */
-    public void setField(Position position, int field) {
-        array[position.getX()][position.getY()] = field;
+    public void setField(Position position, int color) {
+        array[position.getX()][position.getY()] = color;
     }
 
     /**
@@ -161,13 +162,16 @@ public class Board {
                 length = 1;
 
                 Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
-                while (this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD && checkField.outOfBounds()) {
+
+                while (!checkField.outOfBounds() && this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD) {
                     checkField = checkField.add(direction);
                     length++;
                 }
-                if (this.getField(checkField) == player.getColor() && length > 1) {
-                    captures.add(new Capture(checkField, length));
+
+                if (!checkField.outOfBounds() && this.getField(checkField) == player.getColor() && length > 1) {
+                    captures.add(new Capture(direction, length));
                 }
+
             }
 
             Capture[] result = new Capture[captures.size()];
@@ -184,17 +188,15 @@ public class Board {
      * @return een boolean of de zet legaal is.
      */
     public boolean isLegalMove(Player player, Position movePosition) {
-        Position position = new Position(movePosition.getX(), movePosition.getY());
-        Capture[] captures = getCapture(player, position);
+
+        if (movePosition.outOfBounds()) {
+            return false;
+        }
+
+        Capture[] captures = getCapture(player, movePosition);
 
         if (captures.length != 0) {
             return true;
-        }
-
-        for (Position directions : DIRECTIONS) {
-            if (this.getField(position.add(directions)) == EMPTY_FIELD) {
-                return false;
-            }
         }
 
         for (int y = 0; y < BOARD_HEIGHT; y++) {
@@ -205,7 +207,23 @@ public class Board {
                 }
             }
         }
+
+        if (hasSurroundingFields(movePosition)){
+            return true;
+        }
+
         return true;
+    }
+
+    private boolean hasSurroundingFields(Position movePosition) {
+        for (Position direction : DIRECTIONS){
+            if (!movePosition.add(direction).outOfBounds()){
+                if (getField(movePosition.add(direction)) != EMPTY_FIELD){
+                    return true;
+                }
+            }
+        }
+       return false;
     }
 
     /**
@@ -221,11 +239,13 @@ public class Board {
             setField(movePosition, player.getColor());
 
             for (Capture capture : captures) {
-                for (int i = 0; i < captures.length; i++) {
-                    int x = (capture.getDirection().getX() + i * (capture.getDirection().getX()));
-                    int y = (capture.getDirection().getY() + i * (capture.getDirection().getY()));
+                for (int i = 0; i <= captures.length; i++) {
+                    int x = (movePosition.getX() + i * (capture.getDirection().getX()));
+                    int y = (movePosition.getY() + i * (capture.getDirection().getY()));
                     Position seize = new Position(x, y);
-                    setField(seize, player.getColor());
+                    if (!seize.outOfBounds()) {
+                        setField(seize, player.getColor());
+                    }
                 }
             }
             return true;
@@ -263,6 +283,7 @@ public class Board {
 
     /**
      * Kijkt of alle velden gevuld zijn, dus of het spel is afgelopen.
+     *
      * @return een boolean of het spel al voorbij is.
      */
     public boolean gameOver() {
@@ -281,9 +302,10 @@ public class Board {
 
     /**
      * Bepaald de winneer van het spel, als het spel is afgelopen.
+     *
      * @return een integer die de kleur van de winnaar representateerd.
      */
-    public int determineWinner() {
+    public Integer[] determineWinners() {
         int rood = 0;
         int geel = 0;
         int groen = 0;
@@ -305,38 +327,39 @@ public class Board {
             }
 
         }
-        if ( Math.max(rood,geel) > Math.max(groen, blauw)){
-            if ( rood > geel){
-                return 0;
-            }
-            else {
-                return 1;
-            }
-        }
-        else {
-            if (groen > blauw) {
-                return 2;
-            }
-            else {
-                return 3;
+
+        int max = -1;
+        List<Integer> result = new LinkedList<Integer>();
+        int[] data = {rood, geel, groen, blauw};
+
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] > max) {
+                max = data[i];
+                result.clear();
+                result.add(i);
+            } else if (data[i] == max) {
+                result.add(i);
             }
         }
+
+        Integer[] arrayResult = new Integer[result.size()];
+        result.toArray(arrayResult);
+        return arrayResult;
     }
 
     @Override
-    public boolean equals(Object object){
-        if(object instanceof Board){
-            for (int y = 0; y < BOARD_HEIGHT; y++){
-                for (int x = 0; x < BOARD_WIDTH; x++){
-                    if (this.getField(x,y) != ((Board) object).getField(x,y)){
+    public boolean equals(Object object) {
+        if (object instanceof Board) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
+                for (int x = 0; x < BOARD_WIDTH; x++) {
+                    if (this.getField(x, y) != ((Board) object).getField(x, y)) {
                         return false;
                     }
 
                 }
             }
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

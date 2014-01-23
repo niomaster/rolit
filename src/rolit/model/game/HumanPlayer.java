@@ -2,11 +2,14 @@ package rolit.model.game;
 
 import rolit.util.Strings;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 /**
  * De klasse menselijke speler
- * Created by Martijn on 22-1-14.
+ * @author Martijn de Bijl
  */
 public class HumanPlayer implements Player{
     /**
@@ -19,13 +22,19 @@ public class HumanPlayer implements Player{
     private String naam;
 
     /**
-     *
-     * @param naam
-     * @param nummer
+     * Maakt een nieuwe menselijke speler met een naam.
+     * @param naam de naam van de speler.
      */
-    public HumanPlayer(String naam, int nummer) {
-        this.color = nummer;
+    public HumanPlayer(String naam) {
         this.naam = naam;
+    }
+
+    /**
+     * Geeft een kleur aan een speler aan de hand van de hoeveelste speler hij is.
+     * @param nummer de integer die de van de speler aangeeft.
+     */
+    public void setColor(int nummer) {
+        this.color = nummer;
     }
 
     /**
@@ -49,19 +58,19 @@ public class HumanPlayer implements Player{
      * @param board het bord waar de zet op gedaan zal worden.
      * @return een positie op het bord.
      */
-    public Position determineMove(Board board) {
+    public Position determineMove(Board board) throws IOException {
         String prompt = "> " + getNaam() + " (" + getColor() + ")" + ", what is your choice? ";
         Position choice = readPosition(prompt);
-        boolean valid = board.isLegalMove(this, readPosition(prompt));
+        boolean valid = board.isLegalMove(this, choice);
         while (!valid) {
             System.out.println("ERROR: field " + choice + " is no valid choice.");
             choice = readPosition(prompt);
-            valid = board.isLegalMove(this, readPosition(prompt));
+            valid = board.isLegalMove(this, choice);
         }
         return choice;
     }
 
-    public void doMove(Board board) {
+    public void doMove(Board board) throws IOException {
         Position positie = determineMove(board);
         board.doMove(this, positie);
     }
@@ -71,42 +80,19 @@ public class HumanPlayer implements Player{
      * @param prompt de vraag die aan de speler gesteld word.
      * @return een positie die ingevuld is door de speler.
      */
-    private Position readPosition(String prompt) {
-        int value = 0;
-        boolean intRead = false;
-
-        do {
-            System.out.print(prompt);
-            String line = (new Scanner(System.in)).nextLine();
-            Scanner scannerLine = new Scanner(line);
-            if (scannerLine.hasNextInt()) {
-                intRead = true;
-                value = scannerLine.nextInt();
-            }
-        } while (!intRead);
-
-        int x = value;
-
-        value = 0;
-        intRead = false;
-        do {
-            System.out.print(prompt);
-            String line = (new Scanner(System.in)).nextLine();
-            Scanner scannerLine = new Scanner(line);
-            if (scannerLine.hasNextInt()) {
-                intRead = true;
-                value = scannerLine.nextInt();
-            }
-        } while (!intRead);
-
-        int y = value;
-
-        return new Position(x, y);
+    private Position readPosition(String prompt) throws IOException {
+        System.out.print(prompt);
+        System.out.flush();
+        String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+        return new Position(Integer.parseInt(line.split(" ")[0]), Integer.parseInt(line.split(" ")[1]));
     }
 
-    public static void main(String[] args){
-        HumanPlayer player = new HumanPlayer("Rood", 0);
-        Board bord = new Board();
-        player.determineMove(bord);
+    public static void main(String[] args) throws IOException {
+        Board board = new Board();
+        Player player = new HumanPlayer("Martijn");
+        player.doMove(board);
+        System.out.println(board.toString());
+
     }
+
 }

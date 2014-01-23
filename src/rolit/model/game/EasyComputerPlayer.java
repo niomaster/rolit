@@ -5,7 +5,7 @@ import java.util.Random;
 
 /**
  * De klasse makkelijke computer tegenstander.
- * Created by Martijn on 21-1-14.
+ * @author Martijn de Bijl
  */
 public class EasyComputerPlayer implements Player {
     /**
@@ -19,9 +19,16 @@ public class EasyComputerPlayer implements Player {
 
     /**
      * De constructor van de computer speler.
-     * @param nummer het nummer van de computer speler, die de kleur aangeeft.
      */
-    public EasyComputerPlayer(int nummer) {
+    public EasyComputerPlayer() {
+
+    }
+
+    /**
+     * Geeft een kleur aan een speler aan de hand van de hoeveelste speler hij is.
+     * @param nummer de integer die de van de speler aangeeft.
+     */
+    public void setColor(int nummer) {
         this.color = nummer;
     }
 

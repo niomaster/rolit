@@ -2,16 +2,13 @@ package rolit.model.game.Test;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA._PolicyStub;
 import rolit.model.game.*;
 
-import javax.print.attribute.standard.PrinterLocation;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
- * Created by Martijn on 22-1-14.
+ * De test die alle methoden test in board.
+ * @author Martijn de Bijl
  */
 public class BoardTest {
     private Board board;
@@ -22,7 +19,8 @@ public class BoardTest {
     public void setUp() throws Exception {
         board = new Board();
         position = new Position(5,5);
-        player = new EasyComputerPlayer(0);
+        player = new EasyComputerPlayer();
+        player.setColor(0);
     }
 
     @Test
@@ -48,6 +46,16 @@ public class BoardTest {
     }
 
     @Test
+    public void testSetField2() throws Exception {
+        try {
+            board.setField(new Position(9, 20), 0);
+            fail();
+        } catch(ArrayIndexOutOfBoundsException e) {
+
+        }
+    }
+
+    @Test
     public void testIsEmpty() throws Exception {
         assertTrue(board.isEmpty(5,5));
     }
@@ -70,14 +78,32 @@ public class BoardTest {
     }
 
     @Test
+    public void testGetCapture1() throws Exception {
+        board.getCapture(player, new Position(-1,-1));
+    }
+
+    @Test
     public void testIsLegalMove() throws Exception {
         Position position = new Position(5,5);
         assertTrue(board.isLegalMove(player, position));
     }
 
     @Test
+    public void testIsLegalMove1() throws Exception {
+        Position position = new Position(6,6);
+        assertFalse(board.isLegalMove(player, position));
+    }
+
+    @Test
+    public void testIsLegalMove2() throws Exception {
+        Position position = new Position(-1,-1);
+        assertFalse(board.isLegalMove(player, position));
+    }
+
+    @Test
     public void testDoMove() throws Exception {
         assertTrue(board.doMove(player, position));
+        assertEquals(0, board.getField(4,4));
     }
 
     @Test
@@ -91,13 +117,28 @@ public class BoardTest {
     }
 
     @Test
+    public void testGameOver1() throws Exception {
+        for (int y = 0; y < Board.BOARD_HEIGHT; y++){
+            for (int x = 0; x < (Board.BOARD_WIDTH - 1); x++){
+                board.setField(x,y, 0);
+            }
+        }
+        assertFalse(board.gameOver());
+    }
+
+    @Test
     public void testDetermineWinner() throws Exception {
         for (int y = 0; y < Board.BOARD_HEIGHT; y++){
             for (int x = 0; x < Board.BOARD_WIDTH; x++){
                 board.setField(x,y, 0);
             }
         }
-        assertEquals(0, board.determineWinner());
+        assertEquals(1, board.determineWinners().length);
+    }
+
+    public void testDetermineWinner1() throws Exception {
+        Integer[] winners = board.determineWinners();
+        assertEquals(2, (int)winners[2]);
     }
 
 }

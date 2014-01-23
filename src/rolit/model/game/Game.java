@@ -1,5 +1,11 @@
 package rolit.model.game;
 
+import java.io.IOException;
+
+/**
+ * Start het spel, houdt de spelers en het bord bij.
+ * @author Martijn de Bijl
+ */
 public class Game {
     /**
      * Aantal spelers in het spel.
@@ -62,14 +68,30 @@ public class Game {
     /**
      * Start het spel, en laat de spelers spelen, zolang het bord niet vol is.
      */
-    public void start() {
+    public void start() throws IOException {
+        currentPlayer = 0;
         while (!board.gameOver()) {
             playerArray[currentPlayer].doMove(board);
             currentPlayer = (currentPlayer + 1) % players;
-            board.toString();
+            System.out.println(board.toString());
         }
         if (board.gameOver()) {
-            System.out.println(board.determineWinner());
+            System.out.println(board.determineWinners());
+        }
+    }
+
+    /**
+     * Voegt de speler toe aan het spel.
+     * @param player de speler die toegevoegd wordt.
+     */
+    public void addPlayer(Player player) throws GameFullException {
+        if(currentPlayer >= players){
+            throw new GameFullException();
+        }
+        else {
+            playerArray[currentPlayer] = player;
+            player.setColor(currentPlayer);
+            currentPlayer = currentPlayer + 1;
         }
     }
 }

@@ -3,7 +3,8 @@ package rolit.model.game;
 import java.util.Objects;
 
 /**
- * Created by Martijn on 20-1-14.
+ * De klasse die op een bepaald veld de vector bijhoudt met de slagen die gedaan kunnen worden.
+ * @author Martijn de Bijl
  */
 public class Capture {
     /**
