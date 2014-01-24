@@ -159,7 +159,7 @@ public abstract class ServerProtocol extends CommonProtocol {
      * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client
      * nog niet de volledige lijst met spellen heeft ontvangen direct na de handshake.
      * @param creator De maker van het spel.
-     * @param hasStarted De status van het spel.
+     * @param status De status van het spel.
      * @param noPlayers Het aantal spelers in het spel.
      */
     public abstract void game(String creator, int status, int noPlayers) throws IOException;
