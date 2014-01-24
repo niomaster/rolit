@@ -145,11 +145,12 @@ public class Board {
     /**
      * Kijkt op een bepaald veld in alle richtingen welke slagen mogelijk zijn.
      *
+     *
      * @param player       de speler die de zet wil doen.
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een array met alle slagen die mogelijk zijn.
      */
-    public Capture[] getCapture(Player player, Position movePosition) {
+    public Capture[] getCapture(int player, Position movePosition) {
         Position position = new Position(movePosition.getX(), movePosition.getY());
         LinkedList<Capture> captures = new LinkedList<Capture>();
         int length = 0;
@@ -163,12 +164,12 @@ public class Board {
 
                 Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
 
-                while (!checkField.outOfBounds() && this.getField(checkField) != player.getColor() && this.getField(checkField) != EMPTY_FIELD) {
+                while (!checkField.outOfBounds() && this.getField(checkField) != player && this.getField(checkField) != EMPTY_FIELD) {
                     checkField = checkField.add(direction);
                     length++;
                 }
 
-                if (!checkField.outOfBounds() && this.getField(checkField) == player.getColor() && length > 1) {
+                if (!checkField.outOfBounds() && this.getField(checkField) == player && length > 1) {
                     captures.add(new Capture(direction, length));
                 }
 
@@ -187,7 +188,7 @@ public class Board {
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet legaal is.
      */
-    public boolean isLegalMove(Player player, Position movePosition) {
+    public boolean isLegalMove(int player, Position movePosition) {
 
         if (movePosition.outOfBounds()) {
             return false;
@@ -233,10 +234,10 @@ public class Board {
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet gelukt is.
      */
-    public boolean doMove(Player player, Position movePosition) {
+    public boolean doMove(int player, Position movePosition) {
         if (isLegalMove(player, movePosition)) {
             Capture[] captures = getCapture(player, movePosition);
-            setField(movePosition, player.getColor());
+            setField(movePosition, player);
 
             for (Capture capture : captures) {
                 for (int i = 0; i <= captures.length; i++) {
@@ -244,7 +245,7 @@ public class Board {
                     int y = (movePosition.getY() + i * (capture.getDirection().getY()));
                     Position seize = new Position(x, y);
                     if (!seize.outOfBounds()) {
-                        setField(seize, player.getColor());
+                        setField(seize, player);
                     }
                 }
             }

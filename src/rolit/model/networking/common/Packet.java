@@ -31,7 +31,7 @@ public abstract class Packet {
         CLIENT_PACKETS.put(ClientProtocol.CREATE_GAME, CreateGamePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.JOIN_GAME, JoinGamePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.START_GAME, StartGamePacket.class);
-        CLIENT_PACKETS.put(ClientProtocol.MOVE, MovePacket.class);
+        CLIENT_PACKETS.put(ClientProtocol.MOVE, rolit.model.networking.client.MovePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.MESSAGE, rolit.model.networking.client.MessagePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.CHALLENGE, rolit.model.networking.client.ChallengePacket.class);
         CLIENT_PACKETS.put(ClientProtocol.CHALLENGE_RESPONSE, rolit.model.networking.client.ChallengeResponsePacket.class);
@@ -41,8 +41,8 @@ public abstract class Packet {
         SERVER_PACKETS.put(ServerProtocol.AUTH_OK, AuthOkPacket.class);
         SERVER_PACKETS.put(ServerProtocol.ERROR, ErrorPacket.class);
         SERVER_PACKETS.put(ServerProtocol.GAME, GamePacket.class);
-        SERVER_PACKETS.put(ServerProtocol.START, StartGamePacket.class);
-        SERVER_PACKETS.put(ServerProtocol.MOVE, MovePacket.class);
+        SERVER_PACKETS.put(ServerProtocol.START, StartPacket.class);
+        SERVER_PACKETS.put(ServerProtocol.MOVE, rolit.model.networking.server.MovePacket.class);
         SERVER_PACKETS.put(ServerProtocol.MOVE_DONE, MoveDonePacket.class);
         SERVER_PACKETS.put(ServerProtocol.GAME_OVER, GameOverPacket.class);
         SERVER_PACKETS.put(ServerProtocol.MESSAGE, rolit.model.networking.server.MessagePacket.class);

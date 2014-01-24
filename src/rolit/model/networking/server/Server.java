@@ -176,7 +176,7 @@ public class Server extends ServerSocket implements Runnable {
      */
     public void notifyOfGameChange(ServerGame game) {
         for(User user : users.values()) {
-            if(user.getClient() != null && user.getUsername() != null) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
                 user.getClient().notifyOfGameChange(game);
             }
         }

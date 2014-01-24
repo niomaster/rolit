@@ -58,7 +58,7 @@ public class EasyComputerPlayer implements Player {
         for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
             for (int x = 0; x < Board.BOARD_WIDTH; x++) {
                 Position position = new Position(x, y);
-                if (board.isLegalMove(this, position)) {
+                if (board.isLegalMove(this.getColor(), position)) {
                     possibleMoves.add(position);
                 }
             }
@@ -73,6 +73,6 @@ public class EasyComputerPlayer implements Player {
      * @param board het bord waarop de zet gedaan wordt.
      */
     public void doMove(Board board) {
-        board.doMove(this, determineMove(board));
+        board.doMove(this.getColor(), determineMove(board));
     }
 }

@@ -13,7 +13,7 @@ import static junit.framework.Assert.*;
 public class BoardTest {
     private Board board;
     private Position position;
-    private Player player;
+    private int player;
 
     /**
      *
@@ -23,8 +23,9 @@ public class BoardTest {
     public void setUp() throws Exception {
         board = new Board();
         position = new Position(5,5);
-        player = new EasyComputerPlayer();
-        player.setColor(0);
+        Player p = new EasyComputerPlayer();
+        p.setColor(0);
+        player = p.getColor();
     }
 
     @Test

@@ -32,6 +32,8 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
 
         getHandler().getGameByCreator(getHandler().getClientName()).start();
 
+        getHandler().getGameByCreator(creator).getPlayers().get(0).getClient().notifyDoMove();
+
         return new GameClientHandlerState(getHandler(), getCreator());
     }
 
@@ -64,7 +66,26 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState notifyOfGameStart(String[] users) throws ProtocolException {
         getHandler().write(new StartPacket(users));
-        getHandler().getGameByCreator(creator).getPlayers().get(0).getClient().notifyDoMove();
         return new GameClientHandlerState(getHandler(), creator);
+    }
+
+    @Override
+    public ClientHandlerState exit() {
+        if(getHandler().getClientName().equals(creator)) {
+            try {
+                getHandler().getGameByCreator(creator).abort();
+            } catch (ProtocolException e) {
+                // TODO again, logging service.
+                System.out.println("WTF?");
+            }
+        } else {
+            try {
+                getHandler().getGameByCreator(creator).removePlayer(getHandler().getUser());
+            } catch (ProtocolException e) {
+                System.out.println("WTF?");
+            }
+        }
+
+        return null;
     }
 }
