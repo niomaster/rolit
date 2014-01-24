@@ -87,4 +87,8 @@ public class Game {
             currentPlayer = currentPlayer + 1;
         }
     }
+
+    public void nextPlayer() {
+        currentPlayer = (currentPlayer + 1) % players;
+    }
 }

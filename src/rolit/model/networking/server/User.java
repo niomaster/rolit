@@ -1,5 +1,7 @@
 package rolit.model.networking.server;
 
+import rolit.model.game.Player;
+
 /**
  *
  * @author Pieter Bos

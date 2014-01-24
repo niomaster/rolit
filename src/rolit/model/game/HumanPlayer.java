@@ -61,18 +61,18 @@ public class HumanPlayer implements Player{
     public Position determineMove(Board board) {
         String prompt = "> " + getNaam() + " (" + getColor() + ")" + ", what is your choice? ";
         Position choice = readPosition(prompt);
-        boolean valid = board.isLegalMove(this, choice);
+        boolean valid = board.isLegalMove(this.getColor(), choice);
         while (!valid) {
             System.out.println("ERROR: field " + choice + " is no valid choice.");
             choice = readPosition(prompt);
-            valid = board.isLegalMove(this, choice);
+            valid = board.isLegalMove(this.getColor(), choice);
         }
         return choice;
     }
 
     public void doMove(Board board) {
         Position positie = determineMove(board);
-        board.doMove(this, positie);
+        board.doMove(this.getColor(), positie);
     }
 
     /**

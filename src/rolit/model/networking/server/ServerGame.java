@@ -1,6 +1,7 @@
 package rolit.model.networking.server;
 
 import rolit.model.game.Game;
+import rolit.model.game.Position;
 import rolit.model.networking.common.ProtocolException;
 
 import java.util.LinkedList;
@@ -9,15 +10,16 @@ import java.util.LinkedList;
  * Het spel waarin gespeeld gaat worden.
  * @author Pieter Bos
  */
-public class ServerGame extends Game {
+public class ServerGame {
     private final LinkedList<User> players = new LinkedList<User>();
     private final User creator;
     private Server server;
     private boolean started;
     private boolean aborted;
 
+    private Game game;
+
     public ServerGame(User creator, Server server) throws ProtocolException {
-        super(1);
         this.creator = creator;
         this.server = server;
         players.add(creator);
@@ -25,7 +27,6 @@ public class ServerGame extends Game {
     }
 
     public ServerGame(String challenger, LinkedList<String> others, Server server) {
-        super(1 + others.size());
         creator = server.getUser(challenger);
         players.add(creator);
 
@@ -81,20 +82,10 @@ public class ServerGame extends Game {
     public void start() throws ProtocolException {
         started = true;
 
+        game = new Game(getPlayerCount());
+
         notifyOfChange();
         server.notifyOfGameStart(this);
-    }
-
-    public boolean isNext(User user) {
-        return true;
-    }
-
-    public boolean canDoMove(int x, int y) {
-        return true;
-    }
-
-    public void doMove(int x, int y) {
-
     }
 
     public Server getServer() {
@@ -130,5 +121,17 @@ public class ServerGame extends Game {
         }
 
         return -1;
+    }
+
+    public boolean isLegalMove(int x, int y) {
+        return game.getBoard().isLegalMove(game.getCurrentPlayer(), new Position(x, y));
+    }
+
+    public void doMove(int x, int y) {
+        game.getBoard().doMove(game.getCurrentPlayer(), new Position(x, y));
+    }
+
+    public void nextPlayer() {
+        game.nextPlayer();
     }
 }

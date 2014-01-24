@@ -46,6 +46,8 @@ public class ClientHandler implements Runnable {
      * @throws ProtocolException wordt gegooid als er bij een van de pakketje die ontvangen wordt iets verkeerd gaat.
      */
     private void handlePacket(Packet packet) throws ProtocolException {
+        ClientHandlerState oldState = state;
+
         if(packet instanceof rolit.model.networking.client.ChallengePacket) {
             state = state.challenge((rolit.model.networking.client.ChallengePacket) packet);
         } else if(packet instanceof rolit.model.networking.client.ChallengeResponsePacket) {
@@ -68,6 +70,10 @@ public class ClientHandler implements Runnable {
             state = state.auth((AuthPacket) packet);
         } else {
             throw new ProtocolException("Client caused the server to be in an impossible condition", ServerProtocol.ERROR_GENERIC);
+        }
+
+        if(oldState != state) {
+            System.out.println(getClientName() + ": " + oldState.getClass().getName() + " -> " + state.getClass().getName());
         }
     }
 
@@ -120,6 +126,8 @@ public class ClientHandler implements Runnable {
                 server.notifyCannotBeChallenged(getClientName());
             }
         }
+
+        getUser().setClient(null);
     }
 
     public int getClientSupports() {
@@ -193,7 +201,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void notifyOfGameChange(ServerGame game) {
-        state.notifyOfGameChange(game);
+        state = state.notifyOfGameChange(game);
     }
 
     public void writeInfo() {
