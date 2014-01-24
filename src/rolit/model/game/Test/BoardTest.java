@@ -15,6 +15,10 @@ public class BoardTest {
     private Position position;
     private Player player;
 
+    /**
+     *
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
         board = new Board();
@@ -78,11 +82,6 @@ public class BoardTest {
     }
 
     @Test
-    public void testGetCapture1() throws Exception {
-        board.getCapture(player, new Position(-1,-1));
-    }
-
-    @Test
     public void testIsLegalMove() throws Exception {
         Position position = new Position(5,5);
         assertTrue(board.isLegalMove(player, position));
@@ -134,6 +133,12 @@ public class BoardTest {
             }
         }
         assertEquals(1, board.determineWinners().length);
+    }
+
+    @Test
+    public void testGetHighScore() throws Exception{
+        board.determineWinners();
+        assertEquals(1,board.getHighScore());
     }
 
     public void testDetermineWinner1() throws Exception {

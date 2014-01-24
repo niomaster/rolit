@@ -154,7 +154,7 @@ public class Board {
         LinkedList<Capture> captures = new LinkedList<Capture>();
         int length = 0;
 
-        if (!this.isEmpty(position)) {
+        if (!isEmpty(position)) {
             Capture[] capture = new Capture[0];
             return capture;
         } else {
@@ -298,6 +298,20 @@ public class Board {
         }
 
         return gameOver;
+    }
+
+    public int getHighScore(){
+        Integer[] winnaars = determineWinners();
+        int winner = (int)winnaars[0];
+        int highScore = 0;
+        for (int y = 0; y < BOARD_HEIGHT; y++){
+            for (int x = 0; x < BOARD_WIDTH; x++){
+                if (getField(x,y) == winner){
+                    highScore++;
+                }
+            }
+        }
+        return highScore;
     }
 
     /**
