@@ -167,7 +167,7 @@ public class Server extends ServerSocket implements Runnable {
      * Maakt een nieuwe game aan.
      * @param userName de naam van de speler die de game aanmaakt.
      */
-    public void createGame(String userName) {
+    public void createGame(String userName) throws ProtocolException {
         games.put(userName, new ServerGame(users.get(userName), this));
     }
 
