@@ -1,0 +1,8 @@
+0 > hello player 0 version
+0 < hello * *
+0 > createGame
+0 < game player 0 1
+
+# Try starting the game with only one player
+0 > startGame
+0 < error *
