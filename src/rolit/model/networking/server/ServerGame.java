@@ -5,6 +5,7 @@ import rolit.model.game.Position;
 import rolit.model.networking.common.ProtocolException;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Het spel waarin gespeeld gaat worden.
@@ -15,7 +16,7 @@ public class ServerGame {
     private final User creator;
     private Server server;
     private boolean started;
-    private boolean aborted;
+    private boolean stopped;
 
     private Game game;
 
@@ -93,19 +94,19 @@ public class ServerGame {
     }
 
     public int getStatus() {
-        return isAborted() ? -1 : (isStarted() ? 1 : 0);
+        return isStopped() ? -1 : (isStarted() ? 1 : 0);
     }
 
-    public boolean isAborted() {
-        return aborted;
+    public boolean isStopped() {
+        return stopped;
     }
 
     /**
-     * Breekt het spel af, als er iets mis gaat.
-     * @throws ProtocolException wordt gegooid als er iets mis gaat.
+     * Breekt het spel af, als er iets mis gaat of als het spel is afgelopen.
+     * @throws ProtocolException wordt gegooid als er iets niet goed is in de server.
      */
-    public void abort() throws ProtocolException {
-        this.aborted = true;
+    public void stop() throws ProtocolException {
+        this.stopped = true;
         notifyOfChange();
     }
 
@@ -133,5 +134,36 @@ public class ServerGame {
 
     public void nextPlayer() {
         game.nextPlayer();
+    }
+
+    public int getPlayer() {
+        return game.getCurrentPlayer();
+    }
+
+    public boolean isGameOver() {
+        return game.getBoard().gameOver();
+    }
+
+    public int getScore() {
+        if(isGameOver()) {
+            return 0;
+        } else {
+            return game.getBoard().getHighScore();
+        }
+    }
+
+    public String[] getWinners() {
+        Integer[] winnerIndexes = game.getBoard().determineWinners();
+        List<String> winners = new LinkedList<String>();
+
+        for(Integer index : winnerIndexes) {
+            if(index < getPlayers().size()) {
+                winners.add(getPlayers().get(index).getUsername());
+            }
+        }
+
+        String[] winnersArray = new String[winners.size()];
+        winners.toArray(winnersArray);
+        return winnersArray;
     }
 }

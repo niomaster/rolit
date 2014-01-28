@@ -103,7 +103,10 @@ public class ClientHandler implements Runnable {
                 this.output = new PrintStream(client.getOutputStream(), true, "UTF-8");
 
                 while(true) {
-                    handlePacket(Packet.readClientPacketFrom(input));
+                    Packet packet = Packet.readClientPacketFrom(input);
+                    server.lock();
+                    handlePacket(packet);
+                    server.unlock();
                 }
             } catch (ProtocolException e) {
                 System.out.println("ProtocolException: " + e.getMessage());
@@ -128,6 +131,8 @@ public class ClientHandler implements Runnable {
         }
 
         getUser().setClient(null);
+
+        server.unlock();
     }
 
     public int getClientSupports() {

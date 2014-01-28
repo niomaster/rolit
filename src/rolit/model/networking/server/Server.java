@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * De server
@@ -20,6 +22,7 @@ import java.util.LinkedList;
 public class Server extends ServerSocket implements Runnable {
     private static final int DEFAULT_BACKLOG = 5;
     public static final int GLOBAL_SUPPORTS = CommonProtocol.SUPPORTS_CHAT_CHALLENGE;
+    // TODO change global version
     public static final String GLOBAL_VERSION = "PieterMartijn_Alpha1";
 
     private Thread serverThread;
@@ -27,6 +30,8 @@ public class Server extends ServerSocket implements Runnable {
     private LinkedList<ClientHandler> clients = new LinkedList<ClientHandler>();
     private HashMap<String, User> users = new LinkedHashMap<String, User>();
     private HashMap<String, ServerGame> games = new LinkedHashMap<String, ServerGame>();
+
+    private Lock lock = new ReentrantLock();
 
     public Server(String bindAddress, int port) throws IOException {
         super(port, DEFAULT_BACKLOG, InetAddress.getByName(bindAddress));
@@ -175,6 +180,10 @@ public class Server extends ServerSocket implements Runnable {
      * @param game de spel waarover de verandering gaat.
      */
     public void notifyOfGameChange(ServerGame game) {
+        if(game.isStopped()) {
+            games.remove(game.getCreator().getUsername());
+        }
+
         for(User user : users.values()) {
             if(user.getClient() != null && user.getClient().getClientName() != null) {
                 user.getClient().notifyOfGameChange(game);
@@ -257,5 +266,13 @@ public class Server extends ServerSocket implements Runnable {
         for(User player : game.getPlayers()) {
             player.getClient().notifyOfMove(mover, x, y);
         }
+    }
+
+    public void lock() {
+        lock.lock();
+    }
+
+    public void unlock() {
+        lock.unlock();
     }
 }

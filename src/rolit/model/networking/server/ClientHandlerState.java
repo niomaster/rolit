@@ -78,12 +78,16 @@ public abstract class ClientHandlerState {
     }
 
     /**
-     * Standaardgedrag is om gewoon het pakket door te sturen.
+     * Standaardgedrag is om gewoon het pakket door te sturen, tenzij de staat van het spel is veranderd terwijl het
+     * spel al gestart is.
      * @param game het desbetreffende spel
      * @return zichzelf, aangezien de staat niet verandert.
      */
     public ClientHandlerState notifyOfGameChange(ServerGame game) {
-        getHandler().write(new GamePacket(game.getCreator().getUsername(), game.getStatus(), game.getPlayerCount()));
+        if(!(game.isStarted() && game.isStopped())) {
+            getHandler().write(new GamePacket(game.getCreator().getUsername(), game.getStatus(), game.getPlayerCount()));
+        }
+
         return this;
     }
 

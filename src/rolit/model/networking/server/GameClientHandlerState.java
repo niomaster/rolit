@@ -34,11 +34,14 @@ public class GameClientHandlerState extends ClientHandlerState {
         }
 
         game.doMove(packet.getX(), packet.getY());
-        game.nextPlayer();
-
         getHandler().notifyMove(creator, packet.getX(), packet.getY());
 
-        game.getPlayers().get((index + 1) % game.getPlayerCount()).getClient().notifyDoMove();
+        if(game.isGameOver()) {
+            game.stop();
+        } else {
+            game.nextPlayer();
+            game.getPlayers().get(game.getPlayer()).getClient().notifyDoMove();
+        }
 
         return this;
     }
@@ -60,12 +63,11 @@ public class GameClientHandlerState extends ClientHandlerState {
         super.notifyOfGameChange(updateGame);
 
         if(updateGame == game) {
-            if(game.getStatus() == ServerProtocol.STATUS_PREMATURE_LEAVE) {
+            if(game.isStopped()) {
+                getHandler().write(new GameOverPacket(game.getScore(), game.getWinners()));
                 getHandler().notifyCanBeChallenged();
                 return new GameLobbyClientHandlerState(getHandler());
             }
-        } else {
-            System.out.println("OK");
         }
 
         return this;
@@ -74,7 +76,7 @@ public class GameClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState exit() {
         try {
-            game.abort();
+            game.stop();
         } catch (ProtocolException e) {
             // TODO again, logging service.
             System.out.println("WTF?");
