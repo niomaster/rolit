@@ -44,13 +44,26 @@ public class SSSecurity {
         } catch (NoSuchAlgorithmException e) {
 
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
 
         return null;
     }
 
-    public static void main(String[] args) {
-        System.out.println(SSSecurity.getPublicKey("player_trollit"));
+    public static PrivateKey getPrivateKey(String user, String password) {
+        try {
+            byte[] data = Crypto.base64Decode(get("IDPLAYER " + user + " " + password).split(" ")[1]);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(data);
+            KeyFactory fact = KeyFactory.getInstance("RSA");
+            return fact.generatePrivate(keySpec);
+        } catch (IOException e) {
+
+        } catch (NoSuchAlgorithmException e) {
+
+        } catch (InvalidKeySpecException e) {
+
+        }
+
+        return null;
     }
 }

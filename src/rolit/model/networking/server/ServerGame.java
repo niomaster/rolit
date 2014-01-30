@@ -125,11 +125,11 @@ public class ServerGame {
     }
 
     public boolean isLegalMove(int x, int y) {
-        return game.getBoard().isLegalMove(game.getCurrentPlayer(), new Position(x, y));
+        return game.isLegalMove(game.getCurrentPlayer(), new Position(x, y));
     }
 
     public void doMove(int x, int y) {
-        game.getBoard().doMove(game.getCurrentPlayer(), new Position(x, y));
+        game.doMove(game.getCurrentPlayer(), new Position(x, y));
     }
 
     public void nextPlayer() {
@@ -145,15 +145,15 @@ public class ServerGame {
     }
 
     public int getScore() {
-        if(isGameOver()) {
+        if(!isGameOver()) {
             return 0;
         } else {
-            return game.getBoard().getHighScore();
+            return game.getHighScore();
         }
     }
 
     public String[] getWinners() {
-        Integer[] winnerIndexes = game.getBoard().determineWinners();
+        int[] winnerIndexes = game.determineWinners();
         List<String> winners = new LinkedList<String>();
 
         for(Integer index : winnerIndexes) {

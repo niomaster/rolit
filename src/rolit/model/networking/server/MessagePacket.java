@@ -20,6 +20,14 @@ public class MessagePacket extends Packet {
         this.message = message;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
     /**
      * Zet de argumenten van het pakketje in variabele.
      * @param args de argumenten van het pakket.

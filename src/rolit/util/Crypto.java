@@ -98,7 +98,6 @@ public class Crypto {
     }
 
     public static String getNonce() {
-        byte[] b = "helloéíï".getBytes();
         byte[] bytes = new byte[NONCE_LENGTH];
         SecureRandom random = new SecureRandom();
         random.nextBytes(bytes);
@@ -124,5 +123,22 @@ public class Crypto {
         }
 
         return false;
+    }
+
+    public static byte[] sign(byte[] original, PrivateKey privateKey) {
+        try {
+            Signature signature = Signature.getInstance("SHA1withRSA");
+            signature.initSign(privateKey);
+            signature.update(original);
+            return signature.sign();
+        } catch (NoSuchAlgorithmException e) {
+
+        } catch (InvalidKeyException e) {
+
+        } catch (SignatureException e) {
+
+        }
+
+        return null;
     }
 }

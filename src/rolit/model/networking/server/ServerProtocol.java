@@ -153,7 +153,7 @@ public abstract class ServerProtocol extends CommonProtocol {
     /**
      * Commando om de client te laten weten dat er óf een nieuw spel is, óf dat er een spel is veranderd in status.
      * Clients krijgen een serie van deze commando's na de handshake om zo een lijst van alle spellen op te bouwen. Als
-     * er daarna iets verandert aan het aantal spelers of dat het spel is begonnen moet de server weer een update
+     * er daarna iets verandert aan het aantal spelers of dat het spel is begonnen moet de server weer een updateGames
      * sturen.
      * @requires Dat de handshake is gedaan.
      * @requires Dat óf het spel in hasStarted-status is veranderd, óf in aantal spelers is veranderd, óf dat de client

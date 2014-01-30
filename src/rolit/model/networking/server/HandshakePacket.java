@@ -27,6 +27,18 @@ public class HandshakePacket extends Packet {
         this(supports, version, null);
     }
 
+    public int getSupports() {
+        return supports;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
     /**
      * Zet de argumenten van het pakketje in variabele.
      * @param args de argumenten van het pakket.

@@ -10,6 +10,10 @@ import rolit.model.networking.common.PacketArgs;
 public class ErrorPacket extends Packet {
     private int code;
 
+    protected ErrorPacket() {
+
+    }
+
     public ErrorPacket(int code) {
         this.code = code;
     }

@@ -1,10 +1,19 @@
 package rolit.view.client;
 
-import rolit.view.client.action.ConnectAction;
+import rolit.model.game.Game;
+import rolit.model.game.Position;
+import rolit.model.networking.client.ClientGame;
+import rolit.model.networking.client.ServerHandler;
+import rolit.model.networking.common.Packet;
+import rolit.model.networking.common.PacketInputStream;
+import rolit.model.networking.server.*;
+import rolit.view.client.action.*;
 import rolit.view.client.action.Action;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class MainView extends JFrame {
     private final MainController controller;
@@ -16,46 +25,358 @@ public class MainView extends JFrame {
         private final MainView view;
 
         private final ConnectPanel connectPanel;
+        private final GameListPanel gameListPanel;
+        private final WaitPanel waitPanel;
+        private final GamePanel gamePanel;
 
-        private Action currentAction;
+        private ServerHandler currentServer = null;
+        private String currentGame = null;
+        private String currentUser = null;
+        private String[] currentPlayers;
+        private Game currentGameBoard;
+
+        private HashMap<String, ClientGame> games = new HashMap<String, ClientGame>();
+
+        public void gameUpdate(GamePacket packet) {
+            if(games.get(packet.getGame()) == null) {
+                games.put(packet.getGame(), new ClientGame(packet.getGame(), packet.getPlayers(), packet.getStatus()));
+            } else {
+                games.get(packet.getGame()).setPlayers(packet.getPlayers());
+                games.get(packet.getGame()).setStatus(packet.getStatus());
+            }
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    gameListPanel.getController().updateGames(games.values());
+                    waitPanel.getController().updateGames(games.values());
+                    view.revalidate();
+                }
+            });
+        }
+
+        public void message(MessagePacket packet) {
+            gameListPanel.getChatPanel().getController().message(packet.getUser(), packet.getMessage());
+            waitPanel.getChatPanel().getController().message(packet.getUser(), packet.getMessage());
+            gamePanel.getChatPanel().getController().message(packet.getUser(), packet.getMessage());
+        }
+
+        public void challenge(ChallengePacket packet) {
+            // TODO implement
+        }
+
+        public void online(OnlinePacket packet) {
+            // TODO add UI and implement
+        }
+
+        public void canBeChallenged(CanBeChallengedPacket packet) {
+            // TODO implement
+        }
+
+        public ServerHandler getCurrentServer() {
+            return currentServer;
+        }
+
+        public String getCurrentGame() {
+            return currentGame;
+        }
+
+        public String getCurrentUser() {
+            return currentUser;
+        }
+
+        public void doCreateGame() {
+            gameListPanel.getController().disable();
+            doAction(new CreateGameAction(this, currentServer));
+        }
+
+        public void doJoinGame(String creator) {
+            gameListPanel.getController().disable();
+            doAction(new JoinGameAction(this, currentServer, creator));
+        }
+
+        public ClientGame getGame(String currentGame) {
+            return games.get(currentGame);
+        }
+
+        public void doStart() {
+            doAction(new StartAction(this, currentServer));
+        }
+
+        public String[] getCurrentPlayers() {
+            return currentPlayers;
+        }
+
+        public Game getCurrentGameBoard() {
+            return currentGameBoard;
+        }
+
+        public void doMove(int x, int y) {
+            gamePanel.getController().disableMove();
+            doAction(new MoveAction(this, currentServer, x, y));
+        }
+
+        public void doDisconnect() {
+            ServerHandler server = currentServer;
+
+            currentPlayers = null;
+            currentGame = null;
+            currentGameBoard = null;
+            currentUser = null;
+            currentServer = null;
+
+            doAction(new DisconnectAction(this, server));
+        }
+
+        private class SwitchRunnable implements Runnable {
+            private MainView view;
+            private JPanel switchTo;
+
+            public SwitchRunnable(MainView view, JPanel switchTo) {
+                this.view = view;
+                this.switchTo = switchTo;
+            }
+
+            @Override
+            public void run() {
+                view.getContentPane().remove(0);
+                view.getContentPane().add(switchTo);
+                view.getContentPane().revalidate();
+                view.getContentPane().repaint();
+            }
+        }
+
+        public Collection<ClientGame> getGames() {
+            return games.values();
+        }
 
         public MainController(MainView view) {
             this.view = view;
             this.connectPanel = new ConnectPanel(this);
+            this.gameListPanel = new GameListPanel(this);
+            this.waitPanel = new WaitPanel(this);
+            this.gamePanel = new GamePanel(this);
         }
 
         public void initialize() {
-            view.add(connectPanel);
+            getContentPane().add(connectPanel);
             view.setVisible(true);
         }
 
+        /**
+         * such abstraction
+         * much enterprise
+         * wow
+         * @param action de actie die op de achtergrond moet worden uitgevoerd.
+         */
         private void doAction(Action action) {
-            currentAction = action;
-            currentAction.start();
+            action.start();
         }
 
-        public void doConnect(String hostnamePort, String userName) {
+        public void doConnect(String hostnamePort, String userName, String password) {
             connectPanel.getController().disable();
-            doAction(new ConnectAction(hostnamePort, userName, this));
+            doAction(new ConnectAction(hostnamePort, userName, password, this));
         }
 
-        public synchronized void actionSucceeded() {
-            if(currentAction instanceof ConnectAction) {
-                ConnectAction action = (ConnectAction) currentAction;
-                error("Nu verbonden met " + action.getHostnamePort());
-            }
+        public synchronized void actionSucceeded(Action action) {
+            if(action instanceof ConnectAction) {
+                ConnectAction connectAction = (ConnectAction) action;
+                currentServer = connectAction.getServerHandler();
+                currentUser = connectAction.getUserName();
 
-            currentAction = null;
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameListPanel.getServerPanel().getController().update();
+                        switchTo(gameListPanel);
+                        connectPanel.getController().enable();
+                    }
+                });
+
+                new EventThread(this, connectAction.getEventStream()).start();
+            } else if(action instanceof CreateGameAction) {
+                currentGame = getCurrentUser();
+
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        waitPanel.getController().update();
+                        switchTo(waitPanel);
+                        gameListPanel.getController().enable();
+                    }
+                });
+
+                doWaitForStart();
+            } else if(action instanceof JoinGameAction) {
+                currentGame = ((JoinGameAction) action).getCreator();
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        waitPanel.getController().update();
+                        switchTo(waitPanel);
+                        gameListPanel.getController().enable();
+                    }
+                });
+
+                doWaitForStart();
+            } else if(action instanceof WaitForStartAction) {
+                currentPlayers = ((WaitForStartAction) action).getPlayers();
+                currentGameBoard = new Game(currentPlayers.length);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        gamePanel.getController().update();
+                        switchTo(gamePanel);
+                        waitPanel.getController().enable();
+                    }
+                });
+
+                doAction(new WaitForGameEventAction(this, currentServer));
+            } else if(action instanceof WaitForGameEventAction) {
+                Packet event = ((WaitForGameEventAction) action).getEventPacket();
+
+                if(event instanceof MovePacket) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gamePanel.getController().enableMove();
+                        }
+                    });
+                } else if(event instanceof MoveDonePacket) {
+                    MoveDonePacket move = (MoveDonePacket) event;
+                    currentGameBoard.doMove(currentGameBoard.getCurrentPlayer(), new Position(move.getX(), move.getY()));
+                    currentGameBoard.nextPlayer();
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gamePanel.getController().update();
+                        }
+                    });
+                } else if(event instanceof GameOverPacket) {
+                    GameOverPacket packet = (GameOverPacket) event;
+
+                    if(packet.getWinners().length == 1) {
+                        error("Het spel is afgelopen! De winnaar is " + packet.getWinners()[0] + " met " + packet.getScore() + " punten");
+                    } else {
+                        String winner = "";
+
+                        for(int i = 0; i < packet.getWinners().length - 1; i++) {
+                            if(i != 0) {
+                                winner += ", ";
+                            }
+
+                            winner += packet.getWinners()[i];
+                        }
+
+                        winner += " en " + packet.getWinners()[packet.getWinners().length - 1];
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentGameBoard = null;
+                                currentGame = null;
+                                currentPlayers = null;
+                                switchTo(gameListPanel);
+
+                            }
+                        });
+
+                        error("Het spel is afgelopen! De winnaars zijn " + winner + " met " + packet.getScore() + " punten");
+                    }
+                }
+
+                doAction(new WaitForGameEventAction(this, currentServer));
+            } else if(action instanceof DisconnectAction) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentServer = null;
+                        currentPlayers = null;
+                        currentGame = null;
+                        currentGameBoard = null;
+                        currentUser = null;
+                        switchTo(connectPanel);
+                    }
+                });
+            }
         }
 
-        public synchronized void actionFailed() {
-            if(currentAction instanceof ConnectAction) {
-                ConnectAction action = (ConnectAction) currentAction;
-                error("Kon niet verbinden met " + action.getHostnamePort());
-                connectPanel.getController().enable();
-            }
+        private void doWaitForStart() {
+            doAction(new WaitForStartAction(this, currentServer, currentGame));
+        }
 
-            currentAction = null;
+        private void switchTo(JPanel panel) {
+            SwingUtilities.invokeLater(new SwitchRunnable(view, panel));
+        }
+
+        public synchronized void actionFailed(Action action) {
+            if(action instanceof ConnectAction) {
+                ConnectAction connectAction = (ConnectAction) action;
+
+                if(connectAction.getError() != null) {
+                    error("Kon niet verbinden met " + connectAction.getHostnamePort() + ": " + connectAction.getError());
+                } else {
+                    error("Kon niet verbinden met " + connectAction.getHostnamePort());
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        connectPanel.getController().enable();
+                    }
+                });
+            } else if(action instanceof CreateGameAction) {
+                error("Kon geen spel maken");
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameListPanel.getController().enable();
+                    }
+                });
+            } else if(action instanceof JoinGameAction) {
+                error("Je kunt niet meedoen met dit spel");
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameListPanel.getController().enable();
+                    }
+                });
+            } else if(action instanceof WaitForStartAction) {
+                if(currentServer != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            error("Het spel werd voortijdig afgebroken door de server");
+                            gameListPanel.getController().updateGames(games.values());
+                            switchTo(gameListPanel);
+                            waitPanel.getController().enable();
+                        }
+                    });
+                }
+            } else if(action instanceof WaitForGameEventAction) {
+                if(currentServer != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            error("Het spel werd afgebroken door de server");
+                            switchTo(connectPanel);
+                        }
+                    });
+                }
+            } else if(action instanceof DisconnectAction) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        switchTo(connectPanel);
+                    }
+                });
+            }
         }
     }
 

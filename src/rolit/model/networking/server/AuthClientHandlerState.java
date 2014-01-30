@@ -32,8 +32,8 @@ public class AuthClientHandlerState extends ClientHandlerState {
     @Override
     public ClientHandlerState auth(AuthPacket packet) throws ProtocolException {
         byte[] cypherText = Crypto.base64Decode(packet.getCypherText());
-        byte[] original = Crypto.base64Decode(nonce);
-        PublicKey publicKey = SSSecurity.getPublicKey(getHandler().getClientName());
+        byte[] original = nonce.getBytes();
+        PublicKey publicKey = SSSecurity.getPublicKey(clientName);
 
         if(!Crypto.verify(cypherText, original, publicKey)) {
             throw new ProtocolException("Invalid client authentication", ServerProtocol.ERROR_INVALID_LOGIN);

@@ -15,13 +15,13 @@ public abstract class Action extends Thread {
     public void run() {
         try {
             if(doAction()) {
-                controller.actionSucceeded();
+                controller.actionSucceeded(this);
             } else {
-                controller.actionFailed();
+                controller.actionFailed(this);
             }
         } catch (Throwable throwable) {
             // Een actie móet altijd falen of goed gaan.
-            controller.actionFailed();
+            controller.actionFailed(this);
         }
     }
 }

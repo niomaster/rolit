@@ -146,11 +146,11 @@ public class Board {
      * Kijkt op een bepaald veld in alle richtingen welke slagen mogelijk zijn.
      *
      *
-     * @param player       de speler die de zet wil doen.
+     * @param color       de kleur van de speler die de zet wil doen.
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een array met alle slagen die mogelijk zijn.
      */
-    public Capture[] getCapture(int player, Position movePosition) {
+    public Capture[] getCapture(int color, Position movePosition) {
         Position position = new Position(movePosition.getX(), movePosition.getY());
         LinkedList<Capture> captures = new LinkedList<Capture>();
         int length = 0;
@@ -164,12 +164,12 @@ public class Board {
 
                 Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
 
-                while (!checkField.outOfBounds() && this.getField(checkField) != player && this.getField(checkField) != EMPTY_FIELD) {
+                while (!checkField.outOfBounds() && this.getField(checkField) != color && this.getField(checkField) != EMPTY_FIELD) {
                     checkField = checkField.add(direction);
                     length++;
                 }
 
-                if (!checkField.outOfBounds() && this.getField(checkField) == player && length > 1) {
+                if (!checkField.outOfBounds() && this.getField(checkField) == color && length > 1) {
                     captures.add(new Capture(direction, length));
                 }
 
@@ -184,17 +184,16 @@ public class Board {
     /**
      * Kijkt of een zet legaal is.
      *
-     * @param player       de speler die de zet wil doen.
+     * @param color       de kleur van de speler die de zet wil doen.
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet legaal is.
      */
-    public boolean isLegalMove(int player, Position movePosition) {
-
+    public boolean isLegalMove(int color, Position movePosition) {
         if (movePosition.outOfBounds()) {
             return false;
         }
 
-        Capture[] captures = getCapture(player, movePosition);
+        Capture[] captures = getCapture(color, movePosition);
 
         if (captures.length != 0) {
             return true;
@@ -203,7 +202,7 @@ public class Board {
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 Position checkField = new Position(x, y);
-                if (getCapture(player, checkField).length > 0) {
+                if (getCapture(color, checkField).length > 0) {
                     return false;
                 }
             }
@@ -213,7 +212,7 @@ public class Board {
             return true;
         }
 
-        return true;
+        return false;
     }
 
     private boolean hasSurroundingFields(Position movePosition) {
@@ -230,14 +229,14 @@ public class Board {
     /**
      * Doet de zet van een speler, en verandert alle kleuren naar zijn kleur van de geslagen balletjes.
      *
-     * @param player       de speler die de zet doet.
+     * @param color       de speler die de zet doet.
      * @param movePosition het veld waarop de speler de zet wil doen.
      * @return een boolean of de zet gelukt is.
      */
-    public boolean doMove(int player, Position movePosition) {
-        if (isLegalMove(player, movePosition)) {
-            Capture[] captures = getCapture(player, movePosition);
-            setField(movePosition, player);
+    public boolean doMove(int color, Position movePosition) {
+        if (isLegalMove(color, movePosition)) {
+            Capture[] captures = getCapture(color, movePosition);
+            setField(movePosition, color);
 
             for (Capture capture : captures) {
                 for (int i = 0; i <= captures.length; i++) {
@@ -245,7 +244,7 @@ public class Board {
                     int y = (movePosition.getY() + i * (capture.getDirection().getY()));
                     Position seize = new Position(x, y);
                     if (!seize.outOfBounds()) {
-                        setField(seize, player);
+                        setField(seize, color);
                     }
                 }
             }
@@ -301,7 +300,7 @@ public class Board {
         return gameOver;
     }
 
-    public int getHighScore(){
+    public int getHighScore() {
         Integer[] winnaars = determineWinners();
         int winner = (int)winnaars[0];
         int highScore = 0;
@@ -318,7 +317,7 @@ public class Board {
     /**
      * Bepaald de winneer van het spel, als het spel is afgelopen.
      *
-     * @return een integer die de kleur van de winnaar representateerd.
+     * @return een integer die de kleur van de winnaar representeert.
      */
     public Integer[] determineWinners() {
         int rood = 0;
@@ -377,5 +376,19 @@ public class Board {
         } else {
             return false;
         }
+    }
+
+    public int getScore(int color) {
+        int total = 0;
+
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                if (getField(x, y) == color) {
+                    total++;
+                }
+            }
+        }
+
+        return total;
     }
 }

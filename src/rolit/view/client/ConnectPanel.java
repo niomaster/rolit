@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * @author Pieter Bos
@@ -21,9 +23,10 @@ public class ConnectPanel extends JPanel {
 
     private JTextField hostname;
     private JTextField userName;
+    private JPasswordField password;
     private JButton loginButton;
 
-    public class ConnectPanelController implements ActionListener {
+    public class ConnectPanelController implements ActionListener, KeyListener {
         private final ConnectPanel panel;
         private final MainView.MainController mainController;
 
@@ -34,12 +37,15 @@ public class ConnectPanel extends JPanel {
 
         public void initialize() {
             panel.getLoginButton().addActionListener(this);
+            panel.getUserNameTextField().addActionListener(this);
+            panel.getUserNameTextField().addKeyListener(this);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == panel.getLoginButton()) {
-                mainController.doConnect(panel.getHostnameTextField().getText(), panel.getUserNameTextField().getText());
+                mainController.doConnect(panel.getHostnameTextField().getText(), panel.getUserNameTextField().getText(),
+                        new String(panel.getPasswordField().getPassword()));
             }
         }
 
@@ -50,6 +56,27 @@ public class ConnectPanel extends JPanel {
         public void enable() {
             panel.getLoginButton().setEnabled(true);
         }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if(e.getSource() == panel.getUserNameTextField()) {
+                if(panel.getUserNameTextField().getText().startsWith("player_")) {
+                    panel.getPasswordField().setEnabled(true);
+                } else {
+                    panel.getPasswordField().setEnabled(false);
+                }
+            }
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {  }
+
+        @Override
+        public void keyReleased(KeyEvent e) {  }
+    }
+
+    public JPasswordField getPasswordField() {
+        return password;
     }
 
     public ConnectPanel(MainView.MainController mainController) {
@@ -86,11 +113,21 @@ public class ConnectPanel extends JPanel {
         JPanel panel3 = new JPanel();
         panel3.setLayout(new LeftRightLayoutManager());
 
+        JLabel passwordLabel = new JLabel("Wachtwoord");
+        password = new JPasswordField();
+        password.setPreferredSize(new Dimension(DEFAULT_TEXT_FIELD_WIDTH, DEFAULT_TEXT_FIELD_HEIGHT));
+        password.setEnabled(false);
+        panel3.add(passwordLabel);
+        panel3.add(password);
+        panel.add(panel3);
+
+        JPanel panel4 = new JPanel();
+        panel4.setLayout(new LeftRightLayoutManager());
 
         loginButton = new JButton("Inloggen");
-        panel3.add(Box.createGlue());
-        panel3.add(loginButton);
-        panel.add(panel3);
+        panel4.add(Box.createGlue());
+        panel4.add(loginButton);
+        panel.add(panel4);
 
         add(panel);
 

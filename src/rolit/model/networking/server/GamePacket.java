@@ -12,6 +12,10 @@ public class GamePacket extends Packet {
     private int status;
     private int players;
 
+    protected GamePacket() {
+
+    }
+
     public GamePacket(String game, int status, int players) {
         this.game = game;
         this.status = status;

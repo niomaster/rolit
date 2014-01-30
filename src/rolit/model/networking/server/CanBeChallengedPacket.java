@@ -11,6 +11,10 @@ public class CanBeChallengedPacket extends Packet {
     private String user;
     private boolean canBeChallenged;
 
+    protected CanBeChallengedPacket() {
+
+    }
+
     public CanBeChallengedPacket(String user, boolean canBeChallenged) {
         this.user = user;
         this.canBeChallenged = canBeChallenged;

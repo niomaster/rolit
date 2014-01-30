@@ -91,4 +91,39 @@ public class Game {
     public void nextPlayer() {
         currentPlayer = (currentPlayer + 1) % players;
     }
+
+    public boolean isLegalMove(int player, Position position) {
+        int color = players == 2 ? player * 2 : player;
+
+        return board.isLegalMove(color, position);
+    }
+
+    public void doMove(int player, Position position) {
+        int color = players == 2 ? player * 2 : player;
+
+        board.doMove(color, position);
+    }
+
+    public int getScore(int player) {
+        int color = players == 2 ? player * 2 : player;
+
+        return board.getScore(color);
+    }
+
+    public int[] determineWinners() {
+        Integer[] colors = board.determineWinners();
+        int[] players = new int[colors.length];
+
+        int i = 0;
+        for(Integer color : colors) {
+            players[i] = this.players == 2 ? color / 2 : color;
+            i++;
+        }
+
+        return players;
+    }
+
+    public int getHighScore() {
+        return board.getHighScore();
+    }
 }

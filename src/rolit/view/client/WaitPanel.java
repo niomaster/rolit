@@ -1,14 +1,85 @@
 package rolit.view.client;
 
+import rolit.model.networking.client.ClientGame;
 import rolit.view.layout.HSplitLayoutManager;
-import rolit.view.layout.VBoxLayoutManager;
 import rolit.view.layout.VSplitLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
 
 public class WaitPanel extends JPanel {
-    public WaitPanel() {
+    private final JLabel status;
+    private final JButton actionButton;
+    private final WaitController controller;
+    private final JLabel creator;
+    private final ServerPanel serverPanel;
+    private ChatPanel chatPanel;
+
+    public WaitController getController() {
+        return controller;
+    }
+
+    public JLabel getCreator() {
+        return creator;
+    }
+
+    public ServerPanel getServerPanel() {
+        return serverPanel;
+    }
+
+    public ChatPanel getChatPanel() {
+        return chatPanel;
+    }
+
+    public class WaitController implements ActionListener {
+        private WaitPanel panel;
+        private MainView.MainController controller;
+        private ClientGame game;
+
+        public WaitController(WaitPanel panel, MainView.MainController controller) {
+            this.panel = panel;
+            this.controller = controller;
+        }
+
+        public void updateGames(Collection<ClientGame> games) {
+            if(controller.getCurrentGame() != null) {
+                game = controller.getGame(controller.getCurrentGame());
+
+                creator.setText("Het spel van " + game.getCreator() + " is nog niet begonnen.");
+                status.setText("Er zitten nu " + game.getPlayers() + " mensen in het spel.");
+            }
+
+            update();
+        }
+
+        public void initialize() {
+            panel.getActionButton().addActionListener(this);
+        }
+
+        public void update() {
+            panel.getServerPanel().getController().update();
+            panel.getActionButton().setEnabled(game != null && controller.getCurrentUser().equals(game.getCreator()) && game.getPlayers() >= 2);
+        }
+
+        public void enable() {
+            panel.getServerPanel().getController().enable();
+        }
+
+        public void disable() {
+            panel.getServerPanel().getController().disable();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            controller.doStart();
+        }
+    }
+
+    public WaitPanel(MainView.MainController controller) {
+        this.controller = new WaitController(this, controller);
         setLayout(new VSplitLayoutManager(VSplitLayoutManager.VSplitType.Top));
 
         JPanel mainPanel = new JPanel();
@@ -16,27 +87,30 @@ public class WaitPanel extends JPanel {
 
         JPanel startPanel = new JPanel();
 
-        JLabel status = new JLabel("Het spel van Pieter is nog niet begonnen. Er zitten nu 3 mensen in het spel.");
-        JButton actionButton = new JButton("Beginnen");
+        creator = new JLabel("Het spel van  is nog niet begonnen");
+        status = new JLabel("Er zitten nu  mensen in het spel.");
+        actionButton = new JButton("Beginnen");
         actionButton.setEnabled(false);
 
+        startPanel.add(creator);
         startPanel.add(status);
         startPanel.add(actionButton);
 
         mainPanel.add(startPanel);
-        mainPanel.add(new ChatPanel());
+        chatPanel = new ChatPanel(controller);
+        mainPanel.add(chatPanel);
 
-        add(new ServerPanel());
+        serverPanel = new ServerPanel(controller);
+        add(serverPanel);
         add(mainPanel);
+        this.controller.initialize();
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        JFrame frame = new JFrame();
-        frame.getContentPane().add(new WaitPanel());
-        frame.setSize(640, 480);
-        frame.setMinimumSize(new Dimension(640, 480));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+    public JLabel getStatus() {
+        return status;
+    }
+
+    public JButton getActionButton() {
+        return actionButton;
     }
 }
