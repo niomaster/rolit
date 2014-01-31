@@ -98,7 +98,7 @@ public class BoardTest {
     @Test
     public void testGetCapture() throws Exception {
         Capture capture = new Capture(new Position(-1, -1), 2);
-        capture.equals(board.getCapture(speler, positie));
+        capture.equals(board.getCapture(speler.getColor(), positie));
     }
 
     /**
@@ -107,7 +107,7 @@ public class BoardTest {
      */
     @Test
     public void testIsLegalMove() throws Exception {
-        assertTrue(board.isLegalMove(speler, positie));
+        assertTrue(board.isLegalMove(speler.getColor(), positie));
     }
 
     /**
@@ -116,7 +116,7 @@ public class BoardTest {
      */
     @Test
     public void testDoMove() throws Exception {
-        board.doMove(speler, positie);
+        board.doMove(speler.getColor(), positie);
         assertEquals(0, board.getField(positie));
     }
 

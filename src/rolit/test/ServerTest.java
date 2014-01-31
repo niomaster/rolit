@@ -41,6 +41,11 @@ public class ServerTest {
             public void clientError(String reason) {
 
             }
+
+            @Override
+            public void clientMessage(String clientName, String text) {
+
+            }
         };
     }
 

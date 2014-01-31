@@ -52,4 +52,9 @@ public class Capture {
           return false;
       }
     }
+
+    @Override
+    public String toString() {
+        return "Capture(length=" + length + ", direction=" + direction + ")";
+    }
 }

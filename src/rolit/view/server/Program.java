@@ -59,6 +59,11 @@ public class Program {
                     public void clientError(String reason) {
                         System.out.println("Clientfout: " + reason);
                     }
+
+                    @Override
+                    public void clientMessage(String clientName, String text) {
+                        System.out.println(clientName + " zegt: " + text);
+                    }
                 });
                 server.getServerThread().join();
                 System.out.println("Server afgesloten.");

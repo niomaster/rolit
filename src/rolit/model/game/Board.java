@@ -239,7 +239,7 @@ public class Board {
             setField(movePosition, color);
 
             for (Capture capture : captures) {
-                for (int i = 0; i <= captures.length; i++) {
+                for (int i = 0; i <= capture.getLength(); i++) {
                     int x = (movePosition.getX() + i * (capture.getDirection().getX()));
                     int y = (movePosition.getY() + i * (capture.getDirection().getY()));
                     Position seize = new Position(x, y);
@@ -248,6 +248,7 @@ public class Board {
                     }
                 }
             }
+
             return true;
         } else {
             return false;

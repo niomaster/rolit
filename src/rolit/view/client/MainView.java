@@ -81,7 +81,9 @@ public class MainView extends JFrame {
         }
 
         public void online(OnlinePacket packet) {
-            // TODO add UI and implement
+            gameListPanel.getChatPanel().getController().message("* " + packet.getUser(), packet.isOnline() ? "online" : "offline");
+            waitPanel.getChatPanel().getController().message("* " + packet.getUser(), packet.isOnline() ? "online" : "offline");
+            gamePanel.getChatPanel().getController().message("* " + packet.getUser(), packet.isOnline() ? "online" : "offline");
         }
 
         public void canBeChallenged(CanBeChallengedPacket packet) {

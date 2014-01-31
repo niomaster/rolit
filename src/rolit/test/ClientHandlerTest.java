@@ -84,7 +84,7 @@ public class ClientHandlerTest {
      */
     @Test
     public void testCanChat() throws Exception {
-        assertFalse(handler.canChat());
+        assertFalse(handler.supportsChat());
     }
 
     /**

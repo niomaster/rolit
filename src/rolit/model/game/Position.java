@@ -54,4 +54,9 @@ public class Position {
         return getX() >= Board.BOARD_WIDTH || getY() >= Board.BOARD_HEIGHT || getX() < 0 || getY() < 0;
     }
 
+    @Override
+    public String toString() {
+        return "Position(x=" + x + ", y=" + y + ")";
+    }
+
 }

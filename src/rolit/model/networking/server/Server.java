@@ -335,10 +335,18 @@ public class Server extends ServerSocket implements Runnable {
     }
 
     public void broadcastMessage(String clientName, String text) {
+        fireClientMessage(clientName, text);
+
         for(User user : users.values()) {
             if(user.getClient() != null && user.getClient().getClientName() != null) {
                 user.getClient().notifyOfBroadcast(clientName, text);
             }
+        }
+    }
+
+    private void fireClientMessage(String clientName, String text) {
+        for(ServerListener listener : listeners) {
+            listener.clientMessage(clientName, text);
         }
     }
 }
