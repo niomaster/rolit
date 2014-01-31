@@ -41,6 +41,7 @@ public class MainView extends JFrame {
 
         private HashMap<String, ClientGame> games = new HashMap<String, ClientGame>();
         private LinkedList<String> canBeChallenged = new LinkedList<String>();
+        private String currentChallenge;
 
         public void gameUpdate(GamePacket packet) {
             if(games.get(packet.getGame()) == null) {
@@ -67,7 +68,16 @@ public class MainView extends JFrame {
         }
 
         public void challenge(ChallengePacket packet) {
-            // TODO implement
+            gameListPanel.getController().disable();
+            int reply = JOptionPane.showConfirmDialog(null, "Je wordt uitgedaagd door " + packet.getChallenger() + ".  Wil je de uitdaging accepteren?");
+
+            if(reply == JOptionPane.OK_OPTION) {
+                currentChallenge = packet.getChallenger();
+                doAction(new ChallengeResponseAction(this, currentServer, true));
+            } else {
+                doAction(new ChallengeResponseAction(this, currentServer, false));
+                gameListPanel.getController().enable();
+            }
         }
 
         public void online(OnlinePacket packet) {
@@ -179,6 +189,15 @@ public class MainView extends JFrame {
         public void doChallengeAll(LinkedList<String> challenged) {
             challengePanel.getController().disable();
             doAction(new ChallengeAction(this, currentServer, Arrays.cast(String.class, challenged.toArray())));
+        }
+
+        public void doMessage(String text) {
+            doAction(new MessageAction(this, currentServer, text));
+        }
+
+        public void error(int code) {
+            info("De server zegt dat de client iets fout heeft gedaan! De verbinding wordt nu verbroken. (Foutcode: " + code + ")");
+            doDisconnect();
         }
 
         private class SwitchRunnable implements Runnable {
@@ -341,6 +360,16 @@ public class MainView extends JFrame {
 
                         info("Het spel is afgelopen! De winnaars zijn " + winner + " met " + packet.getScore() + " punten");
                     }
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gameListPanel.getServerPanel().getController().update();
+                            switchTo(gameListPanel);
+                        }
+                    });
+
+                    return;
                 }
 
                 doAction(new WaitForGameEventAction(this, currentServer));
@@ -353,6 +382,10 @@ public class MainView extends JFrame {
                         currentGame = null;
                         currentGameBoard = null;
                         currentUser = null;
+                        games.clear();
+                        gameListPanel.getChatPanel().getController().clear();
+                        waitPanel.getChatPanel().getController().clear();
+                        gamePanel.getChatPanel().getController().clear();
                         switchTo(connectPanel);
                     }
                 });
@@ -371,8 +404,52 @@ public class MainView extends JFrame {
                     }
                 });
 
-                doWaitForStart();
+                doWaitForChallengeResponseOrStart();
+            } else if(action instanceof ChallengeResponseAction) {
+                if(((ChallengeResponseAction) action).isAccept()) {
+                    currentGame = currentChallenge;
+                    games.put(currentGame, new ClientGame(getCurrentUser(), 2, ServerProtocol.STATUS_NOT_STARTED));
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            waitPanel.getController().updateGames(getGames());
+                            switchTo(waitPanel);
+                            challengePanel.getController().enable();
+                        }
+                    });
+
+                    doWaitForChallengeResponseOrStart();
+                }
+            } else if(action instanceof WaitForChallengeResponseOrStartAction) {
+                Packet packet = ((WaitForChallengeResponseOrStartAction) action).getPacket();
+
+                if(packet instanceof ChallengeResponsePacket) {
+                    if(((ChallengeResponsePacket) packet).isAccept()) {
+                        games.get(currentGame).setPlayers(games.get(currentGame).getPlayers() + 1);
+                    }
+
+                    doWaitForChallengeResponseOrStart();
+                } else if(packet instanceof StartPacket) {
+                    currentPlayers = ((WaitForStartAction) action).getPlayers();
+                    currentGameBoard = new Game(currentPlayers.length);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            gamePanel.getController().update();
+                            switchTo(gamePanel);
+                            waitPanel.getController().enable();
+                        }
+                    });
+
+                    doAction(new WaitForGameEventAction(this, currentServer));
+                }
             }
+        }
+
+        private void doWaitForChallengeResponseOrStart() {
+            doAction(new WaitForChallengeResponseOrStartAction(this, currentServer));
         }
 
         private void doWaitForStart() {
@@ -443,6 +520,15 @@ public class MainView extends JFrame {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        currentServer = null;
+                        currentPlayers = null;
+                        currentGame = null;
+                        currentGameBoard = null;
+                        currentUser = null;
+                        games.clear();
+                        gameListPanel.getChatPanel().getController().clear();
+                        waitPanel.getChatPanel().getController().clear();
+                        gamePanel.getChatPanel().getController().clear();
                         switchTo(connectPanel);
                     }
                 });

@@ -66,6 +66,8 @@ public class ServerHandler {
             }
         }
 
+        System.out.println("Onverwacht pakket: " + packet.getClass().getName());
+
         throw new ProtocolException("De server stuurde een pakket dat de client niet verwachtte.");
     }
 
@@ -119,5 +121,13 @@ public class ServerHandler {
 
     public void challenge(String[] challenged) {
         new ChallengePacket(challenged).writeTo(output);
+    }
+
+    public void message(String text) {
+        new MessagePacket(text).writeTo(output);
+    }
+
+    public void challengeResponse(boolean accept) {
+        new ChallengeResponsePacket(accept).writeTo(output);
     }
 }

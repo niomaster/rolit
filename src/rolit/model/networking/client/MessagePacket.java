@@ -1,5 +1,6 @@
 package rolit.model.networking.client;
 
+import rolit.model.networking.common.CommonProtocol;
 import rolit.model.networking.common.Packet;
 import rolit.model.networking.common.PacketArgs;
 
@@ -14,7 +15,6 @@ public class MessagePacket extends Packet {
     }
 
     public MessagePacket(String message) {
-
         this.message = message;
     }
 
@@ -28,7 +28,7 @@ public class MessagePacket extends Packet {
      */
     @Override
     protected void readFromArgs(PacketArgs args) {
-        this.message = args.getString(0);
+        this.message = args.getSpacedString(0);
     }
 
     /**
@@ -37,7 +37,7 @@ public class MessagePacket extends Packet {
      */
     @Override
     protected PacketArgs.ArgumentType[] getArgumentTypes() {
-        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.String };
+        return new PacketArgs.ArgumentType[] { PacketArgs.ArgumentType.MultiString };
     }
 
     /**
@@ -46,6 +46,6 @@ public class MessagePacket extends Packet {
      */
     @Override
     protected Object[] getData() {
-        return new Object[] { message };
+        return new Object[] { message.split(CommonProtocol.COMMAND_DELIMITER) };
     }
 }

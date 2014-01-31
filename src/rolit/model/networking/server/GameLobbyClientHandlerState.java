@@ -103,4 +103,16 @@ public class GameLobbyClientHandlerState extends ClientHandlerState {
     public boolean canBeChallenged() {
         return true;
     }
+
+    @Override
+    public ClientHandlerState message(String text) {
+        getHandler().notifyMessage(text);
+        return this;
+    }
+
+    @Override
+    public ClientHandlerState notifyOfBroadcast(String sender, String message) {
+        getHandler().write(new MessagePacket(sender, message));
+        return this;
+    }
 }

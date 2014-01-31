@@ -3,9 +3,7 @@ package rolit.view.client;
 import rolit.model.game.Board;
 import rolit.model.game.Position;
 import rolit.model.networking.client.ClientGame;
-import rolit.view.layout.GridLayoutManager;
-import rolit.view.layout.HSplitLayoutManager;
-import rolit.view.layout.VSplitLayoutManager;
+import rolit.view.layout.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +16,7 @@ public class GamePanel extends JPanel {
     private final ChatPanel chatPanel;
     private final JPanel scorePanel;
     private final JButton[][] buttons;
+    private final JCheckBox computerPlayer;
     private GameController controller;
 
     public JPanel getScorePanel() {
@@ -26,6 +25,10 @@ public class GamePanel extends JPanel {
 
     public JButton[][] getButtons() {
         return buttons;
+    }
+
+    public JCheckBox getComputerPlayer() {
+        return computerPlayer;
     }
 
     public class GameController implements ActionListener {
@@ -93,9 +96,19 @@ public class GamePanel extends JPanel {
         public void enableMove() {
             shouldMove = true;
 
-            for(int x = 0; x < Board.BOARD_WIDTH; x++) {
-                for(int y = 0; y < Board.BOARD_HEIGHT; y++) {
+            for (int x = 0; x < Board.BOARD_WIDTH; x++) {
+                for (int y = 0; y < Board.BOARD_HEIGHT; y++) {
                     panel.getButtons()[x][y].setContentAreaFilled(controller.getCurrentGameBoard().isLegalMove(controller.getCurrentGameBoard().getCurrentPlayer(), new Position(x, y)));
+                }
+            }
+
+            if (panel.getComputerPlayer().isSelected()) {
+                for(int x = 0; x < Board.BOARD_WIDTH; x++) {
+                    for(int y = 0; y < Board.BOARD_HEIGHT; y++) {
+                        if(controller.getCurrentGameBoard().isLegalMove(controller.getCurrentGameBoard().getCurrentPlayer(), new Position(x, y))) {
+                            panel.getButtons()[x][y].doClick();
+                        }
+                    }
                 }
             }
         }
@@ -146,10 +159,26 @@ public class GamePanel extends JPanel {
         JPanel sideBarPanel = new JPanel();
         sideBarPanel.setLayout(new VSplitLayoutManager(100, VSplitLayoutManager.VSplitType.Top));
 
+        JPanel sideBarTopPanel = new JPanel();
+        sideBarTopPanel.setLayout(new VBoxLayoutManager());
+
         scorePanel = new JPanel();
 
-        sideBarPanel.add(scorePanel);
         chatPanel = new ChatPanel(controller);
+
+        JPanel computerPlayerPanel = new JPanel();
+        computerPlayerPanel.setLayout(new LeftRightLayoutManager());
+
+        computerPlayer = new JCheckBox();
+        JLabel computerPlayerLabel = new JLabel("Automatisch spelen");
+
+        computerPlayerPanel.add(computerPlayer);
+        computerPlayerPanel.add(computerPlayerLabel);
+
+        sideBarTopPanel.add(scorePanel);
+        sideBarTopPanel.add(computerPlayerPanel);
+
+        sideBarPanel.add(sideBarTopPanel);
         sideBarPanel.add(chatPanel);
 
         mainPanel.add(gamePanel);

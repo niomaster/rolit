@@ -274,4 +274,16 @@ public class ClientHandler implements Runnable {
     public void notifyOfMove(String mover, int x, int y) throws ProtocolException {
         state = state.notifyOfMove(mover, x, y);
     }
+
+    public void notifyOfMessage(String clientName, String text) {
+        write(new MessagePacket(clientName, text));
+    }
+
+    public void notifyMessage(String text) {
+        server.broadcastMessage(getClientName(), text);
+    }
+
+    public void notifyOfBroadcast(String clientName, String text) {
+        state = state.notifyOfBroadcast(clientName, text);
+    }
 }

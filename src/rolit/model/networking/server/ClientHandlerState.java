@@ -124,4 +124,8 @@ public abstract class ClientHandlerState {
         error("message");
         return null;
     }
+
+    public ClientHandlerState notifyOfBroadcast(String clientName, String text) {
+        return this;
+    }
 }

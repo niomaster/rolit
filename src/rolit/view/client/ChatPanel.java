@@ -3,13 +3,15 @@ package rolit.view.client;
 import rolit.view.layout.VSplitLayoutManager;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class ChatPanel extends JPanel {
     private final ChatController controller;
     private JTextArea textArea;
     private JTextField textField;
 
-    public class ChatController {
+    public class ChatController implements KeyListener {
         private ChatPanel panel;
         private MainView.MainController controller;
 
@@ -19,11 +21,33 @@ public class ChatPanel extends JPanel {
         }
 
         public void initialize() {
-
+            panel.getTextField().addKeyListener(this);
         }
 
         public void message(String user, String message) {
-            panel.getTextArea().setText(getTextArea().getText() + "\n" + user + ": " + message);
+            panel.getTextArea().setText(user + ": " + message + "\n" + getTextArea().getText());
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                controller.doMessage(panel.getTextField().getText());
+                panel.getTextField().setText("");
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+
+        }
+
+        public void clear() {
+            panel.getTextField().setText("");
         }
     }
 
@@ -36,6 +60,7 @@ public class ChatPanel extends JPanel {
 
         add(textArea);
         add(textField);
+        this.controller.initialize();
     }
 
     public JTextArea getTextArea() {

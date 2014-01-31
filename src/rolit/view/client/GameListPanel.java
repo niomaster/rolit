@@ -66,8 +66,11 @@ public class GameListPanel extends JPanel {
             panel.add(new JLabel("Aantal spelers"));
             panel.add(Box.createGlue());
 
+            int subtractor = 0;
+
             for(ClientGame game : values) {
                 if(game.getStatus() != ServerProtocol.STATUS_NOT_STARTED) {
+                    subtractor++;
                     continue;
                 }
 
@@ -86,7 +89,7 @@ public class GameListPanel extends JPanel {
                 panel.add(joinButton);
             }
 
-            panel.setLayout(new GridLayoutManager(3, values.size() + 1, 8));
+            panel.setLayout(new GridLayoutManager(3, values.size() + 1 - subtractor, 8));
             panel.revalidate();
             panel.repaint();
         }

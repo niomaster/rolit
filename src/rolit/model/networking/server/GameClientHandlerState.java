@@ -38,6 +38,7 @@ public class GameClientHandlerState extends ClientHandlerState {
 
         if(game.isGameOver()) {
             game.stop();
+            return new GameLobbyClientHandlerState(getHandler());
         } else {
             game.nextPlayer();
             game.getPlayers().get(game.getPlayer()).getClient().notifyDoMove();
@@ -82,5 +83,14 @@ public class GameClientHandlerState extends ClientHandlerState {
             System.out.println("WTF?");
         }
         return null;
+    }
+
+    @Override
+    public ClientHandlerState message(String text) {
+        for(User user : game.getPlayers()) {
+            user.getClient().notifyOfMessage(getHandler().getClientName(), text);
+        }
+
+        return this;
     }
 }

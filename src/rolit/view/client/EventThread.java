@@ -16,7 +16,8 @@ public class EventThread extends Thread {
             MessagePacket.class,
             ChallengePacket.class,
             OnlinePacket.class,
-            CanBeChallengedPacket.class
+            CanBeChallengedPacket.class,
+            ErrorPacket.class
     };
 
     public EventThread(MainView.MainController controller, PacketInputStream stream) {
@@ -41,6 +42,8 @@ public class EventThread extends Thread {
                         controller.online((OnlinePacket) packet);
                     } else if(packet instanceof CanBeChallengedPacket) {
                         controller.canBeChallenged((CanBeChallengedPacket) packet);
+                    } else if(packet instanceof ErrorPacket) {
+                        controller.error(((ErrorPacket) packet).getCode());
                     }
                 }
             }

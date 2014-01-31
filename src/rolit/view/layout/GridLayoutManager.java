@@ -1,5 +1,7 @@
 package rolit.view.layout;
 
+import rolit.util.Components;
+
 import java.awt.*;
 
 public class GridLayoutManager implements LayoutManager {

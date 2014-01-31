@@ -112,10 +112,6 @@ public class Server extends ServerSocket implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        new Server("0.0.0.0", 1234).serveForever();
-    }
-
     /**
      * Notified alle spelers die zijn uitgedaagd.
      * @param challengedUsers de spelers die zijn uitgedaag.
@@ -183,7 +179,7 @@ public class Server extends ServerSocket implements Runnable {
      * @param game de spel waarover de verandering gaat.
      */
     public void notifyOfGameChange(ServerGame game) {
-        if(game.isStopped()) {
+        if(game.isStopped() && game.isStarted()) {
             games.remove(game.getCreator().getUsername());
             Date date = new Date();
 
@@ -303,6 +299,14 @@ public class Server extends ServerSocket implements Runnable {
             }
         } catch (ParseException e) {
             return -1;
+        }
+    }
+
+    public void broadcastMessage(String clientName, String text) {
+        for(User user : users.values()) {
+            if(user.getClient() != null && user.getClient().getClientName() != null) {
+                user.getClient().notifyOfBroadcast(clientName, text);
+            }
         }
     }
 }

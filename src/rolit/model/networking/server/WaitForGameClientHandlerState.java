@@ -73,14 +73,17 @@ public class WaitForGameClientHandlerState extends ClientHandlerState {
     public ClientHandlerState exit() {
         if(getHandler().getClientName().equals(creator)) {
             try {
-                getHandler().getGameByCreator(creator).stop();
+                if(getHandler().getGameByCreator(creator) != null) {
+                    getHandler().getGameByCreator(creator).stop();
+                }
             } catch (ProtocolException e) {
-                // TODO again, logging service.
                 System.out.println("WTF?");
             }
         } else {
             try {
-                getHandler().getGameByCreator(creator).removePlayer(getHandler().getUser());
+                if(getHandler().getGameByCreator(creator) != null) {
+                    getHandler().getGameByCreator(creator).removePlayer(getHandler().getUser());
+                }
             } catch (ProtocolException e) {
                 System.out.println("WTF?");
             }

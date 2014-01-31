@@ -208,7 +208,7 @@ public class Board {
             }
         }
 
-        if (hasSurroundingFields(movePosition)){
+        if (hasSurroundingFields(movePosition) && isEmpty(movePosition)) {
             return true;
         }
 

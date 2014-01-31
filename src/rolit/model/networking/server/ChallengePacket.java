@@ -20,6 +20,14 @@ public class ChallengePacket extends Packet {
         this.others = others;
     }
 
+    public String getChallenger() {
+        return challenger;
+    }
+
+    public String[] getOthers() {
+        return others;
+    }
+
     /**
      * Zet de argumenten van het pakketje in de variabele.
      * @param args de argumenten van het pakket.
