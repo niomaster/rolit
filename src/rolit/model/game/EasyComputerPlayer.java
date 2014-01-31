@@ -61,6 +61,7 @@ public class EasyComputerPlayer implements Player {
                 if (board.isLegalMove(this, position)) {
                     possibleMoves.add(position);
                 }
+
             }
         }
         Random random = new Random();

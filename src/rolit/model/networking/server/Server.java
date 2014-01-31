@@ -15,10 +15,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
- * De server
+ * De server.
  * @author Pieter Bos
  */
 public class Server extends ServerSocket implements Runnable {
+
     private static final int DEFAULT_BACKLOG = 5;
     public static final int GLOBAL_SUPPORTS = CommonProtocol.SUPPORTS_CHAT_CHALLENGE;
     public static final String GLOBAL_VERSION = "PieterMartijn_Alpha1";
@@ -29,11 +30,14 @@ public class Server extends ServerSocket implements Runnable {
     private HashMap<String, User> users = new LinkedHashMap<String, User>();
     private HashMap<String, ServerGame> games = new LinkedHashMap<String, ServerGame>();
 
+    //@ requires port >= 0 && port < 65535;
     public Server(String bindAddress, int port) throws IOException {
         super(port, DEFAULT_BACKLOG, InetAddress.getByName(bindAddress));
         serverThread = new Thread(this);
     }
 
+
+    /* pure */
     public Thread getServerThread() {
         return serverThread;
     }
@@ -42,6 +46,7 @@ public class Server extends ServerSocket implements Runnable {
      * Voegt een nieuwe listener toe aan de lijst van listeners
      * @param listener de nieuwe listener.
      */
+    //@ requires listener != null;
     public void addListener(ServerListener listener) {
         listeners.add(listener);
     }
@@ -50,12 +55,26 @@ public class Server extends ServerSocket implements Runnable {
      * Verwijdert een listener uit de lijst van listeners.
      * @param listener de listener die verwijders moet worden.
      */
+    //@ requires listener != null;
+    //@ ensures !listeners.contains(listener);
     public void removeListener(ServerListener listener) {
         listeners.remove(listener);
     }
 
     /**
-     * Start een nieuwe server thread.
+     * Bekijkt of een listener in de lijst van listener zit.
+     * @param listener de listener die gecontroleerd wordt.
+     * @return Een boolean of de listener in de lijst van listeners zit.
+     */
+    //@ requires listener != null;
+    //@ ensures \result false if(listeners.contains(listener));
+    public boolean isInListeners(ServerListener listener){
+        return listeners.contains(listener);
+    }
+
+    /**
+     * Start de server thread.
+     *
      */
     public void serveForever() {
         serverThread.start();
@@ -65,6 +84,7 @@ public class Server extends ServerSocket implements Runnable {
      * verstuurd een nieuwe error.
      * @param reason de rede voor de error.
      */
+    //@
     public void fireServerError(String reason) {
         for(ServerListener listener : listeners) {
             listener.serverError(reason);
@@ -115,6 +135,7 @@ public class Server extends ServerSocket implements Runnable {
      * @param challenger de speler die uitdaagd.
      * @throws ProtocolException
      */
+    //@ requires challengedUsers.size > 0;
     public void notifyChallenged(String[] challengedUsers, String challenger) throws ProtocolException {
         for(String challengedUser : challengedUsers) {
             if(users.get(challengedUser) == null || users.get(challengedUser).getUsername() == null || !users.get(challengedUser).getClient().canBeChallenged()) {
@@ -133,6 +154,9 @@ public class Server extends ServerSocket implements Runnable {
      * @param clientName de naam van de speler
      * @param clientHandler de ClientHandler.
      */
+    //@ requires clientName != null;
+    //@ requires clientHandler != null;
+    //@ ensures user.getClientHandler == clientHandler;
     public void setClientHandler(String clientName, ClientHandler clientHandler) {
         if(users.get(clientName) == null) {
             users.put(clientName, new User(clientName, clientHandler));
@@ -149,16 +173,20 @@ public class Server extends ServerSocket implements Runnable {
      * @param challenged de naam van de speler die een reactie geeft.
      * @throws ProtocolException wordt gegooid als er iets fout gaat.
      */
+    //@ ensures
     public void notifyChallengeResponse(boolean response, String[] userNames, String challenged) throws ProtocolException {
         for(String userName : userNames) {
             users.get(userName).getClient().notifyChallengeResponseBy(response, challenged);
         }
     }
 
+    //@ requires creator != null;
+    //@ ensures \result
    public ServerGame getGameByCreator(String creator) {
         return games.get(creator);
     }
 
+    /* pure */
     public User getUser(String userName) {
         return users.get(userName);
     }
@@ -167,6 +195,8 @@ public class Server extends ServerSocket implements Runnable {
      * Maakt een nieuwe game aan.
      * @param userName de naam van de speler die de game aanmaakt.
      */
+    //@ requires userName != null;
+    //@ ensures
     public void createGame(String userName) throws ProtocolException {
         games.put(userName, new ServerGame(users.get(userName), this));
     }
@@ -175,6 +205,8 @@ public class Server extends ServerSocket implements Runnable {
      * Stuurt een notificatie aan alle andere clients over de verandering van het spel.
      * @param game de spel waarover de verandering gaat.
      */
+    //@ requires game != null;
+    //@ ensures
     public void notifyOfGameChange(ServerGame game) {
         for(User user : users.values()) {
             if(user.getClient() != null && user.getUsername() != null) {

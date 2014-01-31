@@ -47,8 +47,7 @@ public class Position {
      * @return een nieuwe positie, met nieuwe coördinaten.
      */
     public Position add(Position direction) {
-        Position result = new Position(this.getX() + direction.getX(), this.getY() + direction.getY());
-        return result;
+        return new Position(this.getX() + direction.getX(), this.getY() + direction.getY());
     }
 
     public boolean outOfBounds(){

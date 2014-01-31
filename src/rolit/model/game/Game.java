@@ -8,9 +8,14 @@ import java.io.IOException;
  */
 public class Game {
     /**
-     * Aantal spelers in het spel.
+     * Aantal maximale spelers in het spel.
      */
     private final int players;
+
+    /**
+     * Het aantal spelers in het spel.
+     */
+    private int currentNumberOfPlayer;
 
     /**
      * Het bord wat bij het spel hoort.
@@ -33,17 +38,20 @@ public class Game {
         this.players = players;
         board = new Board();
         currentPlayer = 0;
+        currentNumberOfPlayer = 0;
         playerArray = new Player[players];
     }
 
-
+    public int getNumberOfPlayer(){
+        return currentNumberOfPlayer;
+    }
 
     /**
      * Geeft het aantal spelers terug.
      *
      * @return de integer van het aantal spelers.
      */
-    public int getPlayers() {
+    public int getNumberOfMaximumPlayers() {
         return players;
     }
 
@@ -70,14 +78,18 @@ public class Game {
      */
     public void start() throws IOException {
         currentPlayer = 0;
+
+        Player[] playersInGame = new Player[getNumberOfPlayer()];
+        for (int i = 0; i < getNumberOfPlayer(); i++){
+            playersInGame[i] = playerArray[i];
+        }
+
         while (!board.gameOver()) {
-            playerArray[currentPlayer].doMove(board);
-            currentPlayer = (currentPlayer + 1) % players;
-            System.out.println(board.toString());
+            playersInGame[currentPlayer].doMove(board);
+            currentPlayer = (currentPlayer + 1) % (getNumberOfPlayer());
         }
-        if (board.gameOver()) {
-            System.out.println(board.determineWinners());
-        }
+        System.out.println(board.determineWinners()[0]);
+        System.out.println(board.getHighScore());
     }
 
     /**
@@ -89,9 +101,10 @@ public class Game {
             throw new GameFullException();
         }
         else {
-            playerArray[currentPlayer] = player;
             player.setColor(currentPlayer);
+            playerArray[currentPlayer] = player;
             currentPlayer = currentPlayer + 1;
+            currentNumberOfPlayer = currentNumberOfPlayer + 1;
         }
     }
 }
