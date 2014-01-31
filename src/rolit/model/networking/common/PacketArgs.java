@@ -43,26 +43,32 @@ public class PacketArgs {
         return null;
     }
 
+    /* pure */
     public int getInt(int i) {
         return (Integer) data[i];
     }
 
+    /* pure */
     public boolean getBool(int i) {
         return (Boolean) data[i];
     }
 
+    /* pure */
     public String getString(int i) {
         return (String) data[i];
     }
 
+    /* pure */
     public String[] getMultiString(int i) {
         return (String[]) data[i];
     }
 
+    /* pure */
     public String getSpacedString(int i) {
         return Strings.join(CommonProtocol.COMMAND_DELIMITER, getMultiString(i));
     }
 
+    //@ ensures \result elementof ArgumentType;
     public static PacketArgs fromParts(String[] parts, ArgumentType[] args) throws ProtocolException {
         boolean multiString = false;
         int multiStringLocation = -1;
@@ -128,6 +134,8 @@ public class PacketArgs {
         return result;
     }
 
+    //@ requires s != null;
+    //@ ensures \result.getSpacedString == s;
     public static String[] spacedToMulti(String s) {
         return s.split(CommonProtocol.COMMAND_DELIMITER);
     }

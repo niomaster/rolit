@@ -45,6 +45,8 @@ public class ClientHandler implements Runnable {
      * @param packet Het pakketje wat ontvangen worden.
      * @throws ProtocolException wordt gegooid als er bij een van de pakketje die ontvangen wordt iets verkeerd gaat.
      */
+    //@ requires packet instanceof
+    //@ ensures \result new ClientHandlerState();
     private void handlePacket(Packet packet) throws ProtocolException {
         if(packet instanceof rolit.model.networking.client.ChallengePacket) {
             state = state.challenge((rolit.model.networking.client.ChallengePacket) packet);
@@ -91,6 +93,7 @@ public class ClientHandler implements Runnable {
      * @param challenged de spelers die gechallenged worden.
      * @throws ProtocolException een exceptie als er iets fout gaat.
      */
+    //@ requires challenged != null;
     public void notifyChallenged(String[] challenged) throws ProtocolException {
         server.notifyChallenged(challenged, getClientName());
     }
@@ -135,18 +138,24 @@ public class ClientHandler implements Runnable {
         server.unlock();
     }
 
+    /* pure */
     public int getClientSupports() {
         return clientSupports;
     }
 
+    //@ requires clientSupports == 0 || clientSupport == 1 || clientSupport == 2 || clientSupport == 3;
+    //@ ensures getClientSupports == clientSupports;
     public void setClientSupports(int clientSupports) {
         this.clientSupports = clientSupports;
     }
 
+    /* pure */
     public String getClientName() {
         return clientName;
     }
 
+    //@ requires clientName != null;
+    //@ ensures getClientName().equals(clientName);
     public void setClientName(String clientName) {
         this.clientName = clientName;
         server.setClientHandler(clientName, this);
@@ -156,10 +165,12 @@ public class ClientHandler implements Runnable {
         packet.writeTo(output);
     }
 
+    //@ ensures \result true (if getClientSupports == 2 || getClientSupports == 3);
     public boolean supportsChallenge() {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHALLENGE) != 0;
     }
 
+    //@ ensures \result true (if getClientSupports == 1 || getClientSupports == 3);
     public boolean supportsChat() {
         return (getClientSupports() & CommonProtocol.SUPPORTS_CHAT) != 0;
     }
@@ -193,32 +204,39 @@ public class ClientHandler implements Runnable {
         state = state.notifyChallengeResponseBy(response, challenged);
     }
 
+    /* pure */
     public ServerGame getGameByCreator(String creator) {
         return server.getGameByCreator(creator);
     }
 
+    /* pure */
     public User getUser() {
         return server.getUser(getClientName());
     }
 
+    //@ ensures getGameByCreator(getClientName) != null;
     public void createGame() throws ProtocolException {
         server.createGame(getClientName());
     }
 
+    //@ requires game != null;
     public void notifyOfGameChange(ServerGame game) {
         state = state.notifyOfGameChange(game);
     }
 
+    /* pure */
     public void writeInfo() {
         server.writeInfo(this.getClientName());
     }
 
+    
     public void notifyOnline() {
         if(supportsChat()) {
             server.notifyOnline(getClientName());
         }
     }
 
+    //@ requires
     public void notifyOnlineOf(String clientName) {
         if(supportsChat()) {
             write(new OnlinePacket(clientName, true));

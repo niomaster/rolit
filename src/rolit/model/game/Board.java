@@ -156,13 +156,12 @@ public class Board {
         int length = 0;
 
         if (!isEmpty(position)) {
-            Capture[] capture = new Capture[0];
-            return capture;
+            return new Capture[0];
         } else {
             for (Position direction : DIRECTIONS) {
                 length = 1;
 
-                Position checkField = new Position(position.add(direction).getX(), position.add(direction).getY());
+                Position checkField = position.add(direction);
 
                 while (!checkField.outOfBounds() && this.getField(checkField) != color && this.getField(checkField) != EMPTY_FIELD) {
                     checkField = checkField.add(direction);
@@ -216,14 +215,15 @@ public class Board {
     }
 
     private boolean hasSurroundingFields(Position movePosition) {
+        boolean hasNeigbours = false;
         for (Position direction : DIRECTIONS){
             if (!movePosition.add(direction).outOfBounds()){
                 if (getField(movePosition.add(direction)) != EMPTY_FIELD){
-                    return true;
+                    hasNeigbours = true;
                 }
             }
         }
-       return false;
+       return hasNeigbours;
     }
 
     /**
@@ -325,7 +325,7 @@ public class Board {
         int groen = 0;
         int blauw = 0;
 
-        if (gameOver() == true) {
+        if (gameOver()) {
             for (int y = 0; y < BOARD_HEIGHT; y++) {
                 for (int x = 0; x < BOARD_WIDTH; x++) {
                     if (getField(x, y) == 0) {

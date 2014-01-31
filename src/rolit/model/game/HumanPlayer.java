@@ -93,13 +93,4 @@ public class HumanPlayer implements Player{
 
         return new Position(Integer.parseInt(line.split(" ")[0]), Integer.parseInt(line.split(" ")[1]));
     }
-
-    public static void main(String[] args) {
-        Board board = new Board();
-        Player player = new HumanPlayer("Martijn");
-        player.doMove(board);
-        System.out.println(board.toString());
-
-    }
-
 }
