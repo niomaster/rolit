@@ -349,4 +349,12 @@ public class Server extends ServerSocket implements Runnable {
             listener.clientMessage(clientName, text);
         }
     }
+
+    public int getOverallHighscore() {
+        if(leaderBoard.getMax() == null) {
+            return -1;
+        } else {
+            return leaderBoard.getMax().getScore().intValue();
+        }
+    }
 }

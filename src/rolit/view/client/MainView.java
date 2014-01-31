@@ -202,6 +202,10 @@ public class MainView extends JFrame {
             doDisconnect();
         }
 
+        public void doHighscoreOverall() {
+            doHighscore("overall", ".");
+        }
+
         private class SwitchRunnable implements Runnable {
             private MainView view;
             private JPanel switchTo;

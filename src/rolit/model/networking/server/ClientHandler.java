@@ -83,6 +83,8 @@ public class ClientHandler implements Runnable {
             write(new HighscorePacket(new String[] { server.getPlayerHighscore(packet.getArg()) + "" }));
         } else if(packet.getType().equals("date")) {
             write(new HighscorePacket(new String[] { server.getDateHighscore(packet.getArg()) + "" }));
+        } else if(packet.getType().equals("overall")) {
+            write(new HighscorePacket(new String[] { server.getOverallHighscore() + "" }));
         } else {
             write(new HighscorePacket(new String[] { ServerProtocol.HIGHSCORE_UNAVAILABLE }));
         }

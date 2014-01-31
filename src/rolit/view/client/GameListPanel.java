@@ -18,6 +18,7 @@ public class GameListPanel extends JPanel {
     private final JButton challengeButton;
     private final JButton highscorePlayerButton;
     private final JButton highscoreDateButton;
+    private final JButton highscoreOverallButton;
     private GameListController controller;
     private ServerPanel serverPanel;
 
@@ -41,6 +42,10 @@ public class GameListPanel extends JPanel {
         return highscoreDateButton;
     }
 
+    public JButton getHighscoreOverallButton() {
+        return highscoreOverallButton;
+    }
+
     public class GameListController implements ActionListener {
         private GameListPanel panel;
         private MainView.MainController controller;
@@ -55,6 +60,7 @@ public class GameListPanel extends JPanel {
             panel.getCreateGameButton().addActionListener(this);
             panel.getHighscorePlayerButton().addActionListener(this);
             panel.getHighscoreDateButton().addActionListener(this);
+            panel.getHighscoreOverallButton().addActionListener(this);
         }
 
         public void updateGames(Collection<ClientGame> values) {
@@ -104,6 +110,8 @@ public class GameListPanel extends JPanel {
                 controller.doHighscoreDate();
             } else if(e.getActionCommand().equals("  highscorePlayer")) {
                 controller.doHighscorePlayer();
+            } else if(e.getActionCommand().equals("  highscoreOverall")) {
+                controller.doHighscoreOverall();
             } else {
                 controller.doJoinGame(e.getActionCommand());
             }
@@ -156,12 +164,15 @@ public class GameListPanel extends JPanel {
         highscorePlayerButton.setActionCommand("  highscorePlayer");
         highscoreDateButton = new JButton("Dag");
         highscoreDateButton.setActionCommand("  highscoreDate");
+        highscoreOverallButton = new JButton("Totaal");
+        highscoreOverallButton.setActionCommand("  highscoreOverall");
 
         buttonsArrayPanel.add(createGameButton);
         buttonsArrayPanel.add(challengeButton);
         buttonsArrayPanel.add(highscoreLabel);
         buttonsArrayPanel.add(highscorePlayerButton);
         buttonsArrayPanel.add(highscoreDateButton);
+        buttonsArrayPanel.add(highscoreOverallButton);
 
         gamesPanel.add(listPanel);
         gamesPanel.add(buttonsArrayPanel);

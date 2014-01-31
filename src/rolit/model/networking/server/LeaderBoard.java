@@ -1,5 +1,6 @@
 package rolit.model.networking.server;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Date;
@@ -37,7 +38,7 @@ public class LeaderBoard<T extends Number & Comparable<T>> {
     public Score getDay(Date date){
         LeaderBoard leaderBoardDay = new LeaderBoard();
         for (int i = 0; i < getSize(); i++){
-            if (get(i).getDate() == date){
+            if (get(i).getDate().getTime() / (60 * 60 * 24 * 1000) == date.getTime() / (60 * 60 * 24 * 1000)) {
                 leaderBoardDay.add(scores.get(i));
             }
         }
