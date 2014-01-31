@@ -5,15 +5,18 @@ import rolit.model.game.Position;
 import rolit.model.networking.client.ClientGame;
 import rolit.model.networking.client.ServerHandler;
 import rolit.model.networking.common.Packet;
-import rolit.model.networking.common.PacketInputStream;
 import rolit.model.networking.server.*;
+import rolit.util.Arrays;
 import rolit.view.client.action.*;
 import rolit.view.client.action.Action;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class MainView extends JFrame {
     private final MainController controller;
@@ -28,6 +31,7 @@ public class MainView extends JFrame {
         private final GameListPanel gameListPanel;
         private final WaitPanel waitPanel;
         private final GamePanel gamePanel;
+        private final ChallengePanel challengePanel;
 
         private ServerHandler currentServer = null;
         private String currentGame = null;
@@ -36,6 +40,7 @@ public class MainView extends JFrame {
         private Game currentGameBoard;
 
         private HashMap<String, ClientGame> games = new HashMap<String, ClientGame>();
+        private LinkedList<String> canBeChallenged = new LinkedList<String>();
 
         public void gameUpdate(GamePacket packet) {
             if(games.get(packet.getGame()) == null) {
@@ -70,7 +75,20 @@ public class MainView extends JFrame {
         }
 
         public void canBeChallenged(CanBeChallengedPacket packet) {
-            // TODO implement
+            if(packet.isCanBeChallenged()) {
+                if(!canBeChallenged.contains(packet.getUser())) {
+                    canBeChallenged.add(packet.getUser());
+                }
+            } else {
+                canBeChallenged.remove(packet.getUser());
+            }
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    challengePanel.getController().updateCanBeChallenged();
+                }
+            });
         }
 
         public ServerHandler getCurrentServer() {
@@ -128,6 +146,41 @@ public class MainView extends JFrame {
             doAction(new DisconnectAction(this, server));
         }
 
+        public void doHighscoreDate() {
+            String date = JOptionPane.showInputDialog(null, "Vul een datum in (yyyy-MM-dd)");
+
+            try {
+                new SimpleDateFormat("yyyy-MM-dd").parse(date);
+                doHighscore("date", date);
+            } catch (ParseException e) {
+                info("Geen geldige datum");
+            }
+        }
+
+        private void doHighscore(String type, String arg) {
+            doAction(new HighscoreAction(this, currentServer, type, arg));
+        }
+
+        public void doHighscorePlayer() {
+            String player = JOptionPane.showInputDialog(null, "Vul een speler in");
+            doHighscore("player", player);
+        }
+
+        public LinkedList<String> getCanBeChallenged() {
+            return canBeChallenged;
+        }
+
+        public void doChallenge() {
+            challengePanel.getController().update();
+            switchTo(challengePanel);
+        }
+
+
+        public void doChallengeAll(LinkedList<String> challenged) {
+            challengePanel.getController().disable();
+            doAction(new ChallengeAction(this, currentServer, Arrays.cast(String.class, challenged.toArray())));
+        }
+
         private class SwitchRunnable implements Runnable {
             private MainView view;
             private JPanel switchTo;
@@ -156,6 +209,7 @@ public class MainView extends JFrame {
             this.gameListPanel = new GameListPanel(this);
             this.waitPanel = new WaitPanel(this);
             this.gamePanel = new GamePanel(this);
+            this.challengePanel = new ChallengePanel(this);
         }
 
         public void initialize() {
@@ -260,7 +314,7 @@ public class MainView extends JFrame {
                     GameOverPacket packet = (GameOverPacket) event;
 
                     if(packet.getWinners().length == 1) {
-                        error("Het spel is afgelopen! De winnaar is " + packet.getWinners()[0] + " met " + packet.getScore() + " punten");
+                        info("Het spel is afgelopen! De winnaar is " + packet.getWinners()[0] + " met " + packet.getScore() + " punten");
                     } else {
                         String winner = "";
 
@@ -285,7 +339,7 @@ public class MainView extends JFrame {
                             }
                         });
 
-                        error("Het spel is afgelopen! De winnaars zijn " + winner + " met " + packet.getScore() + " punten");
+                        info("Het spel is afgelopen! De winnaars zijn " + winner + " met " + packet.getScore() + " punten");
                     }
                 }
 
@@ -302,6 +356,22 @@ public class MainView extends JFrame {
                         switchTo(connectPanel);
                     }
                 });
+            } else if(action instanceof HighscoreAction) {
+                info("De highscore daarvan is " + ((HighscoreAction) action).getResult().getDataField()[0]);
+            } else if(action instanceof ChallengeAction) {
+                games.put(getCurrentUser(), new ClientGame(getCurrentUser(), 1, ServerProtocol.STATUS_NOT_STARTED));
+                currentGame = getCurrentUser();
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        waitPanel.getController().updateGames(getGames());
+                        switchTo(waitPanel);
+                        challengePanel.getController().enable();
+                    }
+                });
+
+                doWaitForStart();
             }
         }
 
@@ -318,9 +388,9 @@ public class MainView extends JFrame {
                 ConnectAction connectAction = (ConnectAction) action;
 
                 if(connectAction.getError() != null) {
-                    error("Kon niet verbinden met " + connectAction.getHostnamePort() + ": " + connectAction.getError());
+                    info("Kon niet verbinden met " + connectAction.getHostnamePort() + ": " + connectAction.getError());
                 } else {
-                    error("Kon niet verbinden met " + connectAction.getHostnamePort());
+                    info("Kon niet verbinden met " + connectAction.getHostnamePort());
                 }
 
                 SwingUtilities.invokeLater(new Runnable() {
@@ -330,7 +400,7 @@ public class MainView extends JFrame {
                     }
                 });
             } else if(action instanceof CreateGameAction) {
-                error("Kon geen spel maken");
+                info("Kon geen spel maken");
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -339,7 +409,7 @@ public class MainView extends JFrame {
                     }
                 });
             } else if(action instanceof JoinGameAction) {
-                error("Je kunt niet meedoen met dit spel");
+                info("Je kunt niet meedoen met dit spel");
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -352,7 +422,7 @@ public class MainView extends JFrame {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            error("Het spel werd voortijdig afgebroken door de server");
+                            info("Het spel werd voortijdig afgebroken door de server");
                             gameListPanel.getController().updateGames(games.values());
                             switchTo(gameListPanel);
                             waitPanel.getController().enable();
@@ -364,7 +434,7 @@ public class MainView extends JFrame {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            error("Het spel werd afgebroken door de server");
+                            info("Het spel werd afgebroken door de server");
                             switchTo(connectPanel);
                         }
                     });
@@ -383,14 +453,14 @@ public class MainView extends JFrame {
     public MainView() {
         this.controller = new MainController(this);
 
-        setSize(640, 480);
-        setMinimumSize(new Dimension(640, 480));
+        setSize(1024, 768);
+        setMinimumSize(new Dimension(1024, 768));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         controller.initialize();
     }
 
-    public static void error(String message) {
+    public static void info(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
 }

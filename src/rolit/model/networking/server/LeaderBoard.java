@@ -31,7 +31,7 @@ public class LeaderBoard<T extends Number & Comparable<T>> {
     }
 
     public Score getMax(){
-        return scores.getFirst();
+        return scores.size() > 0 ? scores.getFirst() : null;
     }
 
     public Score getDay(Date date){

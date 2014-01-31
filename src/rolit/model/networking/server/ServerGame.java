@@ -28,7 +28,8 @@ public class ServerGame {
     }
 
     public ServerGame(String challenger, LinkedList<String> others, Server server) {
-        creator = server.getUser(challenger);
+        this.creator = server.getUser(challenger);
+        this.server = server;
         players.add(creator);
 
         for(String other : others) {

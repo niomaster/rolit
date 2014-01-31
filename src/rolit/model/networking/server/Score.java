@@ -5,7 +5,7 @@ import java.util.Date;
  * De scores in het leaderboard.
  * @author Martijn de Bijl
  */
-public class Score <T extends Number & Comparable<T>> implements Comparable<T> {
+public class Score <T extends Number & Comparable<T>> implements Comparable<Score<T>> {
 
     private T score;
     private String user;
@@ -30,8 +30,8 @@ public class Score <T extends Number & Comparable<T>> implements Comparable<T> {
     }
 
     @Override
-    public int compareTo(T o){
-        return this.score.compareTo(o);
+    public int compareTo(Score<T> o){
+        return this.score.compareTo(o.getScore());
     }
 
 }

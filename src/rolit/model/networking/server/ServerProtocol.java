@@ -92,7 +92,7 @@ public abstract class ServerProtocol extends CommonProtocol {
     public static final int ERROR_HANDSHAKE_MISSING = 7;
     public static final int ERROR_USER_ALREADY_HAS_GAME = 8;
 
-    public static final int HIGHSCORE_UNAVAILABLE = -1;
+    public static final String HIGHSCORE_UNAVAILABLE = "-1";
 
     /**
      * Status om aan te geven dat de creator voortijdig is weggegaan

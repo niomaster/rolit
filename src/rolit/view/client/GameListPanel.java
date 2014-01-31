@@ -16,6 +16,8 @@ public class GameListPanel extends JPanel {
     private final ChatPanel chatPanel;
     private final JButton createGameButton;
     private final JButton challengeButton;
+    private final JButton highscorePlayerButton;
+    private final JButton highscoreDateButton;
     private GameListController controller;
     private ServerPanel serverPanel;
 
@@ -31,6 +33,14 @@ public class GameListPanel extends JPanel {
         return serverPanel;
     }
 
+    public JButton getHighscorePlayerButton() {
+        return highscorePlayerButton;
+    }
+
+    public JButton getHighscoreDateButton() {
+        return highscoreDateButton;
+    }
+
     public class GameListController implements ActionListener {
         private GameListPanel panel;
         private MainView.MainController controller;
@@ -43,6 +53,8 @@ public class GameListPanel extends JPanel {
         public void initialize() {
             panel.getChallengeButton().addActionListener(this);
             panel.getCreateGameButton().addActionListener(this);
+            panel.getHighscorePlayerButton().addActionListener(this);
+            panel.getHighscoreDateButton().addActionListener(this);
         }
 
         public void updateGames(Collection<ClientGame> values) {
@@ -84,7 +96,11 @@ public class GameListPanel extends JPanel {
             if(e.getActionCommand().equals("  createGame")) {
                 controller.doCreateGame();
             } else if(e.getActionCommand().equals("  challenge")) {
-                // TODO implement
+                controller.doChallenge();
+            } else if(e.getActionCommand().equals("  highscoreDate")) {
+                controller.doHighscoreDate();
+            } else if(e.getActionCommand().equals("  highscorePlayer")) {
+                controller.doHighscorePlayer();
             } else {
                 controller.doJoinGame(e.getActionCommand());
             }
@@ -130,11 +146,19 @@ public class GameListPanel extends JPanel {
 
         createGameButton = new JButton("Maak spel");
         createGameButton.setActionCommand("  createGame");
-        challengeButton = new JButton("Daag een speler uit");
+        challengeButton = new JButton("Uitdagen");
         challengeButton.setActionCommand("  challenge");
+        JLabel highscoreLabel = new JLabel("Highscores:");
+        highscorePlayerButton = new JButton("Speler");
+        highscorePlayerButton.setActionCommand("  highscorePlayer");
+        highscoreDateButton = new JButton("Dag");
+        highscoreDateButton.setActionCommand("  highscoreDate");
 
         buttonsArrayPanel.add(createGameButton);
         buttonsArrayPanel.add(challengeButton);
+        buttonsArrayPanel.add(highscoreLabel);
+        buttonsArrayPanel.add(highscorePlayerButton);
+        buttonsArrayPanel.add(highscoreDateButton);
 
         gamesPanel.add(listPanel);
         gamesPanel.add(buttonsArrayPanel);

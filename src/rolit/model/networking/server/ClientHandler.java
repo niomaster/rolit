@@ -54,12 +54,12 @@ public class ClientHandler implements Runnable {
             state = state.createGame((CreateGamePacket) packet);
         } else if(packet instanceof rolit.model.networking.client.HandshakePacket) {
             state = state.handshake((rolit.model.networking.client.HandshakePacket) packet);
-        } else if(packet instanceof HighscorePacket) {
-            highscore((HighscorePacket) packet);
+        } else if(packet instanceof rolit.model.networking.client.HighscorePacket) {
+            highscore((rolit.model.networking.client.HighscorePacket) packet);
         } else if(packet instanceof JoinGamePacket) {
             state = state.joinGame((JoinGamePacket) packet);
-        } else if(packet instanceof MessagePacket) {
-            message((MessagePacket) packet);
+        } else if(packet instanceof rolit.model.networking.client.MessagePacket) {
+            message((rolit.model.networking.client.MessagePacket) packet);
         } else if(packet instanceof rolit.model.networking.client.MovePacket) {
             state = state.move((rolit.model.networking.client.MovePacket) packet);
         } else if(packet instanceof StartGamePacket) {
@@ -72,12 +72,18 @@ public class ClientHandler implements Runnable {
     }
 
 
-    private void message(MessagePacket packet) {
-
+    private void message(rolit.model.networking.client.MessagePacket packet) throws ProtocolException {
+        state = state.message(packet.getMessage());
     }
 
-    private void highscore(HighscorePacket packet) {
-
+    private void highscore(rolit.model.networking.client.HighscorePacket packet) {
+        if(packet.getType().equals("player")) {
+            write(new HighscorePacket(new String[] { server.getPlayerHighscore(packet.getArg()) + "" }));
+        } else if(packet.getType().equals("date")) {
+            write(new HighscorePacket(new String[] { server.getDateHighscore(packet.getArg()) + "" }));
+        } else {
+            write(new HighscorePacket(new String[] { ServerProtocol.HIGHSCORE_UNAVAILABLE }));
+        }
     }
 
     /**

@@ -112,4 +112,12 @@ public class ServerHandler {
     public void disconnect() throws IOException {
         socket.close();
     }
+
+    public void highscore(String type, String arg) {
+        new HighscorePacket(type, arg).writeTo(output);
+    }
+
+    public void challenge(String[] challenged) {
+        new ChallengePacket(challenged).writeTo(output);
+    }
 }

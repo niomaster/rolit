@@ -119,4 +119,9 @@ public abstract class ClientHandlerState {
         error("notify of move by other");
         return null;
     }
+
+    public ClientHandlerState message(String message) throws ProtocolException {
+        error("message");
+        return null;
+    }
 }

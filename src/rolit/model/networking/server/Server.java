@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -27,9 +30,9 @@ public class Server extends ServerSocket implements Runnable {
 
     private Thread serverThread;
     private LinkedList<ServerListener> listeners = new LinkedList<ServerListener>();
-    private LinkedList<ClientHandler> clients = new LinkedList<ClientHandler>();
     private HashMap<String, User> users = new LinkedHashMap<String, User>();
     private HashMap<String, ServerGame> games = new LinkedHashMap<String, ServerGame>();
+    private LeaderBoard<Integer> leaderBoard = new LeaderBoard<Integer>();
 
     private Lock lock = new ReentrantLock();
 
@@ -182,6 +185,11 @@ public class Server extends ServerSocket implements Runnable {
     public void notifyOfGameChange(ServerGame game) {
         if(game.isStopped()) {
             games.remove(game.getCreator().getUsername());
+            Date date = new Date();
+
+            for(String winner : game.getWinners()) {
+                leaderBoard.add(new Score(game.getScore(), winner, date));
+            }
         }
 
         for(User user : users.values()) {
@@ -274,5 +282,27 @@ public class Server extends ServerSocket implements Runnable {
 
     public void unlock() {
         lock.unlock();
+    }
+
+    public int getPlayerHighscore(String s) {
+        if(leaderBoard.getPlayer(s) == null) {
+            return -1;
+        } else {
+            return leaderBoard.getPlayer(s).getScore().intValue();
+        }
+    }
+
+
+    public int getDateHighscore(String s) {
+        try {
+            Score sc = leaderBoard.getDay(new SimpleDateFormat("yyyy-MM-dd").parse(s));
+            if(sc != null) {
+                return sc.getScore().intValue();
+            } else {
+                return -1;
+            }
+        } catch (ParseException e) {
+            return -1;
+        }
     }
 }

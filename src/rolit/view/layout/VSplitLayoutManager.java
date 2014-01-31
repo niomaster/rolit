@@ -13,7 +13,7 @@ public class VSplitLayoutManager implements LayoutManager {
         Bottom
     }
 
-    private static final int DEFAULT_SPLIT = 24;
+    private static final int DEFAULT_SPLIT = 32;
     private static final VSplitType DEFAULT_TYPE = VSplitType.Top;
 
     private VSplitType splitType;
